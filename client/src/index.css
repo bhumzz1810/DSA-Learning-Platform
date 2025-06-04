@@ -1,11 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .app-container {
@@ -31,7 +35,6 @@
 }
 
 @keyframes shake {
-
   0%,
   100% {
     transform: translateX(0);
@@ -91,7 +94,6 @@
 }
 
 @keyframes glowRed {
-
   0%,
   100% {
     background: #ff0000;
@@ -211,7 +213,7 @@ input {
   font-size: 1em;
   color: #fff;
   padding: 0 20px;
-  transition: .5s ease;
+  transition: 0.5s ease;
 }
 
 input:focus,
@@ -227,13 +229,13 @@ label {
   font-size: 1em;
   color: #fff;
   pointer-events: none;
-  transition: .5s ease;
+  transition: 0.5s ease;
 }
 
-input:focus~label,
-input:valid~label {
+input:focus ~ label,
+input:valid ~ label {
   top: 1px;
-  font-size: .8em;
+  font-size: 0.8em;
   background: #1f293a;
   padding: 0 6px;
   color: #0ef;
@@ -264,7 +266,6 @@ input:valid~label {
   font-weight: bold;
 }
 
-
 .password-strength.weak {
   color: #ff3333;
 }
@@ -284,7 +285,7 @@ input:valid~label {
 }
 
 .forgot-pass a {
-  font-size: .85em;
+  font-size: 0.85em;
   color: #fff;
   text-decoration: none;
   transition: color 0.3s;
@@ -353,8 +354,6 @@ input:valid~label {
   text-align: center;
   font-weight: bold;
 }
-
-
 
 /* Responsive adjustments */
 @media (max-width: 480px) {

@@ -5,21 +5,25 @@ import Dashboard from "./pages/Dashboard";
 import Homepage from "./pages/Homepage";
 import LoginPage from "./pages/Login";
 import RadialNav from "./components/RadialNav";
+import Navbar from "./components/Navbar/Navbar";
 
 function App() {
   return (
-    <BrowserRouter>
-      {/* <RadialNav /> */}
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/problems" element={<Problems />} />
-        <Route path="/problems/:id" element={<ProblemDetail />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<LoginPage />} />
-        {/* Add more routes as needed */}
-      </Routes>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Navbar />
+        {/* <RadialNav /> */}
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/problems" element={<Problems />} />
+          <Route path="/problems/:id" element={<ProblemDetail />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<LoginPage />} />
+          {/* Add more routes as needed */}
+        </Routes>
+      </BrowserRouter>
+    </>
   );
 }
 

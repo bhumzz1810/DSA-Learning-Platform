@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.png";
 import alertSound from "../assets/music/warning.mp3";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -13,10 +19,9 @@ const LoginForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
   const containerRef = useRef(null);
-  const animationRef = useRef(null);
   const audioRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Initialize audio
   useEffect(() => {
     audioRef.current = new Audio(alertSound);
     audioRef.current.volume = 0.3;
@@ -60,24 +65,33 @@ const LoginForm = () => {
     setPasswordStrength(checkPasswordStrength(value));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (showLogin) {
-      if (email === "va@gmail.com" && password === "123456") {
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
         setError("");
-        setLoginAttempts(0);
-      } else {
-        setError("Invalid username or password");
+        navigate("/");
+      } catch (err) {
+        setError(err.message);
       }
     } else {
       if (password !== confirmPassword) {
         setError("Passwords do not match");
-      } else if (passwordStrength === "Weak") {
+        return;
+      }
+      if (passwordStrength === "Weak") {
         setError("Password is too weak");
-      } else {
+        return;
+      }
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
         alert("Signup successful!");
         setError("");
+        handleLoginClick();
+      } catch (err) {
+        setError(err.message);
       }
     }
   };
@@ -90,14 +104,12 @@ const LoginForm = () => {
           .play()
           .catch((e) => console.log("Audio play failed:", e));
       }
-
       const spans = containerRef.current.querySelectorAll("span");
       spans.forEach((span) => {
         span.style.animation = "none";
-        void span.offsetWidth; // Trigger reflow
+        void span.offsetWidth;
         span.style.animation = "glowRed 1s ease infinite";
       });
-
       return () => {
         if (containerRef.current) {
           const spans = containerRef.current.querySelectorAll("span");
@@ -123,7 +135,6 @@ const LoginForm = () => {
         {[...Array(50)].map((_, i) => (
           <span key={i} style={{ "--i": i }}></span>
         ))}
-
         {!showLogin && !showSignup ? (
           <div className="button-container">
             <img src={logo} alt="Logo" className="logo" />
@@ -175,7 +186,6 @@ const LoginForm = () => {
                   </div>
                 )}
               </div>
-
               {showSignup && (
                 <div className="input-box password-container">
                   <input
@@ -198,7 +208,6 @@ const LoginForm = () => {
                   </button>
                 </div>
               )}
-
               {showLogin && (
                 <div className="forgot-pass">
                   <a href="#" tabIndex="0">
@@ -206,11 +215,9 @@ const LoginForm = () => {
                   </a>
                 </div>
               )}
-
               <button type="submit" className="btn">
                 {showLogin ? "Login" : "Sign Up"}
               </button>
-
               <div className="signup-link">
                 <a
                   href="#"
