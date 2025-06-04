@@ -1,10 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-/* @tailwind directives removed because Tailwind CSS is not configured or not being used */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 
 * {
   margin: 0;
@@ -23,8 +18,8 @@
 
 .container {
   position: relative;
-  width: 256px;
-  height: 256px;
+  width: 350px;
+  height: 350px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -36,9 +31,26 @@
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-10px); }
-  40%, 80% { transform: translateX(10px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
 }
 
 .container span {
@@ -48,8 +60,10 @@
   height: 6px;
   background: #2c4766;
   border-radius: 8px;
-  transform-origin: 128px;
+  transform-origin: 170px;
   transform: scale(2.2) rotate(calc(var(--i) * (360deg / 50)));
+  animation: blink 3s linear infinite;
+  animation-delay: calc(var(--i) * (3s / 50));
   animation: blink 3s linear infinite;
   animation-delay: calc(var(--i) * (3s / 50));
 }
@@ -58,25 +72,62 @@
   0% {
     background: #0ef;
   }
+
   25% {
     background: #2c4766;
+  }
+
+  50% {
+    background: #0ef;
+  }
+
+  75% {
+    background: #2c4766;
+  }
+
+  100% {
+    background: #0ef;
   }
 }
 
 @keyframes glowRed {
-  0%, 100% {
+
+  0%,
+  100% {
     background: #ff0000;
   }
+
   50% {
     background: #ff6666;
   }
 }
 
+/* Logo styles */
+.logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  object-fit: contain;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logo-form {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 15px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Button container */
 .button-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
   z-index: 10;
+  align-items: center;
 }
 
 .btn.main-btn {
@@ -97,9 +148,10 @@
   transform: scale(1.05);
 }
 
+/* Form styles */
 .login-box {
   position: absolute;
-  width: 400px;
+  width: 320px;
   background: rgba(31, 41, 58, 0.9);
   padding: 20px 0;
   border-radius: 20px;
@@ -119,19 +171,34 @@
 
 form {
   width: 100%;
-  padding: 0 50px;
+  padding: 0 30px;
 }
 
 h2 {
   font-size: 2em;
   color: #0ef;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
+/* Error message */
+.error-message {
+  color: #ff3333;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 0.9em;
+  font-weight: 500;
+  min-height: 20px;
+}
+
+/* Input boxes */
 .input-box {
   position: relative;
   margin: 25px 0;
+}
+
+.password-container {
+  position: relative;
 }
 
 input {
@@ -172,6 +239,45 @@ input:valid~label {
   color: #0ef;
 }
 
+/* Password toggle */
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 5px;
+}
+
+/* Password strength indicator */
+.password-strength {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-size: 0.7em;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+.password-strength.weak {
+  color: #ff3333;
+}
+
+.password-strength.medium {
+  color: #ffcc00;
+}
+
+.password-strength.strong {
+  color: #00cc66;
+}
+
+/* Forgot password link */
 .forgot-pass {
   margin: -15px 0 10px;
   text-align: center;
@@ -181,8 +287,14 @@ input:valid~label {
   font-size: .85em;
   color: #fff;
   text-decoration: none;
+  transition: color 0.3s;
 }
 
+.forgot-pass a:hover {
+  color: #0ef;
+}
+
+/* Submit button */
 .btn {
   width: 100%;
   height: 45px;
@@ -195,12 +307,14 @@ input:valid~label {
   color: #1f293a;
   font-weight: 600;
   transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
 .btn:hover {
   background: #0cf;
 }
 
+/* Signup/login toggle link */
 .signup-link {
   margin: 20px 0 10px;
   text-align: center;
@@ -211,4 +325,44 @@ input:valid~label {
   color: #0ef;
   text-decoration: none;
   font-weight: 600;
+  transition: color 0.3s;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+/* Add these to your existing CSS */
+.field-error {
+  color: #ff3333;
+  font-size: 0.75em;
+  margin-top: 5px;
+  padding-left: 15px;
+}
+
+.input-box {
+  margin-bottom: 10px;
+}
+
+.password-strength {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-size: 0.7em;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .input-box {
+    margin: 15px 0;
+  }
+
+  .field-error {
+    font-size: 0.7em;
+  }
 }
