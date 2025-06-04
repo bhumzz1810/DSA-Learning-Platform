@@ -1,80 +1,236 @@
-import React from "react";
-import logo from "../assets/Logo/dsalogo.svg"; // Adjust the path as necessary
+import React, { useState, useRef, useEffect } from "react";
+import logo from "../assets/Logo/dsalogoicon.png";
+import alertSound from "../assets/music/warning.mp3";
 
-export default function LoginPage() {
+const LoginForm = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState("");
+  const containerRef = useRef(null);
+  const animationRef = useRef(null);
+  const audioRef = useRef(null);
+
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio(alertSound);
+    audioRef.current.volume = 0.3;
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleLoginClick = () => {
+    setShowLogin(true);
+    setShowSignup(false);
+    setError("");
+  };
+
+  const handleSignupClick = () => {
+    setShowSignup(true);
+    setShowLogin(false);
+    setError("");
+  };
+
+  const checkPasswordStrength = (pass) => {
+    if (pass.length === 0) return "";
+    if (pass.length < 6) return "Weak";
+    if (
+      !/[A-Z]/.test(pass) ||
+      !/[0-9]/.test(pass) ||
+      !/[^A-Za-z0-9]/.test(pass)
+    ) {
+      return "Medium";
+    }
+    return "Strong";
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordStrength(checkPasswordStrength(value));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (showLogin) {
+      if (email === "va@gmail.com" && password === "123456") {
+        alert("Login successful!");
+        setError("");
+        setLoginAttempts(0);
+      } else {
+        setError("Invalid username or password");
+      }
+    } else {
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+      } else if (passwordStrength === "Weak") {
+        setError("Password is too weak");
+      } else {
+        alert("Signup successful!");
+        setError("");
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (error && containerRef.current) {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current
+          .play()
+          .catch((e) => console.log("Audio play failed:", e));
+      }
+
+      const spans = containerRef.current.querySelectorAll("span");
+      spans.forEach((span) => {
+        span.style.animation = "none";
+        void span.offsetWidth; // Trigger reflow
+        span.style.animation = "glowRed 1s ease infinite";
+      });
+
+      return () => {
+        if (containerRef.current) {
+          const spans = containerRef.current.querySelectorAll("span");
+          spans.forEach((span) => {
+            span.style.animation = "none";
+            void span.offsetWidth;
+            span.style.animation =
+              "blink 3s linear infinite, rotate 60s linear infinite";
+            span.style.animationDelay = `calc(var(--i) * (3s / 50))`;
+          });
+        }
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
+      };
+    }
+  }, [error]);
+
   return (
-    <div className="min-h-screen flex">
-      {/* Left panel with logo */}
-      <div className="w-1/3 bg-gray-200 flex items-center justify-center">
-        <h1 className="text-3xl font-bold text-blue-900">
-          <img
-            src={logo}
-            alt="DSArena Logo"
-            className="h-12 inline-block mr-2"
-          />
-        </h1>
-      </div>
+    <div className="app-container">
+      <div className={`container ${error ? "error" : ""}`} ref={containerRef}>
+        {[...Array(50)].map((_, i) => (
+          <span key={i} style={{ "--i": i }}></span>
+        ))}
 
-      {/* Right panel with login form */}
-      <div className="w-2/3 flex items-center justify-center">
-        <div className="w-full max-w-md p-6">
-          <h2 className="text-2xl font-semibold mb-2 text-center">
-            Welcome Back to{" "}
-            <span className="text-blue-800 font-bold">DSArena</span>
-          </h2>
-          <p className="text-center text-gray-600 mb-6">
-            Login to the platform and explore and start learning
-          </p>
-
-          <form className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-800"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-800"
-              />
-            </div>
-
-            <div className="text-right text-sm text-blue-800 hover:underline">
-              Forgot Password?
-            </div>
-
-            <button
-              type="submit"
-              className="w-full bg-blue-900 text-white py-2 rounded-full font-semibold hover:bg-blue-800"
-            >
-              Log in
+        {!showLogin && !showSignup ? (
+          <div className="button-container">
+            <img src={logo} alt="Logo" className="logo" />
+            <button className="btn main-btn" onClick={handleLoginClick}>
+              Login
             </button>
+            <button className="btn main-btn" onClick={handleSignupClick}>
+              Sign Up
+            </button>
+          </div>
+        ) : (
+          <div className="login-box">
+            <img src={logo} alt="Logo" className="logo-form" />
+            <h2>{showLogin ? "Login" : "Sign Up"}</h2>
+            {error && <div className="error-message">{error}</div>}
+            <form onSubmit={handleSubmit}>
+              <div className="input-box">
+                <input
+                  name="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <label>Email</label>
+              </div>
+              <div className="input-box password-container">
+                <input
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                />
+                <label>Password</label>
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "👁️" : "👁️‍🗨️"}
+                </button>
+                {showSignup && password && (
+                  <div
+                    className={`password-strength ${passwordStrength.toLowerCase()}`}
+                  >
+                    Strength: {passwordStrength || "None"}
+                  </div>
+                )}
+              </div>
 
-            <div className="flex items-center justify-center my-4">
-              <div className="border-t border-gray-300 w-1/3"></div>
-              <span className="mx-2 text-gray-500 text-sm">OR</span>
-              <div className="border-t border-gray-300 w-1/3"></div>
-            </div>
+              {showSignup && (
+                <div className="input-box password-container">
+                  <input
+                    name="confirm-password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <label>Confirm Password</label>
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
+                  </button>
+                </div>
+              )}
 
-            <p className="text-center text-sm text-gray-700">
-              Don't have an account?{" "}
-              <a href="#" className="text-blue-800 font-medium hover:underline">
-                Sign up
-              </a>
-            </p>
-          </form>
-        </div>
+              {showLogin && (
+                <div className="forgot-pass">
+                  <a href="#" tabIndex="0">
+                    Forgot your password?
+                  </a>
+                </div>
+              )}
+
+              <button type="submit" className="btn">
+                {showLogin ? "Login" : "Sign Up"}
+              </button>
+
+              <div className="signup-link">
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    showLogin ? handleSignupClick() : handleLoginClick();
+                  }}
+                  tabIndex="0"
+                >
+                  {showLogin
+                    ? "Don't have an account? Signup"
+                    : "Already have an account? Login"}
+                </a>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default LoginForm;

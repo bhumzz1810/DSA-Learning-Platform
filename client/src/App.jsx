@@ -9,13 +9,15 @@ import RadialNav from "./components/RadialNav";
 function App() {
   return (
     <BrowserRouter>
-      <RadialNav />
+      {/* <RadialNav /> */}
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/problems" element={<Problems />} />
         <Route path="/problems/:id" element={<ProblemDetail />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<LoginPage />} />
+        {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>
   );
