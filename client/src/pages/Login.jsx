@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../assets/Logo/dsalogoicon.png";
+import logo from "../assets/Logo/dsalogoicon.svg";
 import alertSound from "../assets/music/warning.mp3";
 import {
   createUserWithEmailAndPassword,
