@@ -1,4 +1,3 @@
-
 import React from "react";
 import "../index.css";
 import "./Homepage.css";
@@ -189,7 +188,6 @@ const Homepage = () => {
                 commodo consequat.
               </p>
             </div>
-
           ))}
         </div>
       </section>
@@ -235,6 +233,8 @@ const Homepage = () => {
           </div>
         </div>
       </section>
+    </div>
+  );
+};
 
-export default LandingPage;
-
+export default Homepage;

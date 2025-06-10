@@ -5,7 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-   css: {
-    postcss: './postcss.config.js' // or .cjs if you went with option 2
-  }
+  css: {
+    postcss: "./postcss.config.js", // or .cjs if you went with option 2
+  },
 });

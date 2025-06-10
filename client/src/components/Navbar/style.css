@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   box-sizing: border-box;
 }
 
@@ -17,7 +17,7 @@
 }
 
 .logo-icon-large {
-  width: 130px;  /* Adjust to match visual balance */
+  width: 130px; /* Adjust to match visual balance */
   height: auto;
   object-fit: contain;
 }
