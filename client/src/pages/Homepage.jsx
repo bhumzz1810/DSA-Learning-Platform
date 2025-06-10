@@ -1,209 +1,240 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Header from './Header';
-import TestimonialCard from './TestimonialCard';
-import PricingCard from './PricingCard.jsx';
-import dashboardImage from '../assets/images/dashboard-preview.png';
-import feature1Icon from '../assets/icons/feature1.svg';
-import feature2Icon from '../assets/icons/feature2.svg';
-import feature3Icon from '../assets/icons/feature3.svg';
 
-const LandingPage = () => {
-  const testimonials = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      role: "Computer Science Student",
-      content: "This platform helped me master data structures in just 3 months! The interactive lessons are incredible.",
-      rating: 5
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      role: "Software Engineer",
-      content: "The practice problems with instant feedback helped me ace my technical interviews. Highly recommended!",
-      rating: 5
-    }
-  ];
+import React from "react";
+import "../index.css";
+import "./Homepage.css";
+import bannerImg from "../assets/Homepage/banner_img.png";
+import ship from "../assets/icons/ship.png";
+import timer from "../assets/icons/timer.png";
+import handshake from "../assets/icons/handshake.png";
+import free from "../assets/free.png";
+import pro from "../assets/pro.png";
+import map from "../assets/map.png"; // Placeholder for map image
 
-  const features = [
-    {
-      icon: feature1Icon,
-      title: "Interactive Learning",
-      description: "Learn with visualizations and step-by-step guidance"
-    },
-    {
-      icon: feature2Icon,
-      title: "Real-time Coding",
-      description: "Practice directly in the browser with instant feedback"
-    },
-    {
-      icon: feature3Icon,
-      title: "Progress Tracking",
-      description: "Monitor your improvement with detailed analytics"
-    }
-  ];
-
+const Homepage = () => {
   return (
-    <div className="landing-page">
-      <Header isAuthenticated={false} onLogout={() => {}} />
-      
-      {/* 1. Banner Section */}
-      <section className="banner-section">
-        <div className="banner-content">
-          <h1>Master Data Structures & Algorithms</h1>
-          <p>Interactive learning platform designed to help you conquer technical interviews</p>
-          <div className="cta-buttons">
-            <Link to="/signup" className="btn primary-btn">Get Started Free</Link>
-            <Link to="/login" className="btn secondary-btn">Login</Link>
+    <div className="homepage">
+      <section className="hero">
+        <div className="hero-left">
+          <div className="tag">&lt;DSArena/&gt;</div>
+          <h1 className="headline">
+            Practice DSA <br /> the Modern Way
+          </h1>
+          <p className="subtext">
+            Build your skills with interactive challenges and detailed
+            explanations.
+          </p>
+          <button className="explore-btn">Explore Now</button>
+        </div>
+
+        <div className="hero-right">
+          <div className="img-wrapper">
+            <img src={bannerImg} alt="Code mockup" className="banner-img" />
           </div>
         </div>
-        <div className="banner-image">
-          <img src={dashboardImage} alt="DSA Learning Platform Preview" />
-        </div>
       </section>
 
-      {/* 2. Dashboard Overview */}
-      <section className="dashboard-section">
-        <div className="section-header">
-          <h2>Powerful Learning Dashboard</h2>
-          <p>Track your progress and focus on areas that need improvement</p>
-        </div>
-        <div className="dashboard-preview">
-          <img src={dashboardImage} alt="Dashboard Preview" />
-        </div>
-        <div className="features-grid">
-          {features.map((feature, index) => (
-            <div key={index} className="feature-card">
-              <img src={feature.icon} alt={feature.title} />
-              <h3>{feature.title}</h3>
-              <p>{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 3. Free/Premium */}
-      <section className="pricing-section">
-        <div className="section-header">
-          <h2>Choose Your Plan</h2>
-          <p>Start learning today with our free tier or unlock premium features</p>
-        </div>
-        <div className="pricing-cards">
-          <PricingCard 
-            title="Free" 
-            price="0" 
-            features={[
-              "Basic DSA lessons",
-              "Limited practice problems",
-              "Community support",
-              "Progress tracking"
-            ]} 
-            ctaText="Get Started"
-          />
-          <PricingCard 
-            title="Premium" 
-            price="9.99" 
-            features={[
-              "All DSA lessons",
-              "Unlimited practice problems",
-              "Priority support",
-              "Advanced analytics",
-              "Interview preparation",
-              "Certificate of completion"
-            ]} 
-            ctaText="Go Premium"
-            featured={true}
-          />
-        </div>
-      </section>
-
-      {/* 4. About */}
       <section className="about-section">
-        <div className="about-content">
-          <h2>About Our Platform</h2>
-          <p>Our mission is to make data structures and algorithms accessible to everyone. Founded in 2023 by a team of computer science educators and industry professionals, we've helped over 10,000 students improve their coding skills.</p>
-          <p>We believe in learning by doing - that's why our platform focuses on interactive coding exercises with immediate feedback, rather than passive video lectures.</p>
-          <Link to="/about" className="btn secondary-btn">Learn More</Link>
+        <h2 className="section-title">Who Are We?</h2>
+        <p className="section-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor
+        </p>
+
+        <div className="about-grid">
+          <div className="about-left">
+            <h3 className="about-heading">Read More About Us</h3>
+            <h4 className="about-subheading">The most important</h4>
+            <p className="about-desc">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <a href="#" className="about-link">
+              More about Us →
+            </a>
+
+            <div className="about-icons-list">
+              <div className="icon-item">
+                <img src={ship} alt="Icon 2" className="icon-circle" />
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</p>
+              </div>
+              <div className="icon-item">
+                <img src={timer} alt="Icon 2" className="icon-circle" />
+                <p>Lorem ipsum dolor sit amet,</p>
+              </div>
+              <div className="icon-item">
+                <img src={handshake} alt="Icon 3" className="icon-circle" />
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="about-right">
+            <div className="about-image">Image Placeholder</div>
+          </div>
         </div>
-        <div className="about-image">
-          <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" alt="Team working on code" />
+
+        <div className="cards-row">
+          <div className="about-card">
+            <div className="card-image"></div>
+            <h5>Lorem Ipsum</h5>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+          </div>
+
+          <div className="feature-col">
+            <div className="feature-item">✈️ Lorem Ipsum</div>
+            <div className="feature-item">🧠 Lorem Ipsum</div>
+            <div className="feature-item">📦 Lorem Ipsum</div>
+            <div className="feature-item">🛠️ Lorem Ipsum</div>
+          </div>
         </div>
       </section>
 
-      {/* 5. Testimonials */}
-      <section className="testimonials-section">
-        <div className="section-header">
-          <h2>What Our Students Say</h2>
-          <p>Hear from learners who transformed their coding skills with our platform</p>
+      <section className="pricing-section">
+        <h2 className="section-title">Plans & Pricing</h2>
+        <p className="section-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor
+        </p>
+
+        <div className="billing-toggle">
+          <button className="billing-btn active">Monthly</button>
+          <button className="billing-btn">Yearly</button>
         </div>
-        <div className="testimonials-grid">
-          {testimonials.map(testimonial => (
-            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+
+        <div className="pricing-cards">
+          {/* Free Plan */}
+          <div className="pricing-card free-card">
+            <div className="plan-header">
+              <img src={free} alt="Free Plan Icon" />
+              <h3>Free</h3>
+            </div>
+            <p className="plan-description">
+              Unleash the Power with the Free Tier Plan
+            </p>
+            <h2 className="plan-price">
+              <hr className="plan-divider" />
+              $0 <span>/per month</span>
+            </h2>
+            <ul className="plan-features">
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+              <li>❌ Lorem Ipsum</li>
+              <li>❌ Lorem Ipsum</li>
+            </ul>
+            <button className="start-btn outline">Get Started</button>
+          </div>
+
+          {/* Pro Plan */}
+          <div className="pricing-card pro-card">
+            <div className="plan-header">
+              <img src={pro} alt="Pro Plan Icon" />
+              <div className="pro-title">
+                <h3>Pro</h3>
+                <span className="badge">Best offer</span>
+              </div>
+            </div>
+            <p className="plan-description">
+              Take Your Business to the Next Level with Pro Plan.
+            </p>
+            <h2 className="plan-price">
+              $12 <span>/per month</span>
+            </h2>
+            <ul className="plan-features">
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+              <li>✔️ Lorem Ipsum</li>
+            </ul>
+            <button className="start-btn filled">Get Started</button>
+          </div>
+        </div>
+      </section>
+
+      <section className="testimonials-section">
+        <h2 className="section-title">Read Our Client Testimonials</h2>
+        <p className="section-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor
+        </p>
+
+        <div className="testimonial-cards">
+          {[1, 2, 3].map((_, idx) => (
+            <div className="testimonial-card" key={idx}>
+              <div className="profile-pic"></div>
+              <h4 className="testimonial-name">John Doe</h4>
+              <p className="testimonial-role">UI/UX Designer</p>
+
+              <div className="testimonial-stars">
+                <span>★</span>
+                <span>★</span>
+                <span>★</span>
+                <span>★</span>
+                {idx === 0 ? <span>☆</span> : <span>★</span>}
+              </div>
+
+              <p className="testimonial-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua quis
+                nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+                commodo consequat.
+              </p>
+            </div>
+
           ))}
         </div>
       </section>
 
-      {/* 6. Contact Us */}
       <section className="contact-section">
-        <div className="contact-form">
-          <h2>Contact Us</h2>
-          <form>
-            <div className="form-group">
-              <input type="text" placeholder="Your Name" required />
+        <h2 className="section-title">Reach us At</h2>
+        <p className="section-subtitle">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor
+        </p>
+
+        <div className="contact-wrapper">
+          <form className="contact-form">
+            <div className="form-row">
+              <input type="text" placeholder="First Name" />
+              <input type="text" placeholder="Last Name" />
             </div>
-            <div className="form-group">
-              <input type="email" placeholder="Your Email" required />
-            </div>
-            <div className="form-group">
-              <textarea placeholder="Your Message" rows="5" required></textarea>
-            </div>
-            <button type="submit" className="btn primary-btn">Send Message</button>
+            <input type="email" placeholder="Email Address" />
+            <textarea rows="4" placeholder="Your message"></textarea>
+
+            {/* <div className="checkbox-row">
+              <input type="checkbox" id="agree" />
+              <label htmlFor="agree">
+                I agree to the <a>Terms and Conditions</a>.
+              </label>
+            </div> */}
+
+            <button type="submit" className="send-btn">
+              Send Message
+            </button>
           </form>
-        </div>
-        <div className="contact-map">
-          <iframe 
-            title="Office Location"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215256627466!2d-73.9878446845938!3d40.7484404793279!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" 
-            allowFullScreen="" 
-            loading="lazy"
-          ></iframe>
+
+          <div className="contact-map">
+            <iframe
+              title="map"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2813.5674310660425!2d-80.55818798471027!3d43.472285279126465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882bf41df7e206e9%3A0x3aa39b5b9f91e26e!2sConestoga%20College!5e0!3m2!1sen!2sca!4v1682100276142!5m2!1sen!2sca"
+              width="100%"
+              height="100%"
+              style={{ border: 0, borderRadius: "12px" }}
+              allowFullScreen=""
+              loading="lazy"
+            ></iframe>
+          </div>
         </div>
       </section>
-
-      <footer className="landing-footer">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <img src={logo} alt="DSA Learning Platform" />
-            <p>Master Data Structures & Algorithms</p>
-          </div>
-          <div className="footer-links">
-            <div className="link-group">
-              <h4>Platform</h4>
-              <Link to="/features">Features</Link>
-              <Link to="/pricing">Pricing</Link>
-              <Link to="/examples">Examples</Link>
-            </div>
-            <div className="link-group">
-              <h4>Resources</h4>
-              <Link to="/blog">Blog</Link>
-              <Link to="/tutorials">Tutorials</Link>
-              <Link to="/docs">Documentation</Link>
-            </div>
-            <div className="link-group">
-              <h4>Company</h4>
-              <Link to="/about">About</Link>
-              <Link to="/careers">Careers</Link>
-              <Link to="/contact">Contact</Link>
-            </div>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          <p>© 2023 DSA Learning Platform. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
-  );
-};
 
 export default LandingPage;
+

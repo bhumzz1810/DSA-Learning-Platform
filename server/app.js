@@ -13,10 +13,13 @@ app.get("/", (req, res) => {
 });
 
 // Connect MongoDB
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("MongoDB error:", err));
+// mongoose
+//   .connect(process.env.MONGO_URI)
+//   .then(() => console.log("MongoDB connected"))
+//   .catch((err) => console.error("MongoDB error:", err));
+
+const suggestRoute = require("./routes/suggest");
+app.use("/api/suggest", suggestRoute);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
