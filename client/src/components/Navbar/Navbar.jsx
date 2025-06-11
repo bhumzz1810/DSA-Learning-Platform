@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./style.css";
 import logoIcon from "../../assets/Logo/dsalogo.svg";
 import avatarImg from "../../assets/avatar.jpg";
-import { FiBell, FiSearch } from "react-icons/fi";
+import { FiBell, FiSearch, FiSun } from "react-icons/fi";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -24,16 +24,18 @@ const Navbar = () => {
       {/* Menu */}
       <div className="navbar-right">
         <ul className="nav-links">
-          <li>Home</li>
-          <li>Problems</li>
-          <li>Dashboard</li>
-          <li>Editor</li>
+          <li onClick={() => navigate("/")}>Home</li>
+          <li onClick={() => navigate("/problems")}>Problems</li>
+          <li onClick={() => navigate("/dashboard")}>Dashboard</li>
+          <li onClick={() => navigate("/editor")}>Editor</li>
         </ul>
+        <FiBell className="bell-icon" />
+        <img src={avatarImg} alt="Profile" className="avatar" />
+        <FiSun className="theme-icon" />
         <button onClick={() => navigate("/login")} className="btn btn-primary">
           Get Started
         </button>
-        <FiBell className="bell-icon" />
-        <img src={avatarImg} alt="Profile" className="avatar" />
+
       </div>
     </nav>
   );
