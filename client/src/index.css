@@ -38,14 +38,17 @@
 }
 
 .logo {
-  height: 50px;
-  width: auto;
+  width: 80px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 5px rgba(0, 238, 255, 0.5));
   transition: transform 0.3s ease;
 }
 
 .logo:hover {
   transform: scale(1.05);
 }
+
 
 .app-title {
   font-size: 3rem;
@@ -179,11 +182,22 @@
 }
 
 .btn {
-  padding: 0.8rem 1.8rem;
-  border-radius: 30px;
+  width: 150px;
+  height: 45px;
+  background: #0ef;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 1em;
+  color: #1f293a;
   font-weight: 600;
-  text-decoration: none;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 238, 255, 0.3);
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 238, 255, 0.4);
 }
 
 .primary-btn {
@@ -514,43 +528,33 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: #1f293a;
+  background: linear-gradient(135deg, #1f293a 0%, #0a0e17 100%);
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .container {
   position: relative;
-  width: 350px;
+  width: 100%;
+  max-width: 350px;
   height: 350px;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: all 0.5s ease;
+  overflow: hidden;
+  border-radius: 20px;
 }
 
 .container.error {
   animation: shake 0.5s ease;
 }
 
+
 @keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-10px);
-  }
-
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(10px);
-  }
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
 }
 
 .container span {
@@ -564,43 +568,24 @@
   transform: scale(2.2) rotate(calc(var(--i) * (360deg / 50)));
   animation: blink 3s linear infinite;
   animation-delay: calc(var(--i) * (3s / 50));
-  animation: blink 3s linear infinite;
-  animation-delay: calc(var(--i) * (3s / 50));
 }
+
 
 @keyframes blink {
-  0% {
-    background: #0ef;
-  }
-
-  25% {
-    background: #2c4766;
-  }
-
-  50% {
-    background: #0ef;
-  }
-
-  75% {
-    background: #2c4766;
-  }
-
-  100% {
-    background: #0ef;
-  }
+  0%, 50%, 100% { background: #0ef; }
+  25%, 75% { background: #2c4766; }
 }
+
+/* Error State */
+.container.error span {
+  animation: glowRed 1s ease infinite;
+}
+
 
 @keyframes glowRed {
-  0%,
-  100% {
-    background: #ff0000;
-  }
-
-  50% {
-    background: #ff6666;
-  }
+  0%, 100% { background: #ff3333; }
+  50% { background: #ff6666; }
 }
-
 
 
 /* Button container */
@@ -610,6 +595,7 @@
   gap: 20px;
   z-index: 10;
   align-items: center;
+  text-align: center;
 }
 
 .btn.main-btn {
@@ -633,21 +619,325 @@
 /* Form styles */
 .login-box {
   position: absolute;
-  width: 320px;
-  background: rgba(31, 41, 58, 0.9);
-  padding: 20px 0;
+  width: 100%;
+  max-width: 320px;
+  background: rgba(31, 41, 58, 0.95);
+  padding: 30px 0;
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(0, 238, 255, 0.5);
   z-index: 10;
   opacity: 0;
   transform: scale(0.8);
   animation: fadeIn 0.5s forwards;
+  backdrop-filter: blur(5px);
 }
 
 @keyframes fadeIn {
-  to {
-    opacity: 1;
-    transform: scale(1);
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Login/Signup Container */
+.app-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f293a 0%, #0a0e17 100%);
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Main Container with Animated Border */
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.5s ease;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.container.error {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+  20%, 40%, 60%, 80% { transform: translateX(8px); }
+}
+
+/* Animated Background Circles */
+.container span {
+  position: absolute;
+  left: 0;
+  width: 32px;
+  height: 6px;
+  background: #2c4766;
+  border-radius: 8px;
+  transform-origin: 170px;
+  transform: scale(2.2) rotate(calc(var(--i) * (360deg / 50)));
+  animation: blink 3s linear infinite;
+  animation-delay: calc(var(--i) * (3s / 50));
+}
+
+@keyframes blink {
+  0%, 50%, 100% { background: #0ef; }
+  25%, 75% { background: #2c4766; }
+}
+
+/* Error State */
+.container.error span {
+  animation: glowRed 1s ease infinite;
+}
+
+@keyframes glowRed {
+  0%, 100% { background: #ff3333; }
+  50% { background: #ff6666; }
+}
+
+/* Button Container (Initial State) */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: 10;
+  align-items: center;
+  text-align: center;
+}
+
+.logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 5px rgba(0, 238, 255, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* Button Styles */
+.btn {
+  width: 150px;
+  height: 45px;
+  background: #0ef;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  font-size: 1em;
+  color: #1f293a;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 238, 255, 0.3);
+}
+
+.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 238, 255, 0.4);
+}
+
+/* Form Container */
+.login-box {
+  position: absolute;
+  width: 100%;
+  max-width: 320px;
+  background: rgba(31, 41, 58, 0.95);
+  padding: 30px 0;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0, 238, 255, 0.5);
+  z-index: 10;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: fadeIn 0.5s forwards;
+  backdrop-filter: blur(5px);
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Form Elements */
+form {
+  width: 100%;
+  padding: 0 30px;
+}
+
+h2 {
+  font-size: 2em;
+  color: #0ef;
+  text-align: center;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(0, 238, 255, 0.5);
+}
+
+/* Input Fields */
+.input-box {
+  position: relative;
+  margin: 25px 0;
+}
+
+.password-container {
+  position: relative;
+}
+
+input {
+  width: 100%;
+  height: 50px;
+  background: transparent;
+  border: 2px solid #2c4766;
+  outline: none;
+  border-radius: 40px;
+  font-size: 1em;
+  color: #fff;
+  padding: 0 45px 0 20px;
+  transition: all 0.3s ease;
+}
+
+input:focus,
+input:valid {
+  border-color: #0ef;
+  box-shadow: 0 0 10px rgba(0, 238, 255, 0.3);
+}
+
+label {
+  position: absolute;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  font-size: 1em;
+  color: #fff;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  background: transparent;
+  padding: 0 5px;
+}
+
+input:focus ~ label,
+input:valid ~ label {
+  top: 0;
+  font-size: 0.75em;
+  background: #1f293a;
+  color: #0ef;
+}
+
+/* Password Toggle */
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 5px;
+  transition: color 0.3s;
+}
+
+.password-toggle:hover {
+  color: #0ef;
+}
+
+/* Password Strength */
+.password-strength {
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  font-size: 0.7em;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.password-strength.weak { color: #ff3333; }
+.password-strength.medium { color: #ffcc00; }
+.password-strength.strong { color: #00cc66; }
+
+.password-hint {
+  font-size: 0.65em;
+  color: #888;
+  margin-top: 25px;
+  text-align: center;
+}
+
+/* Error Message */
+.error-message {
+  color: #ff3333;
+  text-align: center;
+  margin: -10px 0 15px;
+  font-size: 0.85em;
+  font-weight: 500;
+  min-height: 20px;
+  text-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
+}
+
+/* Links */
+.forgot-pass,
+.signup-link {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.forgot-pass a,
+.signup-link a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85em;
+  transition: color 0.3s;
+}
+
+.forgot-pass a:hover,
+.signup-link a:hover {
+  color: #0ef;
+  text-decoration: underline;
+}
+
+.signup-link a {
+  font-weight: 600;
+  font-size: 0.9em;
+}
+
+/* Submit Button */
+.btn[type="submit"] {
+  width: 100%;
+  margin-top: 10px;
+  background: #0ef;
+  color: #1f293a;
+}
+
+.btn[type="submit"]:hover {
+  background: #0cf;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .container {
+    height: auto;
+    min-height: 350px;
+  }
+  
+  .login-box {
+    padding: 20px 0;
+  }
+  
+  form {
+    padding: 0 20px;
+  }
+  
+  h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+  }
+  
+  .input-box {
+    margin: 20px 0;
   }
 }
 

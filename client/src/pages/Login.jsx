@@ -2,10 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
 import alertSound from "../assets/music/warning.mp3";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 
 const LoginForm = () => {
@@ -18,6 +15,8 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
+  const [attempts, setAttempts] = useState(0);
+
   const containerRef = useRef(null);
   const audioRef = useRef(null);
   const navigate = useNavigate();
@@ -34,6 +33,11 @@ const LoginForm = () => {
     };
   }, []);
 
+  const speak = (msg) => {
+    const speech = new SpeechSynthesisUtterance(msg);
+    speechSynthesis.speak(speech);
+  };
+
   const handleLoginClick = () => {
     setShowLogin(true);
     setShowSignup(false);
@@ -49,11 +53,7 @@ const LoginForm = () => {
   const checkPasswordStrength = (pass) => {
     if (pass.length === 0) return "";
     if (pass.length < 6) return "Weak";
-    if (
-      !/[A-Z]/.test(pass) ||
-      !/[0-9]/.test(pass) ||
-      !/[^A-Za-z0-9]/.test(pass)
-    ) {
+    if (!/[A-Z]/.test(pass) || !/[0-9]/.test(pass) || !/[^A-Za-z0-9]/.test(pass)) {
       return "Medium";
     }
     return "Strong";
@@ -70,11 +70,17 @@ const LoginForm = () => {
     if (showLogin) {
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
         setError("");
+        setAttempts(0);
+        speak("Login successful");
         navigate("/");
       } catch (err) {
-        setError(err.message);
+        setAttempts((prev) => prev + 1);
+        if (attempts >= 2) {
+          setError("Username or password incorrect. Please try again later.");
+        } else {
+          setError(err.message);
+        }
       }
     } else {
       if (password !== confirmPassword) {
@@ -87,8 +93,8 @@ const LoginForm = () => {
       }
       try {
         await createUserWithEmailAndPassword(auth, email, password);
-        alert("Signup successful!");
         setError("");
+        speak("Signup successful");
         handleLoginClick();
       } catch (err) {
         setError(err.message);
@@ -100,9 +106,7 @@ const LoginForm = () => {
     if (error && containerRef.current) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current
-          .play()
-          .catch((e) => console.log("Audio play failed:", e));
+        audioRef.current.play().catch((e) => console.log("Audio play failed:", e));
       }
       const spans = containerRef.current.querySelectorAll("span");
       spans.forEach((span) => {
@@ -116,8 +120,7 @@ const LoginForm = () => {
           spans.forEach((span) => {
             span.style.animation = "none";
             void span.offsetWidth;
-            span.style.animation =
-              "blink 3s linear infinite, rotate 60s linear infinite";
+            span.style.animation = "blink 3s linear infinite, rotate 60s linear infinite";
             span.style.animationDelay = `calc(var(--i) * (3s / 50))`;
           });
         }
@@ -138,18 +141,14 @@ const LoginForm = () => {
         {!showLogin && !showSignup ? (
           <div className="button-container">
             <img src={logo} alt="Logo" className="logo" />
-            <button className="btn main-btn" onClick={handleLoginClick}>
-              Login
-            </button>
-            <button className="btn main-btn" onClick={handleSignupClick}>
-              Sign Up
-            </button>
+            <button className="btn main-btn" onClick={handleLoginClick}>Login</button>
+            <button className="btn main-btn" onClick={handleSignupClick}>Sign Up</button>
           </div>
         ) : (
           <div className="login-box">
             <img src={logo} alt="Logo" className="logo-form" />
             <h2>{showLogin ? "Login" : "Sign Up"}</h2>
-            {error && <div className="error-message">{error}</div>}
+            {error && <div className="error-message" role="alert">{error}</div>}
             <form onSubmit={handleSubmit}>
               <div className="input-box">
                 <input
@@ -179,11 +178,16 @@ const LoginForm = () => {
                   {showPassword ? "👁️" : "👁️‍🗨️"}
                 </button>
                 {showSignup && password && (
-                  <div
-                    className={`password-strength ${passwordStrength.toLowerCase()}`}
-                  >
-                    Strength: {passwordStrength || "None"}
-                  </div>
+                  <>
+                    <div className={`password-strength ${passwordStrength.toLowerCase()}`}>
+                      Strength: {passwordStrength || "None"}
+                    </div>
+                    {passwordStrength === "Weak" && (
+                      <div className="password-hint" role="tooltip">
+                        Use at least 6 characters, including a number, uppercase letter, and symbol.
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               {showSignup && (
@@ -193,6 +197,7 @@ const LoginForm = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    onPaste={(e) => e.preventDefault()}
                     required
                   />
                   <label>Confirm Password</label>
@@ -200,9 +205,7 @@ const LoginForm = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={
-                      showConfirmPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                   >
                     {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
@@ -210,9 +213,7 @@ const LoginForm = () => {
               )}
               {showLogin && (
                 <div className="forgot-pass">
-                  <a href="#" tabIndex="0">
-                    Forgot your password?
-                  </a>
+                  <a href="#" tabIndex="0">Forgot your password?</a>
                 </div>
               )}
               <button type="submit" className="btn">
