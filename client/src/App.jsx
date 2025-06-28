@@ -6,6 +6,7 @@ import Homepage from "./pages/Homepage";
 import LoginPage from "./pages/Login";
 import RadialNav from "./components/RadialNav";
 import Navbar from "./components/Navbar/Navbar";
+import "./index.css";
 
 function App() {
   return (
