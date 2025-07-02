@@ -15,17 +15,26 @@ const Navbar = () => {
         <img src={logoIcon} alt="DSArena logo" className="logo-icon-large" />
       </div>
 
-      {/* Search */}
-      <div className="navbar-search">
+      {/* <div className="navbar-search">
         <FiSearch className="search-icon" />
         <input type="text" placeholder="Search" />
-      </div>
+      </div> */}
 
       {/* Menu */}
       <div className="navbar-right">
         <ul className="nav-links">
-          <li>Home</li>
-          <li>Problems</li>
+          <li
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/")}
+          >
+            Home
+          </li>
+          <li
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/problems")}
+          >
+            Problems
+          </li>
           <li>Dashboard</li>
           <li>Editor</li>
         </ul>

@@ -134,6 +134,7 @@ export default function Problems() {
               </div>
             </div>
             <div className="relative">
+              <label className="sr-only">Filter by Difficulty</label>
               <select
                 value={difficultyFilter}
                 onChange={(e) => {
