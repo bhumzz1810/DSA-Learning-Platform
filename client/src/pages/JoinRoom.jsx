@@ -25,9 +25,7 @@ const JoinRoom = () => {
         
         <form onSubmit={handleJoinRoom} className="space-y-6">
           <div>
-            <label htmlFor="roomId" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              Room ID
-            </label>
+            
             <input
               type="text"
               id="roomId"
@@ -39,9 +37,7 @@ const JoinRoom = () => {
           </div>
           
           <div>
-            <label htmlFor="alias" className={`block text-sm font-medium mb-1 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
-              Your Alias
-            </label>
+            
             <input
               type="text"
               id="alias"

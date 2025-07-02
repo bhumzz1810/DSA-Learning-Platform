@@ -6,7 +6,6 @@ require("dotenv").config();
 
 const app = express();
 
-// CORS setup
 app.use(cors({
   origin: "http://localhost:5173",
   methods: ["GET", "POST", "OPTIONS"],
@@ -16,7 +15,6 @@ app.use(cors({
 
 app.use(express.json());
 
-// Sample route
 app.get("/", (req, res) => {
   res.send("DSA Platform API is running");
 });
@@ -38,6 +36,23 @@ const io = new Server(server, {
 
 const rooms = new Map();
 
+const cleanupRoom = (roomId) => {
+  if (rooms.has(roomId)) {
+    const room = rooms.get(roomId);
+    const activeUsers = Array.from(room.users.values()).filter(u => u.isActive);
+    
+    if (activeUsers.length === 0) {
+      // Clear all room data
+      rooms.delete(roomId);
+      io.to(roomId).emit('files-updated', []);
+      io.to(roomId).emit('room-cleared');
+      console.log(`Room ${roomId} fully cleaned up`);
+      return true;
+    }
+  }
+  return false;
+};
+
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
 
@@ -54,12 +69,11 @@ io.on('connection', (socket) => {
     rooms.set(roomId, {
       users: new Map(),
       files: [],
-      code: {}  // stores latest code per filePath
+      code: {}
     });
   }
 
   const room = rooms.get(roomId);
-
   room.users.set(socket.id, {
     id: socket.id,
     alias,
@@ -67,18 +81,19 @@ io.on('connection', (socket) => {
     isActive: true
   });
 
+  // Notify all users in the room about the updated user list
   io.to(roomId).emit('users-updated', Array.from(room.users.values()));
-  io.to(roomId).emit('files-updated', room.files);
+  
+  // Send current files to the new user
+  socket.emit('files-updated', room.files);
 
-  // ✅ Chat
+  // Chat message handler
   socket.on('send-message', (data) => {
-    console.log('💬 send-message:', data);
     io.to(roomId).emit('new-message', data);
   });
 
-  // ✅ File upload
-  socket.on('files-added', ({ roomId, files }) => {
-    console.log('📥 files-added:', files);
+  // File addition handler
+  socket.on('files-added', ({ files }) => {
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
       room.files.push(...files);
@@ -86,50 +101,79 @@ io.on('connection', (socket) => {
     }
   });
 
-  // ✅ File content request
+  // File request handler
   socket.on('request-file', ({ filePath }) => {
-    console.log('📤 request-file:', filePath);
     const room = rooms.get(roomId);
     if (room) {
       const file = room.files.find(f => f.path === filePath);
       if (file) {
-        // If code was edited and stored, send latest code, else original content
         const latestCode = room.code[filePath];
-        socket.emit('file-content', { filePath, content: latestCode !== undefined ? latestCode : file.content || '' });
+        socket.emit('file-content', { 
+          filePath, 
+          content: latestCode !== undefined ? latestCode : file.content || '' 
+        });
       }
     }
   });
 
-  // ✅ Code syncing
+  // Code change handler
   socket.on('code-change', ({ filePath, newCode }) => {
     if (!filePath) return;
-
-    // Save latest code for this file in room state
-    room.code[filePath] = newCode;
-
-    // Broadcast code update to all other clients in the room
-    socket.to(roomId).emit('code-update', { filePath, newCode });
+    const room = rooms.get(roomId);
+    if (room) {
+      room.code[filePath] = newCode;
+      socket.to(roomId).emit('code-update', { filePath, newCode });
+    }
   });
 
-  // Disconnect cleanup
+  // File save handler
+  socket.on('save-file', ({ filePath, content }) => {
+    const room = rooms.get(roomId);
+    if (room) {
+      room.code[filePath] = content;
+      const file = room.files.find(f => f.path === filePath);
+      if (file) {
+        file.content = content;
+      }
+    }
+  });
+
+  // Room clearance handler
+  socket.on('clear-room', () => {
+    const room = rooms.get(roomId);
+    if (room) {
+      room.files = [];
+      room.code = {};
+      io.to(roomId).emit('files-updated', []);
+      io.to(roomId).emit('room-cleared');
+    }
+  });
+
+  // Disconnect handler
   socket.on('disconnect', () => {
     console.log('❌ Disconnected:', socket.id);
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
+      
       if (room.users.has(socket.id)) {
+        // Mark user as inactive
         room.users.get(socket.id).isActive = false;
         io.to(roomId).emit('users-updated', Array.from(room.users.values()));
 
-        setTimeout(() => {
-          if (rooms.has(roomId)) {
-            rooms.get(roomId).users.delete(socket.id);
-            io.to(roomId).emit('users-updated', Array.from(rooms.get(roomId).users.values()));
-            if (rooms.get(roomId).users.size === 0) {
-              rooms.delete(roomId);
-              console.log('🧹 Room cleaned up:', roomId);
+        // Check if this was the last active user
+        const activeUsers = Array.from(room.users.values()).filter(u => u.isActive);
+        if (activeUsers.length === 0) {
+          cleanupRoom(roomId);
+        } else {
+          // For non-last users, schedule removal
+          setTimeout(() => {
+            if (rooms.has(roomId) && room.users.has(socket.id)) {
+              room.users.delete(socket.id);
+              io.to(roomId).emit('users-updated', Array.from(room.users.values()));
+              cleanupRoom(roomId);
             }
-          }
-        }, 60000);
+          }, 60000);
+        }
       }
     }
   });

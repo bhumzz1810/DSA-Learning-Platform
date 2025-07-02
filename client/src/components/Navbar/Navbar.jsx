@@ -36,7 +36,12 @@ const Navbar = () => {
             Problems
           </li>
           <li>Dashboard</li>
-          <li>Editor</li>
+          <li
+            style={{ cursor: "pointer" }}
+            onClick={() => navigate("/join-room")}
+          >
+            Editor
+          </li>
         </ul>
         <button onClick={() => navigate("/login")} className="btn btn-primary">
           Get Started
