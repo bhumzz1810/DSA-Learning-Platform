@@ -27,6 +27,7 @@ function App() {
           <Route path="/join-room" element={<JoinRoom />} />
           <Route path="/coding-room" element={<CodingRoom />} />
           <Route path="/coding-room/:roomId" element={<CodingRoom />} />
+          <Route path="/playground" element={<CodingRoom />} />
           {/* Add more routes as needed */}
         </Routes>
       </BrowserRouter>
