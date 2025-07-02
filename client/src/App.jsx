@@ -6,6 +6,9 @@ import Homepage from "./pages/Homepage";
 import LoginPage from "./pages/Login";
 import RadialNav from "./components/RadialNav";
 import Navbar from "./components/Navbar/Navbar";
+import AddProblem from "./pages/admin/AddProblem";
+import ProblemList from "./pages/admin/ProblemList";
+import EditProblem from "./pages/admin/EditProblem";
 
 function App() {
   return (
@@ -21,6 +24,10 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/login" element={<LoginPage />} />
           {/* Add more routes as needed */}
+          {/* ADMIN ROUTES */}
+          <Route path="/admin/add-problem" element={<AddProblem />} />
+          <Route path="/admin/problems" element={<ProblemList />} />
+          <Route path="/admin/problems/edit/:id" element={<EditProblem />} />
         </Routes>
       </BrowserRouter>
     </>

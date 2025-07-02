@@ -65,37 +65,63 @@ const LoginForm = () => {
     setPasswordStrength(checkPasswordStrength(value));
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (showLogin) {
+  //     try {
+  //       await signInWithEmailAndPassword(auth, email, password);
+  //       alert("Login successful!");
+  //       setError("");
+  //       navigate("/");
+  //     } catch (err) {
+  //       setError(err.message);
+  //     }
+  //   } else {
+  //     if (password !== confirmPassword) {
+  //       setError("Passwords do not match");
+  //       return;
+  //     }
+  //     if (passwordStrength === "Weak") {
+  //       setError("Password is too weak");
+  //       return;
+  //     }
+  //     try {
+  //       await createUserWithEmailAndPassword(auth, email, password);
+  //       alert("Signup successful!");
+  //       setError("");
+  //       handleLoginClick();
+  //     } catch (err) {
+  //       setError(err.message);
+  //     }
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (showLogin) {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Login successful!");
-        setError("");
-        navigate("/");
-      } catch (err) {
-        setError(err.message);
-      }
-    } else {
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        return;
-      }
-      if (passwordStrength === "Weak") {
-        setError("Password is too weak");
-        return;
-      }
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        alert("Signup successful!");
-        setError("");
-        handleLoginClick();
-      } catch (err) {
-        setError(err.message);
-      }
+    const apiUrl =
+      import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/auth";
+    try {
+      const endpoint = showLogin ? "login" : "register";
+      const payload = showLogin
+        ? { email, password }
+        : { email, username: email.split("@")[0], password };
+
+      const res = await fetch(`${apiUrl}/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Something went wrong");
+
+      localStorage.setItem("token", data.token);
+      alert(`${showLogin ? "Login" : "Signup"} successful!`);
+      setError("");
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
     }
   };
-
   useEffect(() => {
     if (error && containerRef.current) {
       if (audioRef.current) {
