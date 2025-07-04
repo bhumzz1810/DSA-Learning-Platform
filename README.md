@@ -39,7 +39,7 @@ DSArena is a full-stack web application designed to help students master Data St
 
 ### 1. Clone Repo
 
-git clone https://github.com/bhumzz1810/DSA-Learning-Platform.git
+git clone https://github.com/bhumzz1810/DSA-Learning-Platform.git<br>
 cd DSA-Learning-Platform
 
 
