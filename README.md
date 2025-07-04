@@ -47,10 +47,10 @@ cd DSA-Learning-Platform
 
 cd server
 npm install
-# Create .env file with:
-# PORT=5000
-# MONGO_URI=your_mongo_url
-# JWT_SECRET=your_secret
+Create .env file with:
+PORT=5000
+MONGO_URI=your_mongo_url
+JWT_SECRET=your_secret
 npm run dev
 
 ### 3. Setup Frontend (client)
