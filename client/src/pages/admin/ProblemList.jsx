@@ -13,12 +13,21 @@ const ProblemList = () => {
   const fetchProblems = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`/api/problems?archived=${showArchived}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setProblems(res.data);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/problems?archived=${showArchived}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (Array.isArray(res.data)) {
+        setProblems(res.data);
+      } else {
+        setProblems([]);
+      }
     } catch (err) {
       console.error("Failed to fetch problems:", err);
+      setProblems([]);
     }
   };
 

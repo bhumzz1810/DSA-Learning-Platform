@@ -2,11 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
 import alertSound from "../assets/music/warning.mp3";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../firebase/firebaseConfig";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -18,6 +13,7 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
+
   const containerRef = useRef(null);
   const audioRef = useRef(null);
   const navigate = useNavigate();
@@ -33,6 +29,11 @@ const LoginForm = () => {
       }
     };
   }, []);
+
+  const speak = (msg) => {
+    const speech = new SpeechSynthesisUtterance(msg);
+    speechSynthesis.speak(speech);
+  };
 
   const handleLoginClick = () => {
     setShowLogin(true);
@@ -65,36 +66,6 @@ const LoginForm = () => {
     setPasswordStrength(checkPasswordStrength(value));
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (showLogin) {
-  //     try {
-  //       await signInWithEmailAndPassword(auth, email, password);
-  //       alert("Login successful!");
-  //       setError("");
-  //       navigate("/");
-  //     } catch (err) {
-  //       setError(err.message);
-  //     }
-  //   } else {
-  //     if (password !== confirmPassword) {
-  //       setError("Passwords do not match");
-  //       return;
-  //     }
-  //     if (passwordStrength === "Weak") {
-  //       setError("Password is too weak");
-  //       return;
-  //     }
-  //     try {
-  //       await createUserWithEmailAndPassword(auth, email, password);
-  //       alert("Signup successful!");
-  //       setError("");
-  //       handleLoginClick();
-  //     } catch (err) {
-  //       setError(err.message);
-  //     }
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const apiUrl =
@@ -115,13 +86,26 @@ const LoginForm = () => {
       if (!res.ok) throw new Error(data.message || "Something went wrong");
 
       localStorage.setItem("token", data.token);
+
+      // ✅ Decode token to get user role
+      const payloadData = JSON.parse(atob(data.token.split(".")[1]));
+      const role = payloadData.role;
+      localStorage.setItem("role", role);
+
       alert(`${showLogin ? "Login" : "Signup"} successful!`);
       setError("");
-      navigate("/");
+
+      // ✅ Redirect based on role
+      if (role === "admin") {
+        navigate("/admin/problems");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       setError(err.message);
     }
   };
+
   useEffect(() => {
     if (error && containerRef.current) {
       if (audioRef.current) {
@@ -174,8 +158,13 @@ const LoginForm = () => {
         ) : (
           <div className="login-box">
             <img src={logo} alt="Logo" className="logo-form" />
+
             <h2>{showLogin ? "Login" : "Sign Up"}</h2>
-            {error && <div className="error-message">{error}</div>}
+            {error && (
+              <div className="error-message" role="alert">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="input-box">
                 <input
@@ -205,11 +194,19 @@ const LoginForm = () => {
                   {showPassword ? "👁️" : "👁️‍🗨️"}
                 </button>
                 {showSignup && password && (
-                  <div
-                    className={`password-strength ${passwordStrength.toLowerCase()}`}
-                  >
-                    Strength: {passwordStrength || "None"}
-                  </div>
+                  <>
+                    <div
+                      className={`password-strength ${passwordStrength.toLowerCase()}`}
+                    >
+                      Strength: {passwordStrength || "None"}
+                    </div>
+                    {passwordStrength === "Weak" && (
+                      <div className="password-hint" role="tooltip">
+                        Use at least 6 characters, including a number, uppercase
+                        letter, and symbol.
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               {showSignup && (
@@ -219,6 +216,7 @@ const LoginForm = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    onPaste={(e) => e.preventDefault()}
                     required
                   />
                   <label>Confirm Password</label>

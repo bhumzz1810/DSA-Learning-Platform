@@ -1,0 +1,427 @@
+[
+  {
+    "title": "Two Sum",
+    "description": "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
+    "category": "Array",
+    "difficulty": "Easy",
+    "constraints": "Only one valid answer exists. You may not use the same element twice.",
+    "testCases": [
+      {
+        "input": "[2,7,11,15],9",
+        "expectedOutput": "[0,1]"
+      }
+    ],
+    "hints": [
+      "Use a hash map for O(n) time"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Longest Substring Without Repeating Characters",
+    "description": "Given a string s, find the length of the longest substring without repeating characters.",
+    "category": "String",
+    "difficulty": "Medium",
+    "constraints": "0 <= s.length <= 5 * 10^4; s consists of English letters, digits, symbols and spaces.",
+    "testCases": [
+      {
+        "input": "\"abcabcbb\"",
+        "expectedOutput": "3"
+      }
+    ],
+    "hints": [
+      "Use sliding window with a set or map"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Valid Parentheses",
+    "description": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.",
+    "category": "Stack",
+    "difficulty": "Easy",
+    "constraints": "s consists only of parentheses and has a maximum length of 10^4.",
+    "testCases": [
+      {
+        "input": "\"()[]{}\"",
+        "expectedOutput": "true"
+      }
+    ],
+    "hints": [
+      "Use a stack to match pairs"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Merge Two Sorted Lists",
+    "description": "Merge two sorted linked lists and return it as a new list.",
+    "category": "Linked List",
+    "difficulty": "Easy",
+    "constraints": "The number of nodes in both lists is in the range [0, 50].",
+    "testCases": [
+      {
+        "input": "[1,2,4],[1,3,4]",
+        "expectedOutput": "[1,1,2,3,4,4]"
+      }
+    ],
+    "hints": [
+      "Iteratively merge nodes"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Maximum Depth of Binary Tree",
+    "description": "Given the root of a binary tree, return its maximum depth.",
+    "category": "Tree",
+    "difficulty": "Easy",
+    "constraints": "The number of nodes in the tree is in the range [0, 10^4].",
+    "testCases": [
+      {
+        "input": "[3,9,20,null,null,15,7]",
+        "expectedOutput": "3"
+      }
+    ],
+    "hints": [
+      "DFS recursion"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Binary Tree Level Order Traversal",
+    "description": "Return the level order traversal of nodes' values (left to right, level by level).",
+    "category": "Tree",
+    "difficulty": "Medium",
+    "constraints": "The number of nodes in the tree is in the range [0, 2000].",
+    "testCases": [
+      {
+        "input": "[3,9,20,null,null,15,7]",
+        "expectedOutput": "[[3],[9,20],[15,7]]"
+      }
+    ],
+    "hints": [
+      "Use a queue for BFS"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Search in Rotated Sorted Array",
+    "description": "Search for a target value in a rotated sorted array.",
+    "category": "Binary Search",
+    "difficulty": "Medium",
+    "constraints": "Must use O(log n) time.",
+    "testCases": [
+      {
+        "input": "[4,5,6,7,0,1,2],0",
+        "expectedOutput": "4"
+      }
+    ],
+    "hints": [
+      "Use modified binary search"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Container With Most Water",
+    "description": "Find two lines that form a container to hold the most water.",
+    "category": "Two Pointers",
+    "difficulty": "Medium",
+    "constraints": "Lines cannot slant.",
+    "testCases": [
+      {
+        "input": "[1,8,6,2,5,4,8,3,7]",
+        "expectedOutput": "49"
+      }
+    ],
+    "hints": [
+      "Use two pointers from outside"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Valid Palindrome",
+    "description": "Determine if a string is a palindrome, ignoring non-alphanumeric characters and cases.",
+    "category": "String",
+    "difficulty": "Easy",
+    "constraints": "s consists only of printable ASCII characters.",
+    "testCases": [
+      {
+        "input": "\"A man, a plan, a canal: Panama\"",
+        "expectedOutput": "true"
+      }
+    ],
+    "hints": [
+      "Clean string then two pointers"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Climbing Stairs",
+    "description": "You can climb 1 or 2 steps. Find how many distinct ways to climb n steps.",
+    "category": "Dynamic Programming",
+    "difficulty": "Easy",
+    "constraints": "1 <= n <= 45",
+    "testCases": [
+      {
+        "input": "2",
+        "expectedOutput": "2"
+      }
+    ],
+    "hints": [
+      "Use DP or Fibonacci"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Reverse Linked List",
+    "description": "Reverse a singly linked list.",
+    "category": "Linked List",
+    "difficulty": "Easy",
+    "constraints": "The number of nodes in the list is the range [0, 5000].",
+    "testCases": [
+      {
+        "input": "[1,2,3,4,5]",
+        "expectedOutput": "[5,4,3,2,1]"
+      }
+    ],
+    "hints": [
+      "Iterative or recursive reversal"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Best Time to Buy and Sell Stock",
+    "description": "Find the maximum profit you can achieve from one transaction.",
+    "category": "Array",
+    "difficulty": "Easy",
+    "constraints": "Prices are in the range [0, 10^4]",
+    "testCases": [
+      {
+        "input": "[7,1,5,3,6,4]",
+        "expectedOutput": "5"
+      }
+    ],
+    "hints": [
+      "Track minimum so far and compare with current"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Valid Anagram",
+    "description": "Check if two strings are anagrams of each other.",
+    "category": "String",
+    "difficulty": "Easy",
+    "constraints": "All strings contain lowercase letters only.",
+    "testCases": [
+      {
+        "input": "\"anagram\",\"nagaram\"",
+        "expectedOutput": "true"
+      }
+    ],
+    "hints": [
+      "Use character count"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Group Anagrams",
+    "description": "Group strings that are anagrams of each other.",
+    "category": "Hashing",
+    "difficulty": "Medium",
+    "constraints": "Input strings contain lowercase letters only.",
+    "testCases": [
+      {
+        "input": "[\"eat\",\"tea\",\"tan\",\"ate\",\"nat\",\"bat\"]",
+        "expectedOutput": "[[\"eat\",\"tea\",\"ate\"],[\"tan\",\"nat\"],[\"bat\"]]"
+      }
+    ],
+    "hints": [
+      "Sort characters and group by signature"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Top K Frequent Elements",
+    "description": "Return the k most frequent elements.",
+    "category": "Heap",
+    "difficulty": "Medium",
+    "constraints": "Time complexity must be better than O(n log n)",
+    "testCases": [
+      {
+        "input": "[1,1,1,2,2,3],2",
+        "expectedOutput": "[1,2]"
+      }
+    ],
+    "hints": [
+      "Use hash map and heap"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Implement Queue using Stacks",
+    "description": "Implement a queue using two stacks.",
+    "category": "Stack",
+    "difficulty": "Easy",
+    "constraints": "Implement push, pop, peek and empty",
+    "testCases": [
+      {
+        "input": "push(1),push(2),peek()",
+        "expectedOutput": "1"
+      }
+    ],
+    "hints": [
+      "Push in one stack, pop from reversed"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Minimum in Rotated Sorted Array",
+    "description": "Find the minimum element in a rotated sorted array.",
+    "category": "Binary Search",
+    "difficulty": "Medium",
+    "constraints": "Must run in O(log n) time.",
+    "testCases": [
+      {
+        "input": "[3,4,5,1,2]",
+        "expectedOutput": "1"
+      }
+    ],
+    "hints": [
+      "Binary search with mid vs right"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Number of Islands",
+    "description": "Count the number of islands in a 2D grid of '1's and '0's.",
+    "category": "Graph",
+    "difficulty": "Medium",
+    "constraints": "Use DFS or BFS",
+    "testCases": [
+      {
+        "input": "[['1','1','0','0'],['1','0','0','1'],['0','0','1','1']]",
+        "expectedOutput": "3"
+      }
+    ],
+    "hints": [
+      "Mark visited using DFS"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Course Schedule",
+    "description": "Determine if it's possible to finish all courses given prerequisites.",
+    "category": "Graph",
+    "difficulty": "Medium",
+    "constraints": "Detect cycles",
+    "testCases": [
+      {
+        "input": "2,[[1,0]]",
+        "expectedOutput": "true"
+      }
+    ],
+    "hints": [
+      "Use topological sort"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Coin Change",
+    "description": "Find the fewest coins to make up the given amount.",
+    "category": "Dynamic Programming",
+    "difficulty": "Hard",
+    "constraints": "You may assume an infinite number of each coin.",
+    "testCases": [
+      {
+        "input": "[1,2,5],11",
+        "expectedOutput": "3"
+      }
+    ],
+    "hints": [
+      "Use bottom-up DP"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Longest Increasing Subsequence",
+    "description": "Find the length of the longest increasing subsequence.",
+    "category": "Dynamic Programming",
+    "difficulty": "Hard",
+    "constraints": "1 <= nums.length <= 2500",
+    "testCases": [
+      {
+        "input": "[10,9,2,5,3,7,101,18]",
+        "expectedOutput": "4"
+      }
+    ],
+    "hints": [
+      "Use DP with binary search"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Kth Largest Element in Array",
+    "description": "Find the kth largest element in an unsorted array.",
+    "category": "Heap",
+    "difficulty": "Hard",
+    "constraints": "Use a heap or quickselect",
+    "testCases": [
+      {
+        "input": "[3,2,1,5,6,4],2",
+        "expectedOutput": "5"
+      }
+    ],
+    "hints": [
+      "Use min-heap or quickselect"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Find Peak Element",
+    "description": "Find a peak element and return its index.",
+    "category": "Binary Search",
+    "difficulty": "Hard",
+    "constraints": "You must solve it in O(log n) time.",
+    "testCases": [
+      {
+        "input": "[1,2,3,1]",
+        "expectedOutput": "2"
+      }
+    ],
+    "hints": [
+      "Binary search looking for increasing slope"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Subsets",
+    "description": "Return all possible subsets (the power set).",
+    "category": "Backtracking",
+    "difficulty": "Hard",
+    "constraints": "1 <= nums.length <= 10",
+    "testCases": [
+      {
+        "input": "[1,2,3]",
+        "expectedOutput": "[[],[1],[2],[3],[1,2],[1,3],[2,3],[1,2,3]]"
+      }
+    ],
+    "hints": [
+      "Use recursion and backtracking"
+    ],
+    "visualAid": ""
+  },
+  {
+    "title": "Permutations",
+    "description": "Return all permutations of the array.",
+    "category": "Backtracking",
+    "difficulty": "Hard",
+    "constraints": "All elements are unique",
+    "testCases": [
+      {
+        "input": "[1,2,3]",
+        "expectedOutput": "[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]"
+      }
+    ],
+    "hints": [
+      "Use backtracking"
+    ],
+    "visualAid": ""
+  }
+]

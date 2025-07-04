@@ -1,22 +1,46 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 
-const dummyProblems = {
-  "two-sum": {
-    title: "Two Sum",
-    description:
-      "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
-    example: "Input: nums = [2,7,11,15], target = 9 → Output: [0,1]",
-    difficulty: "Easy",
-    topic: "Array",
-    videoUrl: "https://www.youtube.com/embed/3yUuo7TqMW8", // Replace with your own link
-  },
-};
+export default function ProblemDetail() {
+  const { id } = useParams();
+  const [problem, setProblem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-const wrapUserCode = (userCode) => {
-  return `
+  const [code, setCode] = useState("");
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [ghostSuggestion, setGhostSuggestion] = useState("");
+  const [activeTab, setActiveTab] = useState("description");
+
+  useEffect(() => {
+    const fetchProblem = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/problems/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setProblem(res.data);
+        setInput(res.data.testCases?.[0]?.input || "");
+        setCode("// Write your solution here");
+      } catch (err) {
+        setError("Problem not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProblem();
+  }, [id]);
+
+  const wrapUserCode = (userCode) =>
+    `
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
 
@@ -27,35 +51,9 @@ process.stdin.on("data", function(chunk) {
 
 process.stdin.on("end", function() {
   const lines = input.trim().split("\\n");
-  const nums = JSON.parse(lines[0]);
-  const target = parseInt(lines[1]);
 
   ${userCode}
-
-});
-`.trim();
-};
-
-export default function ProblemDetail() {
-  const { id } = useParams();
-  const problem = dummyProblems[id];
-  const [ghostSuggestion, setGhostSuggestion] = useState("");
-
-  const [code, setCode] = useState(`function twoSum(nums, target) {
-  const map = new Map();
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-    if (map.has(complement)) {
-      return [map.get(complement), i];
-    }
-    map.set(nums[i], i);
-  }
-}
-console.log(twoSum(nums, target));`);
-
-  const [input, setInput] = useState("[2, 7, 11, 15]\n9");
-  const [output, setOutput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+});`.trim();
 
   const handleRunCode = async () => {
     setIsLoading(true);
@@ -82,7 +80,6 @@ console.log(twoSum(nums, target));`);
       );
 
       const token = response.data.token;
-
       let result = null;
       while (!result || result.status.id <= 2) {
         const res = await axios.get(
@@ -105,103 +102,188 @@ console.log(twoSum(nums, target));`);
       );
     } catch (error) {
       console.error(error);
-      setOutput("Something went wrong.");
+      setOutput(
+        "Error: " + (error.response?.data?.message || "Something went wrong")
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!problem) {
+  if (loading)
+    return <div className="p-10 text-center text-lg">Loading...</div>;
+
+  if (error) {
     return (
-      <div className="p-6">
-        <h2 className="text-red-600 text-xl">Problem not found</h2>
-        <Link to="/problems" className="text-blue-500 underline">
-          Back to problems
-        </Link>
+      <div className="p-6 min-h-screen bg-gray-50 flex flex-col items-center justify-center">
+        <div className="max-w-md bg-white p-8 rounded-lg shadow-md text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">{error}</h2>
+          <Link
+            to={`/problems/${problem._id}`}
+            className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Back to problems
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 md:p-10">
-      <div className="flex flex-col lg:flex-row gap-8 max-w-[1400px] mx-auto w-full">
-        {/* LEFT: Video + Description */}
-        <div className="flex-1 space-y-6">
-          <div className="aspect-video w-full rounded overflow-hidden shadow">
-            <iframe
-              src="https://www.youtube.com/embed/3yUuo7TqMW8"
-              title="Concept Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            ></iframe>
-          </div>
-
-          <div className="bg-white p-4 rounded shadow">
-            <h1 className="text-2xl font-bold mb-2">{problem.title}</h1>
-            <p className="text-gray-800">{problem.description}</p>
-            <p className="text-sm text-gray-500 mt-2">
-              <strong>Example:</strong> {problem.example}
-            </p>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">{problem.title}</h1>
+          <div className="flex items-center space-x-4 mt-2">
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                problem.difficulty === "Easy"
+                  ? "bg-green-100 text-green-800"
+                  : problem.difficulty === "Medium"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {problem.difficulty}
+            </span>
+            <span className="text-gray-600">Topic: {problem.category}</span>
           </div>
         </div>
 
-        {/* RIGHT: Editor + Input/Output */}
-        <div className="flex-1 space-y-4">
-          <Editor
-            height="300px"
-            defaultLanguage="javascript"
-            value={code}
-            onChange={(value) => {
-              setCode(value);
-              if (value && value.length % 5 === 0) {
-                axios
-                  .post("http://localhost:5000/api/suggest", { prompt: value })
-                  .then((res) => {
-                    setGhostSuggestion(res.data.suggestion.trim());
-                  });
-              }
-            }}
-            theme="vs-dark"
-          />
-
-          {ghostSuggestion && (
-            <div className="bg-gray-800 text-gray-400 px-2 py-1 rounded mt-1 text-sm italic">
-              Suggestion: <span>{ghostSuggestion}</span>
-              <button
-                className="ml-2 text-blue-400 underline"
-                onClick={() => setCode(code + ghostSuggestion)}
-              >
-                ⏎ Accept
-              </button>
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="lg:w-1/2 space-y-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4">Problem Statement</h2>
+              <p className="text-gray-700 mb-4">{problem.description}</p>
+              <h3 className="font-medium">Constraints:</h3>
+              <ul className="list-disc pl-5 space-y-1">
+                {(problem.constraints || "").split("\n").map((line, i) => (
+                  <li key={i} className="text-sm text-gray-700">
+                    {line}
+                  </li>
+                ))}
+              </ul>
             </div>
-          )}
-
-          <div>
-            <label className="block mb-2 font-semibold">Custom Input:</label>
-            <textarea
-              className="w-full border rounded p-2"
-              rows={3}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
           </div>
 
-          <button
-            onClick={handleRunCode}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-            disabled={isLoading}
-          >
-            {isLoading ? "Running..." : "Run Code"}
-          </button>
-
-          {output && (
-            <div className="bg-white p-4 rounded shadow">
-              <h3 className="font-bold mb-2">Output:</h3>
-              <pre className="text-sm">{output}</pre>
+          <div className="lg:w-1/2 space-y-6">
+            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+              <div className="px-4 py-2 bg-gray-900 flex justify-between items-center">
+                <div className="flex space-x-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                  <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                  <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                </div>
+                <span className="text-gray-400 text-sm">JavaScript</span>
+              </div>
+              <Editor
+                height="400px"
+                defaultLanguage="javascript"
+                value={code}
+                onChange={(value) => {
+                  setCode(value);
+                  if (value && value.length % 5 === 0) {
+                    axios
+                      .post("http://localhost:5000/api/suggest", {
+                        prompt: value,
+                      })
+                      .then((res) =>
+                        setGhostSuggestion(res.data.suggestion.trim())
+                      );
+                  }
+                }}
+                theme="vs-dark"
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  scrollBeyondLastLine: false,
+                }}
+              />
             </div>
-          )}
+
+            {ghostSuggestion && (
+              <div className="bg-gray-800 text-gray-300 p-3 rounded-lg shadow text-sm flex justify-between items-center">
+                <div>
+                  <span className="text-gray-400 italic">Suggestion: </span>
+                  <span>{ghostSuggestion}</span>
+                </div>
+                <button
+                  onClick={() => setCode(code + ghostSuggestion)}
+                  className="ml-2 px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-xs"
+                >
+                  Accept
+                </button>
+              </div>
+            )}
+
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="border-b border-gray-200">
+                <nav className="flex">
+                  <button className="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
+                    Input
+                  </button>
+                </nav>
+              </div>
+              <textarea
+                className="w-full p-3 text-sm font-mono border-none focus:ring-0 resize-none"
+                rows={4}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Enter your input here..."
+              />
+            </div>
+
+            <button
+              onClick={handleRunCode}
+              disabled={isLoading}
+              className={`w-full py-3 px-4 rounded-lg font-medium text-white ${
+                isLoading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
+              } transition-colors flex items-center justify-center`}
+            >
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Running...
+                </>
+              ) : (
+                "Run Code"
+              )}
+            </button>
+
+            {output && (
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="border-b border-gray-200">
+                  <nav className="flex">
+                    <button className="px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600">
+                      Output
+                    </button>
+                  </nav>
+                </div>
+                <pre className="p-3 text-sm font-mono bg-gray-50 overflow-auto max-h-60">
+                  {output}
+                </pre>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

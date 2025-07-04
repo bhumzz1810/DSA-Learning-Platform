@@ -1,235 +1,582 @@
-import React from "react";
 import "../index.css";
 import "./Homepage.css";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import bannerImg from "../assets/Homepage/banner_img.png";
 import ship from "../assets/icons/ship.png";
 import timer from "../assets/icons/timer.png";
 import handshake from "../assets/icons/handshake.png";
 import free from "../assets/free.png";
 import pro from "../assets/pro.png";
-import map from "../assets/map.png"; // Placeholder for map image
 
 const Homepage = () => {
-  return (
-    <div className="homepage">
-      <section className="hero">
-        <div className="hero-left">
-          <div className="tag">&lt;DSArena/&gt;</div>
-          <h1 className="headline">
-            Practice DSA <br /> the Modern Way
-          </h1>
-          <p className="subtext">
-            Build your skills with interactive challenges and detailed
-            explanations.
-          </p>
-          <button className="explore-btn">Explore Now</button>
-        </div>
+  const navigate = useNavigate();
+  const [isMonthly, setIsMonthly] = useState(true);
 
-        <div className="hero-right">
-          <div className="img-wrapper">
-            <img src={bannerImg} alt="Code mockup" className="banner-img" />
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Software Engineer",
+      rating: 4,
+      text: "DSArena helped me ace my technical interviews. The interactive challenges are the closest thing to real coding tests.",
+    },
+    {
+      name: "Michael Chen",
+      role: "CS Student",
+      rating: 5,
+      text: "The visual explanations of algorithms made complex concepts click for me. Worth every penny of the Pro plan!",
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Bootcamp Grad",
+      rating: 5,
+      text: "Went from zero to confident in data structures within 3 months. The community support is incredible.",
+    },
+  ];
+
+  return (
+    <div className="bg-white text-gray-900 font-sans">
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+        <div className="flex flex-col md:flex-row items-center gap-12">
+          <div className="md:w-1/2 space-y-6">
+            <span className="inline-block bg-gray-900 text-yellow-400 px-4 py-1 rounded-full text-sm font-bold">
+              &lt;DSArena/&gt;
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight">
+              Master Data Structures & Algorithms Efficiently
+            </h1>
+            <p className="text-lg text-gray-600 max-w-md">
+              Interactive coding playground with visualizations, real-time
+              feedback, and personalized learning paths.
+            </p>
+            <button
+              onClick={() => navigate("/Problems")}
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-lg transition-all duration-300 transform hover:scale-105"
+            >
+              Start Learning Now
+            </button>
+          </div>
+          <div className="md:w-1/2 flex justify-center">
+            <img
+              src={bannerImg}
+              alt="Interactive code editor with algorithm visualization"
+              className="max-w-full h-auto rounded-xl shadow-xl"
+            />
           </div>
         </div>
       </section>
 
-      <section className="about-section">
-        <h2 className="section-title">Who Are We?</h2>
-        <p className="section-subtitle">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor
-        </p>
-
-        <div className="about-grid">
-          <div className="about-left">
-            <h3 className="about-heading">Read More About Us</h3>
-            <h4 className="about-subheading">The most important</h4>
-            <p className="about-desc">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+      {/* About Section */}
+      <section className="bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Why Choose DSArena?
+            </h2>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+              We're revolutionizing how developers learn computer science
+              fundamentals
             </p>
-            <a href="#" className="about-link">
-              More about Us →
-            </a>
+          </div>
 
-            <div className="about-icons-list">
-              <div className="icon-item">
-                <img src={ship} alt="Icon 2" className="icon-circle" />
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</p>
+          <div className="flex flex-col lg:flex-row gap-12">
+            <div className="lg:w-1/2 space-y-8">
+              <h3 className="text-2xl font-semibold text-gray-900">
+                Our Learning Philosophy
+              </h3>
+              <p className="text-gray-600">
+                Traditional coding platforms focus on solutions. We emphasize
+                the{" "}
+                <strong className="text-gray-900">
+                  problem-solving process
+                </strong>
+                with step-by-step visualizations, complexity analysis, and
+                pattern recognition techniques used by FAANG engineers.
+              </p>
+              <a
+                href="/about"
+                className="inline-flex items-center text-blue-600 font-medium group"
+              >
+                Our Methodology
+                <svg
+                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
+                </svg>
+              </a>
+
+              <div className="space-y-6 mt-8">
+                <div className="flex items-start gap-4">
+                  <div className="bg-gray-900 p-2 rounded-full">
+                    <img src={ship} alt="Fast Learning" className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      Accelerated Learning
+                    </h4>
+                    <p className="text-gray-600 text-sm">
+                      Master concepts 2x faster with our spatial repetition
+                      system
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="bg-gray-900 p-2 rounded-full">
+                    <img src={timer} alt="Time Efficient" className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      Time-Efficient
+                    </h4>
+                    <p className="text-gray-600 text-sm">
+                      15-min daily challenges that fit your schedule
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="bg-gray-900 p-2 rounded-full">
+                    <img src={handshake} alt="Community" className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">
+                      Expert Community
+                    </h4>
+                    <p className="text-gray-600 text-sm">
+                      Get unstuck with help from senior engineers
+                    </p>
+                  </div>
+                </div>
               </div>
-              <div className="icon-item">
-                <img src={timer} alt="Icon 2" className="icon-circle" />
-                <p>Lorem ipsum dolor sit amet,</p>
+            </div>
+
+            <div className="lg:w-1/2 grid grid-cols-3 gap-4">
+              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
+                <span className="text-3xl font-bold text-gray-900">
+                  10,000+
+                </span>
+                <p className="mt-2 text-gray-600">Active Learners</p>
               </div>
-              <div className="icon-item">
-                <img src={handshake} alt="Icon 3" className="icon-circle" />
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod
+              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
+                <span className="text-3xl font-bold text-gray-900">350+</span>
+                <p className="mt-2 text-gray-600">Hands-on Challenges</p>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
+                <span className="text-3xl font-bold text-gray-900">92%</span>
+                <p className="mt-2 text-gray-600">Interview Success Rate</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Plans That Fit Your Goals
+            </h2>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+              Start for free, upgrade when you're ready for advanced features
+            </p>
+          </div>
+
+          <div className="flex justify-center mb-12">
+            <div className="inline-flex bg-gray-100 rounded-full p-1">
+              <button
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                  isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                }`}
+                onClick={() => setIsMonthly(true)}
+              >
+                Monthly
+              </button>
+              <button
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                  !isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                }`}
+                onClick={() => setIsMonthly(false)}
+              >
+                Yearly (2 months free)
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row justify-center gap-8 max-w-4xl mx-auto">
+            {/* Free Plan */}
+            <div className="flex-1 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <img src={free} alt="Free Plan" className="w-10 h-10" />
+                  <h3 className="text-xl font-bold text-gray-900">Free</h3>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Perfect for getting started with DSA basics
+                </p>
+                <div className="mb-8">
+                  <span className="text-4xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-500">/month</span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    50+ beginner challenges
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Basic algorithm visualizations
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Community support
+                  </li>
+                  <li className="flex items-center text-gray-400">
+                    <svg
+                      className="w-5 h-5 text-red-400 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Advanced patterns
+                  </li>
+                  <li className="flex items-center text-gray-400">
+                    <svg
+                      className="w-5 h-5 text-red-400 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Interview simulations
+                  </li>
+                </ul>
+                <button
+                  onClick={() => navigate("/Problems")}
+                  className="w-full py-3 px-4 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
+                >
+                  Start Learning
+                </button>
+              </div>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-lg overflow-hidden relative">
+              <div className="absolute top-4 right-4 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full">
+                Most Popular
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-6">
+                  <img src={pro} alt="Pro Plan" className="w-10 h-10" />
+                  <h3 className="text-xl font-bold text-gray-900">Pro</h3>
+                </div>
+                <p className="text-gray-600 mb-6">
+                  Everything you need for technical interview mastery
+                </p>
+                <div className="mb-8">
+                  <span className="text-4xl font-bold text-gray-900">
+                    ${isMonthly ? "12" : "10"}
+                  </span>
+                  <span className="text-gray-500">
+                    /{isMonthly ? "month" : "year"}
+                  </span>
+                </div>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    350+ challenges
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Advanced visualizations
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Mock interviews
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Personalized coaching
+                  </li>
+                  <li className="flex items-center text-gray-600">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                    Priority support
+                  </li>
+                </ul>
+                <button
+                  onClick={() => navigate("/subscribe")}
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-md"
+                >
+                  Get Pro Access
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Success Stories
+            </h2>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+              Join thousands of developers who transformed their careers
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, idx) => (
+              <div
+                key={idx}
+                className="bg-white p-8 rounded-xl shadow-sm border border-gray-100"
+              >
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 text-blue-600 text-xl font-bold">
+                  {testimonial.name.charAt(0)}
+                </div>
+                <h4 className="text-center font-semibold text-gray-900">
+                  {testimonial.name}
+                </h4>
+                <p className="text-center text-gray-500 text-sm mb-4">
+                  {testimonial.role}
+                </p>
+                <div className="flex justify-center mb-4 text-yellow-400">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i}>{i < testimonial.rating ? "★" : "☆"}</span>
+                  ))}
+                </div>
+                <p className="text-center text-gray-600 italic">
+                  "{testimonial.text}"
                 </p>
               </div>
-            </div>
-          </div>
-
-          <div className="about-right">
-            <div className="about-image">Image Placeholder</div>
-          </div>
-        </div>
-
-        <div className="cards-row">
-          <div className="about-card">
-            <div className="card-image"></div>
-            <h5>Lorem Ipsum</h5>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-          </div>
-
-          <div className="feature-col">
-            <div className="feature-item">✈️ Lorem Ipsum</div>
-            <div className="feature-item">🧠 Lorem Ipsum</div>
-            <div className="feature-item">📦 Lorem Ipsum</div>
-            <div className="feature-item">🛠️ Lorem Ipsum</div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="pricing-section">
-        <h2 className="section-title">Plans & Pricing</h2>
-        <p className="section-subtitle">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor
-        </p>
-
-        <div className="billing-toggle">
-          <button className="billing-btn active">Monthly</button>
-          <button className="billing-btn">Yearly</button>
-        </div>
-
-        <div className="pricing-cards">
-          {/* Free Plan */}
-          <div className="pricing-card free-card">
-            <div className="plan-header">
-              <img src={free} alt="Free Plan Icon" />
-              <h3>Free</h3>
-            </div>
-            <p className="plan-description">
-              Unleash the Power with the Free Tier Plan
-            </p>
-            <h2 className="plan-price">
-              <hr className="plan-divider" />
-              $0 <span>/per month</span>
+      {/* Contact Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Have Questions?
             </h2>
-            <ul className="plan-features">
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-              <li>❌ Lorem Ipsum</li>
-              <li>❌ Lorem Ipsum</li>
-            </ul>
-            <button className="start-btn outline">Get Started</button>
+            <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+              We're here to help you on your DSA journey
+            </p>
           </div>
 
-          {/* Pro Plan */}
-          <div className="pricing-card pro-card">
-            <div className="plan-header">
-              <img src={pro} alt="Pro Plan Icon" />
-              <div className="pro-title">
-                <h3>Pro</h3>
-                <span className="badge">Best offer</span>
+          <div className="flex flex-col lg:flex-row gap-12">
+            <form className="lg:w-1/2 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <input
+                    type="text"
+                    placeholder="First Name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    required
+                  />
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Last Name"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  required
+                />
+              </div>
+              <div>
+                <textarea
+                  rows="4"
+                  placeholder="Your message"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  required
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3 px-6 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-lg transition-colors shadow-md"
+              >
+                Send Message
+              </button>
+            </form>
+
+            <div className="lg:w-1/2 space-y-6">
+              <h3 className="text-xl font-semibold text-gray-900">
+                Other Ways to Connect
+              </h3>
+              <div className="space-y-4">
+                <p className="text-gray-600">
+                  <span className="font-medium">Email:</span>{" "}
+                  <a
+                    href="mailto:support@dsarena.com"
+                    className="text-blue-600 hover:underline"
+                  >
+                    support@dsarena.com
+                  </a>
+                </p>
+                <p className="text-gray-600">
+                  <span className="font-medium">Discord:</span>{" "}
+                  <a href="#" className="text-blue-600 hover:underline">
+                    Join our community
+                  </a>
+                </p>
+                <p className="text-gray-600">
+                  <span className="font-medium">Office Hours:</span> Mon-Fri,
+                  9AM-5PM EST
+                </p>
+              </div>
+              <div className="rounded-xl overflow-hidden shadow-lg">
+                <iframe
+                  title="DSArena Headquarters"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2813.5674310660425!2d-80.55818798471027!3d43.472285279126465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882bf41df7e206e9%3A0x3aa39b5b9f91e26e!2sConestoga%20College!5e0!3m2!1sen!2sca!4v1682100276142!5m2!1sen!2sca"
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                ></iframe>
               </div>
             </div>
-            <p className="plan-description">
-              Take Your Business to the Next Level with Pro Plan.
-            </p>
-            <h2 className="plan-price">
-              $12 <span>/per month</span>
-            </h2>
-            <ul className="plan-features">
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-              <li>✔️ Lorem Ipsum</li>
-            </ul>
-            <button className="start-btn filled">Get Started</button>
-          </div>
-        </div>
-      </section>
-
-      <section className="testimonials-section">
-        <h2 className="section-title">Read Our Client Testimonials</h2>
-        <p className="section-subtitle">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor
-        </p>
-
-        <div className="testimonial-cards">
-          {[1, 2, 3].map((_, idx) => (
-            <div className="testimonial-card" key={idx}>
-              <div className="profile-pic"></div>
-              <h4 className="testimonial-name">John Doe</h4>
-              <p className="testimonial-role">UI/UX Designer</p>
-
-              <div className="testimonial-stars">
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                {idx === 0 ? <span>☆</span> : <span>★</span>}
-              </div>
-
-              <p className="testimonial-text">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua quis
-                nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-                commodo consequat.
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="contact-section">
-        <h2 className="section-title">Reach us At</h2>
-        <p className="section-subtitle">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor
-        </p>
-
-        <div className="contact-wrapper">
-          <form className="contact-form">
-            <div className="form-row">
-              <input type="text" placeholder="First Name" />
-              <input type="text" placeholder="Last Name" />
-            </div>
-            <input type="email" placeholder="Email Address" />
-            <textarea rows="4" placeholder="Your message"></textarea>
-
-            {/* <div className="checkbox-row">
-              <input type="checkbox" id="agree" />
-              <label htmlFor="agree">
-                I agree to the <a>Terms and Conditions</a>.
-              </label>
-            </div> */}
-
-            <button type="submit" className="send-btn">
-              Send Message
-            </button>
-          </form>
-
-          <div className="contact-map">
-            <iframe
-              title="map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2813.5674310660425!2d-80.55818798471027!3d43.472285279126465!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x882bf41df7e206e9%3A0x3aa39b5b9f91e26e!2sConestoga%20College!5e0!3m2!1sen!2sca!4v1682100276142!5m2!1sen!2sca"
-              width="100%"
-              height="100%"
-              style={{ border: 0, borderRadius: "12px" }}
-              allowFullScreen=""
-              loading="lazy"
-            ></iframe>
           </div>
         </div>
       </section>
