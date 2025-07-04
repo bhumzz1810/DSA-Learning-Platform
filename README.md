@@ -45,45 +45,45 @@ cd DSA-Learning-Platform
 
 ### 2. Setup Backend (server)
 
-cd server
-npm install
-Create .env file with:
-PORT=5000
-MONGO_URI=your_mongo_url
-JWT_SECRET=your_secret
-npm run dev
+cd server<br>
+npm install<br>
+Create .env file with:<br>
+PORT=5000<br>
+MONGO_URI=your_mongo_url<br>
+JWT_SECRET=your_secret<br>
+npm run dev<br>
 
 ### 3. Setup Frontend (client)
 
-cd ../client
-npm install
-npm run dev
+cd ../client<br>
+npm install<br>
+npm run dev<br>
 
 
 📁 Folder Structure
 
-DSA-Learning-Platform/
-├── client/          # React frontend
-│   └── src/
-│       └── pages/
-│       └── components/
-├── server/          # Express backend
-│   └── models/
-│   └── controllers/
-│   └── routes/
-│   └── middleware/
+DSA-Learning-Platform/<br>
+├── client/          # React frontend<br>
+│   └── src/<br>
+│       └── pages/<br>
+│       └── components/<br>
+├── server/          # Express backend<br>
+│   └── models/<br>
+│   └── controllers/<br>
+│   └── routes/<br>
+│   └── middleware/<br>
 
 
 🧪 Seed Script (Add Problems)
-To add multiple problems:
+To add multiple problems:<br>
 
-cd server/scripts
-node seedProblems.js
+cd server/scripts<br>
+node seedProblems.js<br>
 
 
 👥 Team Members
 
-Bhumil Parate          Full Stack Dev
-Vasim Ahmed Choudhary  Frontend Dev
-Alshifan	             UI/UX Designer
+Bhumil Parate          Full Stack Dev<br>
+Vasim Ahmed Choudhary  Frontend Dev<br>
+Alshifan	             UI/UX Designer<br>
 
