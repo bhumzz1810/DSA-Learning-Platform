@@ -83,9 +83,6 @@ node seedProblems.js<br>
 
 👥 Team Members
 
-Bhumil Parate          Full Stack Dev<br>
-Vasim Ahmed Choudhary  Frontend Dev<br>
-Alshifan	             UI/UX Designer<br>
 | Role                   | Name                    |
 |------------------------|-------------------------|
 | Full Stack Developer   | Bhumil Parate           |
