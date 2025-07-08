@@ -1,6 +1,6 @@
 import React from "react";
 import { FiLock, FiCode, FiArrowRightCircle } from "react-icons/fi";
-import "./Dashboard.css";
+// import "./Dashboard.css";
 import "./Sidebar"
 import roadmapImg from "../assets/images/traversal.jpg"; // Adjust path as needed
 import Sidebar from "./Sidebar";
