@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const problemRoutes = require("./routes/problemRoutes");
 const suggestRoute = require("./routes/suggest");
+const judgeRoutes = require("./routes/judgeRoutes");
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/suggest", suggestRoute);
 app.use("/api/problems", problemRoutes);
+app.use("/api", judgeRoutes);
+
 const server = http.createServer(app);
 
 const io = new Server(server, {
