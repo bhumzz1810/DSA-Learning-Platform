@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
-import Editor from '@monaco-editor/react';
+import { useEffect, useState } from "react";
+import Editor from "@monaco-editor/react";
 
 const CodeEditor = ({ code, onChange, language, theme }) => {
-  const [editorTheme, setEditorTheme] = useState('vs');
-  
+  const [editorTheme, setEditorTheme] = useState("vs");
+
   useEffect(() => {
     // Map our theme names to Monaco editor themes
     const themeMap = {
-      light: 'vs',
-      dark: 'vs-dark',
-      ocean: 'vs',
-      forest: 'vs'
+      light: "vs",
+      dark: "vs-dark",
+      ocean: "vs",
+      forest: "vs",
     };
-    setEditorTheme(themeMap[theme] || 'vs');
+    setEditorTheme(themeMap[theme] || "vs");
   }, [theme]);
 
   const handleEditorChange = (value) => {
@@ -30,9 +30,9 @@ const CodeEditor = ({ code, onChange, language, theme }) => {
         options={{
           minimap: { enabled: true },
           fontSize: 14,
-          wordWrap: 'on',
+          wordWrap: "on",
           automaticLayout: true,
-          scrollBeyondLastLine: false
+          scrollBeyondLastLine: false,
         }}
       />
     </div>

@@ -22,7 +22,7 @@ router.post("/", async (req, res) => {
       },
       {
         headers: {
-          Authorization: `Bearer  ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         },
       }
     );

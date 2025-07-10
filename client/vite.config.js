@@ -2,23 +2,23 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {},
   },
-server: {
+  server: {
     proxy: {
-      '/socket.io': {
-        target: 'http://localhost:3001',
+      "/api": {
+        target: "http://localhost:5000", // your Express server
+        changeOrigin: true,
+      },
+      "/socket.io": {
+        target: "http://localhost:5000",
         ws: true,
-        changeOrigin: true
-      }
-    }
+        changeOrigin: true,
+      },
+    },
   },
-  
-  plugins: [react()]
-});
 
+  plugins: [react()],
+});

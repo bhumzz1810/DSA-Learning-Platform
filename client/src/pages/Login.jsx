@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
 import alertSound from "../assets/music/warning.mp3";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebaseConfig";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -15,7 +13,6 @@ const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState("");
-  const [attempts, setAttempts] = useState(0);
 
   const containerRef = useRef(null);
   const audioRef = useRef(null);
@@ -53,7 +50,11 @@ const LoginForm = () => {
   const checkPasswordStrength = (pass) => {
     if (pass.length === 0) return "";
     if (pass.length < 6) return "Weak";
-    if (!/[A-Z]/.test(pass) || !/[0-9]/.test(pass) || !/[^A-Za-z0-9]/.test(pass)) {
+    if (
+      !/[A-Z]/.test(pass) ||
+      !/[0-9]/.test(pass) ||
+      !/[^A-Za-z0-9]/.test(pass)
+    ) {
       return "Medium";
     }
     return "Strong";
@@ -67,38 +68,41 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (showLogin) {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        setError("");
-        setAttempts(0);
-        speak("Login successful");
-        navigate("/");
-      } catch (err) {
-        setAttempts((prev) => prev + 1);
-        if (attempts >= 2) {
-          setError("Username or password incorrect. Please try again later.");
-        } else {
-          setError(err.message);
-        }
+    const apiUrl =
+      import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/api/auth";
+    try {
+      const endpoint = showLogin ? "login" : "register";
+      const payload = showLogin
+        ? { email, password }
+        : { email, username: email.split("@")[0], password };
+
+      const res = await fetch(`${apiUrl}/${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Something went wrong");
+
+      localStorage.setItem("token", data.token);
+
+      // ✅ Decode token to get user role
+      const payloadData = JSON.parse(atob(data.token.split(".")[1]));
+      const role = payloadData.role;
+      localStorage.setItem("role", role);
+
+      alert(`${showLogin ? "Login" : "Signup"} successful!`);
+      setError("");
+
+      // ✅ Redirect based on role
+      if (role === "admin") {
+        navigate("/admin/problems");
+      } else {
+        navigate("/dashboard");
       }
-    } else {
-      if (password !== confirmPassword) {
-        setError("Passwords do not match");
-        return;
-      }
-      if (passwordStrength === "Weak") {
-        setError("Password is too weak");
-        return;
-      }
-      try {
-        await createUserWithEmailAndPassword(auth, email, password);
-        setError("");
-        speak("Signup successful");
-        handleLoginClick();
-      } catch (err) {
-        setError(err.message);
-      }
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -106,7 +110,9 @@ const LoginForm = () => {
     if (error && containerRef.current) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
-        audioRef.current.play().catch((e) => console.log("Audio play failed:", e));
+        audioRef.current
+          .play()
+          .catch((e) => console.log("Audio play failed:", e));
       }
       const spans = containerRef.current.querySelectorAll("span");
       spans.forEach((span) => {
@@ -120,7 +126,8 @@ const LoginForm = () => {
           spans.forEach((span) => {
             span.style.animation = "none";
             void span.offsetWidth;
-            span.style.animation = "blink 3s linear infinite, rotate 60s linear infinite";
+            span.style.animation =
+              "blink 3s linear infinite, rotate 60s linear infinite";
             span.style.animationDelay = `calc(var(--i) * (3s / 50))`;
           });
         }
@@ -141,14 +148,23 @@ const LoginForm = () => {
         {!showLogin && !showSignup ? (
           <div className="button-container">
             <img src={logo} alt="Logo" className="logo" />
-            <button className="btn main-btn" onClick={handleLoginClick}>Login</button>
-            <button className="btn main-btn" onClick={handleSignupClick}>Sign Up</button>
+            <button className="btn main-btn" onClick={handleLoginClick}>
+              Login
+            </button>
+            <button className="btn main-btn" onClick={handleSignupClick}>
+              Sign Up
+            </button>
           </div>
         ) : (
           <div className="login-box">
             <img src={logo} alt="Logo" className="logo-form" />
+
             <h2>{showLogin ? "Login" : "Sign Up"}</h2>
-            {error && <div className="error-message" role="alert">{error}</div>}
+            {error && (
+              <div className="error-message" role="alert">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="input-box">
                 <input
@@ -179,12 +195,15 @@ const LoginForm = () => {
                 </button>
                 {showSignup && password && (
                   <>
-                    <div className={`password-strength ${passwordStrength.toLowerCase()}`}>
+                    <div
+                      className={`password-strength ${passwordStrength.toLowerCase()}`}
+                    >
                       Strength: {passwordStrength || "None"}
                     </div>
                     {passwordStrength === "Weak" && (
                       <div className="password-hint" role="tooltip">
-                        Use at least 6 characters, including a number, uppercase letter, and symbol.
+                        Use at least 6 characters, including a number, uppercase
+                        letter, and symbol.
                       </div>
                     )}
                   </>
@@ -205,7 +224,9 @@ const LoginForm = () => {
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                   >
                     {showConfirmPassword ? "👁️" : "👁️‍🗨️"}
                   </button>
@@ -213,7 +234,9 @@ const LoginForm = () => {
               )}
               {showLogin && (
                 <div className="forgot-pass">
-                  <a href="#" tabIndex="0">Forgot your password?</a>
+                  <a href="#" tabIndex="0">
+                    Forgot your password?
+                  </a>
                 </div>
               )}
               <button type="submit" className="btn">
