@@ -13,8 +13,10 @@ import ProblemList from "./pages/admin/ProblemList";
 import EditProblem from "./pages/admin/EditProblem";
 import JoinRoom from "./pages/JoinRoom";
 import CodingRoom from "./pages/CodingRoom";
-
+import { ToastContainer, Slide } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
+import SocialLogin from "./pages/SocialLogin";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -30,27 +32,42 @@ function LayoutWrapper({ children }) {
 
 function App() {
   return (
-    <BrowserRouter>
-      <LayoutWrapper>
-        <Routes>
-          {/* USER ROUTES */}
-          <Route path="/" element={<Homepage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/problems" element={<Problems />} />
-          <Route path="/problems/:id" element={<ProblemDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/join-room" element={<JoinRoom />} />
-          <Route path="/coding-room" element={<CodingRoom />} />
-          <Route path="/coding-room/:roomId" element={<CodingRoom />} />
-          <Route path="/playground" element={<CodingRoom />} />
+    <>
+      <ToastContainer
+        transition={Slide}
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <BrowserRouter>
+        <LayoutWrapper>
+          <Routes>
+            {/* USER ROUTES */}
+            <Route path="/" element={<Homepage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/problems" element={<Problems />} />
+            <Route path="/problems/:id" element={<ProblemDetail />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/join-room" element={<JoinRoom />} />
+            <Route path="/coding-room" element={<CodingRoom />} />
+            <Route path="/coding-room/:roomId" element={<CodingRoom />} />
+            <Route path="/playground" element={<CodingRoom />} />
+            <Route path="/social-login" element={<SocialLogin />} />
 
-          {/* ADMIN ROUTES */}
-          <Route path="/admin/add-problem" element={<AddProblem />} />
-          <Route path="/admin/problems" element={<ProblemList />} />
-          <Route path="/admin/problems/edit/:id" element={<EditProblem />} />
-        </Routes>
-      </LayoutWrapper>
-    </BrowserRouter>
+            {/* ADMIN ROUTES */}
+            <Route path="/admin/add-problem" element={<AddProblem />} />
+            <Route path="/admin/problems" element={<ProblemList />} />
+            <Route path="/admin/problems/edit/:id" element={<EditProblem />} />
+          </Routes>
+        </LayoutWrapper>
+      </BrowserRouter>
+    </>
   );
 }
 

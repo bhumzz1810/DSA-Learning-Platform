@@ -18,6 +18,10 @@ const problemSchema = new mongoose.Schema({
   constraints: String,
   testCases: [testCaseSchema],
   hints: [String],
+  isDaily: {
+    type: Boolean,
+    default: false,
+  },
   visualAid: String, // URL to a gif or animation
   authorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   isArchived: { type: Boolean, default: false },
