@@ -1,7 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const { authenticate } = require("../middleware/auth");
-
+const axios = require("axios");
+const JUDGE0_API = "https://judge0-ce.p.rapidapi.com/submissions";
+const JUDGE0_HEADERS = {
+  "content-type": "application/json",
+  "Content-Type": "application/json",
+  "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+  "X-RapidAPI-Key": process.env.JUDGE0_API_KEY,
+};
 router.post("/execute", authenticate, async (req, res) => {
   const { source_code, language_id, stdin } = req.body;
 
@@ -34,7 +41,14 @@ router.post("/execute", authenticate, async (req, res) => {
 
     res.json(result);
   } catch (err) {
-    res.status(500).json({ error: "Execution failed" });
+    console.error(
+      "❌ Judge0 Error:",
+      err?.response?.data || err.message || err
+    );
+    res.status(500).json({
+      error: "Execution failed",
+      details: err?.response?.data || err.message,
+    });
   }
 });
 

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import { FiMaximize, FiMinimize } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 const wrapUserCode = (userCode) => {
   return `
@@ -15,7 +16,8 @@ process.stdin.on("data", function(chunk) {
 });
 
 process.stdin.on("end", function() {
-  const lines = input.trim().split("\\n");
+  globalThis.input = input.trim();
+  globalThis.lines = input.trim().split("\\n");
 
   ${userCode}
 
@@ -33,7 +35,7 @@ export default function ProblemDetail() {
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [ghostSuggestion, setGhostSuggestion] = useState("");
+  // const [ghostSuggestion, setGhostSuggestion] = useState("");
   const [activeTab, setActiveTab] = useState("description");
   const [ioTab, setIoTab] = useState("input");
   const [hint, setHint] = useState(null);
@@ -42,6 +44,13 @@ export default function ProblemDetail() {
     description: false,
     editor: false,
   });
+  const [runtime, setRuntime] = useState("");
+  const [memory, setMemory] = useState("");
+  const language = "javascript"; // You can later add a dropdown to change this
+  const languageId = 63; // JavaScript ID for Judge0
+  const [bookmarked, setBookmarked] = useState(false);
+  const [note, setNote] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -67,7 +76,52 @@ export default function ProblemDetail() {
       }
     };
 
+    const fetchLastSubmission = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/submissions/latest/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        if (res.data.code) {
+          setCode(res.data.code); // 👈 Set editor with last submitted code
+        }
+      } catch (err) {
+        console.error("Failed to load last submission:", err);
+      }
+    };
+
+    const checkBookmark = async () => {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+        }/bookmarks`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const ids = res.data.bookmarks.map((p) => p._id);
+      setBookmarked(ids.includes(id));
+    };
+    const fetchNote = async () => {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+        }/notes/${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (res.data.note) setNote(res.data.note.content);
+    };
+    fetchNote();
+    checkBookmark();
     fetchProblem();
+    fetchLastSubmission();
   }, [id]);
 
   useEffect(() => {
@@ -97,49 +151,121 @@ export default function ProblemDetail() {
       const wrappedCode = wrapUserCode(code);
 
       const response = await axios.post(
-        "https://judge0-ce.p.rapidapi.com/submissions",
+        `${
+          import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"
+        }/api/judge/execute`,
         {
-          language_id: 63,
+          language_id: languageId,
           source_code: wrappedCode,
           stdin: input,
         },
         {
           headers: {
-            "content-type": "application/json",
-            "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-            "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
 
-      const token = response.data.token;
-      let result = null;
+      const result = response.data;
 
-      while (!result || result.status.id <= 2) {
-        const res = await axios.get(
-          `https://judge0-ce.p.rapidapi.com/submissions/${token}?base64_encoded=false`,
-          {
-            headers: {
-              "X-RapidAPI-Key": "YOUR_RAPIDAPI_KEY",
-              "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
-            },
-          }
-        );
-        result = res.data;
-        if (result.status.id > 2) break;
-        await new Promise((r) => setTimeout(r, 1000));
-      }
+      const hasError = result.stderr || result.compile_output;
 
       setOutput(
-        result.stdout || result.stderr || result.compile_output || "No output"
+        hasError
+          ? result.stderr || result.compile_output
+          : result.stdout || "No output"
       );
+      setRuntime(result.time || "-");
+      setMemory(result.memory || "-");
+
+      if (hasError) {
+        toast.error("❌ Code failed to compile or run", {
+          icon: "💥",
+          theme: "colored",
+          style: {
+            background: "#b91c1c",
+            color: "#fff",
+          },
+        });
+      } else {
+        toast.success("✅ Code ran successfully!", {
+          icon: "⚙️",
+          theme: "colored",
+          style: {
+            background: "#2563eb",
+            color: "#fff",
+          },
+        });
+      }
     } catch (error) {
       console.error(error);
       setOutput(
         "Error: " + (error.response?.data?.message || "Something went wrong")
       );
+      toast.error("❌ Error while running code", {
+        icon: "💥",
+        theme: "colored",
+        style: {
+          background: "#b91c1c",
+          color: "#fff",
+        },
+      });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ProblemDetail.jsx
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      console.log("Using token:", token ? "exists" : "missing");
+
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+        }/submissions`,
+        {
+          problemId: id,
+          code,
+          language,
+          status: output.includes("Error") ? "Failed" : "Accepted",
+          runtime,
+          memory,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("Submission response:", response);
+      toast.success("Code submitted successfully!", {
+        icon: "🚀",
+        theme: "colored",
+        style: {
+          background: "#16a34a",
+          color: "white",
+        },
+      });
+    } catch (err) {
+      console.error("FRONTEND SUBMIT ERROR:", err);
+      const msg =
+        err.response?.status === 409
+          ? "Already accepted! Try a new problem"
+          : err.response?.data?.error || err.message;
+      toast.error(msg, {
+        icon: "❌",
+        theme: "colored",
+        style: {
+          background: "#dc2626",
+          color: "#fff",
+        },
+      });
+
+      // alert(`Submit failed: ${msg}`);
     }
   };
 
@@ -148,6 +274,94 @@ export default function ProblemDetail() {
       ...prev,
       [section]: !prev[section],
     }));
+  };
+
+  const handleEditorWillMount = (monaco) => {
+    monaco.languages.registerCompletionItemProvider("javascript", {
+      triggerCharacters: [".", "(", "=", " "],
+      provideCompletionItems: async (model, position) => {
+        const textUntilPosition = model.getValueInRange({
+          startLineNumber: 1,
+          startColumn: 1,
+          endLineNumber: position.lineNumber,
+          endColumn: position.column,
+        });
+
+        try {
+          const res = await axios.post("http://localhost:5000/api/suggest", {
+            prompt: textUntilPosition,
+          });
+
+          const suggestionText = res.data.suggestion.trim();
+
+          return {
+            suggestions: [
+              {
+                label: suggestionText.slice(0, 30),
+                kind: monaco.languages.CompletionItemKind.Snippet,
+                insertText: suggestionText,
+                insertTextRules:
+                  monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                range: {
+                  startLineNumber: position.lineNumber,
+                  startColumn: position.column,
+                  endLineNumber: position.lineNumber,
+                  endColumn: position.column,
+                },
+              },
+            ],
+          };
+        } catch (e) {
+          console.error("Auto-suggest failed", e);
+          return { suggestions: [] };
+        }
+      },
+    });
+  };
+
+  const toggleBookmark = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      if (bookmarked) {
+        await axios.delete(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/bookmarks/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setBookmarked(false);
+      } else {
+        await axios.post(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/bookmarks/${id}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setBookmarked(true);
+      }
+    } catch (err) {
+      toast.error("Failed to update bookmark");
+    }
+  };
+
+  const saveNote = async () => {
+    setSavingNote(true);
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+        }/notes/${id}`,
+        { content: note },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Note saved");
+    } catch (err) {
+      toast.error("Failed to save note");
+    } finally {
+      setSavingNote(false);
+    }
   };
 
   if (loading)
@@ -176,7 +390,22 @@ export default function ProblemDetail() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">{problem.title}</h1>
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <h1 className="text-3xl font-bold text-gray-800">
+              {problem.title}
+            </h1>
+            <button
+              onClick={toggleBookmark}
+              className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium border transition ${
+                bookmarked
+                  ? "bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200"
+                  : "bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200"
+              }`}
+            >
+              {bookmarked ? "🔖 Bookmarked" : "➕ Add to Bookmarks"}
+            </button>
+          </div>
+
           <div className="flex items-center space-x-4 mt-2">
             <span
               className={`px-3 py-1 rounded-full text-sm font-medium ${
@@ -287,6 +516,26 @@ export default function ProblemDetail() {
                   )}
                 </div>
               </div>
+              <div className="bg-white rounded-lg shadow-md p-5 border border-gray-100">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    📝 Your Notes
+                  </h2>
+                  <button
+                    onClick={saveNote}
+                    disabled={savingNote}
+                    className="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                  >
+                    {savingNote ? "Saving..." : "Save Note"}
+                  </button>
+                </div>
+                <textarea
+                  className="w-full h-32 border border-gray-300 p-3 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Write any helpful notes for this problem..."
+                />
+              </div>
             </div>
           )}
 
@@ -316,18 +565,8 @@ export default function ProblemDetail() {
                   height={fullScreen.editor ? "calc(100vh - 300px)" : "400px"}
                   defaultLanguage="javascript"
                   value={code}
-                  onChange={(value) => {
-                    setCode(value);
-                    if (value && value.length % 5 === 0) {
-                      axios
-                        .post("http://localhost:5000/api/suggest", {
-                          prompt: value,
-                        })
-                        .then((res) =>
-                          setGhostSuggestion(res.data.suggestion.trim())
-                        );
-                    }
-                  }}
+                  onChange={(value) => setCode(value)}
+                  beforeMount={handleEditorWillMount}
                   theme="vs-dark"
                   options={{
                     minimap: { enabled: false },
@@ -337,7 +576,7 @@ export default function ProblemDetail() {
                 />
               </div>
 
-              {ghostSuggestion && (
+              {/* {ghostSuggestion && (
                 <div className="bg-gray-800 text-gray-300 p-3 rounded-lg shadow text-sm flex justify-between items-center">
                   <div>
                     <span className="text-gray-400 italic">Suggestion: </span>
@@ -350,7 +589,7 @@ export default function ProblemDetail() {
                     Accept
                   </button>
                 </div>
-              )}
+              )} */}
 
               <div className="bg-white rounded-lg shadow overflow-hidden">
                 <div className="border-b border-gray-200 flex">
@@ -394,7 +633,7 @@ export default function ProblemDetail() {
                   {isLoading ? "Running..." : "Run Code"}
                 </button>
                 <button
-                  onClick={() => alert("Submit logic goes here")}
+                  onClick={handleSubmit}
                   className="flex-1 py-3 px-4 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 transition-colors"
                 >
                   Submit

@@ -58,6 +58,8 @@ export default function Problems() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const problemsPerPage = 9;
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+  const [dailyOnly, setDailyOnly] = useState(false);
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -78,7 +80,25 @@ export default function Problems() {
         console.error("Error fetching problems:", err);
       }
     };
+    const fetchBookmarks = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/bookmarks`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const ids = res.data.bookmarks.map((p) => p._id);
+        setBookmarkedIds(ids);
+      } catch (err) {
+        console.error("Failed to fetch bookmarks:", err);
+      }
+    };
 
+    fetchBookmarks();
     fetchProblems();
   }, []);
 
@@ -90,7 +110,9 @@ export default function Problems() {
       (problem.category || "")
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
-    return matchesDifficulty && matchesSearch;
+    const matchesDaily = !dailyOnly || problem.isDaily;
+
+    return matchesDifficulty && matchesSearch && matchesDaily;
   });
 
   const totalPages = Math.ceil(filteredProblems.length / problemsPerPage);
@@ -102,6 +124,33 @@ export default function Problems() {
   );
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Function to toggle bookmark
+  const toggleBookmark = async (problemId) => {
+    const token = localStorage.getItem("token");
+    try {
+      if (bookmarkedIds.includes(problemId)) {
+        await axios.delete(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/bookmarks/${problemId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setBookmarkedIds(bookmarkedIds.filter((id) => id !== problemId));
+      } else {
+        await axios.post(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+          }/bookmarks/${problemId}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setBookmarkedIds([...bookmarkedIds, problemId]);
+      }
+    } catch (err) {
+      console.error("Error toggling bookmark:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
@@ -109,7 +158,8 @@ export default function Problems() {
           <h1 className="text-3xl font-bold text-gray-900">
             DSArena Challenges
           </h1>
-          <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap md:flex-nowrap gap-4 w-full md:justify-end items-center">
+            {/* 🔍 Search bar */}
             <div className="relative w-full md:w-64">
               <input
                 type="text"
@@ -138,35 +188,33 @@ export default function Problems() {
               </div>
             </div>
 
-            <div className="relative">
-              <select
-                value={difficultyFilter}
-                onChange={(e) => {
-                  setDifficultyFilter(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="appearance-none px-4 py-2 pr-8 bg-white text-gray-900 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all w-full md:w-48"
-              >
-                <option value="All">All Difficulties</option>
-                <option value="Easy">Easy</option>
-                <option value="Medium">Medium</option>
-                <option value="Hard">Hard</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
+            {/* 🎯 Difficulty dropdown */}
+            <select
+              value={difficultyFilter}
+              onChange={(e) => {
+                setDifficultyFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="appearance-none px-4 py-2 bg-white text-gray-900 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all w-full md:w-48"
+            >
+              <option value="All">All Difficulties</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+
+            {/* 🔥 Daily Challenge checkbox */}
+            <div className="flex items-center gap-2">
+              <input
+                id="dailyOnly"
+                type="checkbox"
+                checked={dailyOnly}
+                onChange={() => setDailyOnly(!dailyOnly)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <label htmlFor="dailyOnly" className="text-sm text-gray-700">
+                Show only Daily Challenge
+              </label>
             </div>
           </div>
         </div>
@@ -180,35 +228,96 @@ export default function Problems() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
-                <BackgroundGradient containerClassName="rounded-xl">
-                  <div className="bg-white p-6 rounded-xl">
-                    <div className="flex flex-col h-full">
-                      <div className="flex justify-between items-start mb-4">
-                        <h2 className="text-xl font-bold text-gray-900">
-                          {problem.title}
-                        </h2>
+                <BackgroundGradient
+                  containerClassName={cn(
+                    "rounded-xl shadow-md transition-transform duration-300",
+                    problem.isDaily
+                      ? "ring-2 ring-blue-400 hover:scale-[1.03] animate-pulse"
+                      : "hover:scale-[1.02]"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "bg-white rounded-xl p-5 flex flex-col h-full",
+                      problem.isDaily &&
+                        "border border-blue-500 shadow-md shadow-blue-200 animate-pulse"
+                    )}
+                  >
+                    <div className="bg-white rounded-xl p-5 flex flex-col h-full">
+                      {/* Row 1: Title + Bookmark */}
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex flex-col">
+                          <h2 className="text-base font-semibold text-gray-900 leading-snug line-clamp-2">
+                            {problem.title}
+                          </h2>
+                          {problem.isDaily && (
+                            <span className="mt-1 inline-block text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full w-fit">
+                              🔥 Daily Challenge
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => toggleBookmark(problem._id)}
+                          className="text-gray-400 hover:text-yellow-500 transition"
+                          aria-label="Bookmark problem"
+                        >
+                          {bookmarkedIds.includes(problem._id) ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                              className="w-5 h-5"
+                            >
+                              <path d="M6 4a2 2 0 012-2h8a2 2 0 012 2v18l-7-4-7 4V4z" />
+                            </svg>
+                          ) : (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              className="w-5 h-5"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-4-7 4V5z"
+                              />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* Row 2: Category + Difficulty */}
+                      <div className="flex items-center justify-between mb-5">
+                        <p className="text-sm text-gray-600">
+                          Category:{" "}
+                          <span className="font-medium">
+                            {problem.category || "N/A"}
+                          </span>
+                        </p>
                         <span
-                          className={`px-3 py-1 text-xs rounded-full font-medium ${
+                          className={`px-2 py-1 text-xs font-semibold rounded-full ${
                             problem.difficulty === "Easy"
-                              ? "bg-green-100 text-green-800"
+                              ? "bg-green-100 text-green-700"
                               : problem.difficulty === "Medium"
                               ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
+                              : "bg-red-100 text-red-700"
                           }`}
                         >
                           {problem.difficulty}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-6">
-                        Topic: {problem.category || "N/A"}
-                      </p>
+
+                      {/* Row 3: Solve Button */}
                       <div className="mt-auto">
                         <Link
                           to={`/problems/${problem._id}`}
-                          className="w-full px-4 py-2 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                          className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition"
                         >
                           <svg
-                            className="w-4 h-4 mr-2"
+                            className="w-4 h-4"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"

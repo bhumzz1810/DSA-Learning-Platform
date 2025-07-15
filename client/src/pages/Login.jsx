@@ -257,6 +257,37 @@ const LoginForm = () => {
                 </a>
               </div>
             </form>
+            <hr className="my-6 border-t border-gray-300 w-full" />
+
+            <div className="mt-6 w-full flex flex-col items-center">
+              <p className="text-sm text-gray-500 mb-2">or continue with</p>
+
+              <div className="flex flex-col w-full gap-3 max-w-xs">
+                <a
+                  href="http://localhost:5000/auth/google"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition duration-200"
+                >
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
+                    alt="Google"
+                    className="w-5 h-5"
+                  />
+                  Sign in with Google
+                </a>
+
+                <a
+                  href="http://localhost:5000/auth/github"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-900 transition duration-200"
+                >
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg"
+                    alt="GitHub"
+                    className="w-5 h-5"
+                  />
+                  Sign in with GitHub
+                </a>
+              </div>
+            </div>
           </div>
         )}
       </div>
