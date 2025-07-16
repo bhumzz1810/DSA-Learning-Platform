@@ -610,7 +610,7 @@ const CodingRoom = () => {
         }}
         className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
-        Light
+        <span className="mr-2">☀️</span> Light
       </button>
       <button
         onClick={() => {
@@ -619,7 +619,7 @@ const CodingRoom = () => {
         }}
         className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
-        Dark
+       <span className="mr-2">🌙</span>  Dark
       </button>
     </div>
   )}
