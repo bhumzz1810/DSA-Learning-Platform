@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from '../components/ThemeContext';
+import { useTheme } from '../components/RT_Pairing/ThemeContext';
 
 const JoinRoom = () => {
   const [roomId, setRoomId] = useState('');

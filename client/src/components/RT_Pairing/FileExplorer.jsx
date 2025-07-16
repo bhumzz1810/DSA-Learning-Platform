@@ -1,7 +1,9 @@
 import { useState } from "react";
 
-const FileExplorer = ({ files, onFileSelect, activeFile, theme }) => {
+const FileExplorer = ({ files, onFileSelect, onFileDelete, onFileRename, activeFile, theme }) => {
   const [expandedFolders, setExpandedFolders] = useState({});
+  const [renamingFile, setRenamingFile] = useState(null);
+  const [newFileName, setNewFileName] = useState("");
 
   const toggleFolder = (path) => {
     setExpandedFolders((prev) => ({
@@ -10,12 +12,24 @@ const FileExplorer = ({ files, onFileSelect, activeFile, theme }) => {
     }));
   };
 
-  // Keyboard support for folders and files
   const handleKeyDown = (e, onClick) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       onClick();
     }
+  };
+
+  const startRenaming = (file) => {
+    setRenamingFile(file);
+    setNewFileName(file.name);
+  };
+
+  const handleRenameSubmit = (file) => {
+    if (newFileName && newFileName.trim() !== "") {
+      onFileRename(file, newFileName.trim());
+    }
+    setRenamingFile(null);
+    setNewFileName("");
   };
 
   const renderFiles = (files, path = "", depth = 0) => {
@@ -53,10 +67,7 @@ const FileExplorer = ({ files, onFileSelect, activeFile, theme }) => {
           <div
             key={fullPath}
             role="treeitem"
-            tabIndex={0}
-            onClick={() => onFileSelect({ ...file, path: fullPath })}
-            onKeyDown={(e) => handleKeyDown(e, () => onFileSelect({ ...file, path: fullPath }))}
-            className={`flex items-center cursor-pointer rounded py-1 px-2 select-none ${
+            className={`flex items-center justify-between rounded py-1 px-2 select-none ${
               isActive
                 ? theme === "dark"
                   ? "bg-blue-900 text-white"
@@ -67,8 +78,55 @@ const FileExplorer = ({ files, onFileSelect, activeFile, theme }) => {
             }`}
             style={{ paddingLeft: `${depth * 1.25}rem` }}
           >
-            <span className="mr-2">📄</span>
-            <span>{file.name}</span>
+            {renamingFile?.path === fullPath ? (
+              <input
+                type="text"
+                value={newFileName}
+                onChange={(e) => setNewFileName(e.target.value)}
+                onBlur={() => handleRenameSubmit(file)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleRenameSubmit(file);
+                  if (e.key === "Escape") {
+                    setRenamingFile(null);
+                    setNewFileName("");
+                  }
+                }}
+                className={`flex-1 p-1 rounded ${
+                  theme === "dark" ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                }`}
+                autoFocus
+              />
+            ) : (
+              <>
+                <div
+                  tabIndex={0}
+                  onClick={() => onFileSelect({ ...file, path: fullPath })}
+                  onKeyDown={(e) => handleKeyDown(e, () => onFileSelect({ ...file, path: fullPath }))}
+                  className="flex items-center flex-1 cursor-pointer"
+                >
+                  <span className="mr-2">📄</span>
+                  <span>{file.name}</span>
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => startRenaming(file)}
+                    className={`text-xs ${
+                      theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => onFileDelete(file)}
+                    className={`text-xs ${
+                      theme === "dark" ? "text-gray-400 hover:text-gray-200" : "text-gray-600 hover:text-gray-800"
+                    }`}
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         );
       }
