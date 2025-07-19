@@ -7,20 +7,25 @@ import { toast } from "react-toastify";
 
 const wrapUserCode = (userCode) => {
   return `
-process.stdin.resume();
-process.stdin.setEncoding("utf8");
+const readline = require("readline");
 
 let input = "";
-process.stdin.on("data", function(chunk) {
-  input += chunk;
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false,
 });
 
-process.stdin.on("end", function() {
-  globalThis.input = input.trim();
-  globalThis.lines = input.trim().split("\\n");
+rl.on("line", (line) => {
+  input += line + "\\n";
+});
 
+rl.on("close", () => {
+  const lines = input.trim().split("\\n");
+
+  // Define input and lines locally instead of using globalThis
   ${userCode}
-
 });
 `.trim();
 };
