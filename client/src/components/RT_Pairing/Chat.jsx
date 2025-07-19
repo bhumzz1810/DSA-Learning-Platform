@@ -1,8 +1,16 @@
-// Chat.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const Chat = ({ messages, onSendMessage, theme, currentUser, inputClassName }) => {
   const [message, setMessage] = useState('');
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,13 +29,19 @@ const Chat = ({ messages, onSendMessage, theme, currentUser, inputClassName }) =
           <div 
             key={i} 
             className={`mb-3 p-3 rounded-lg ${
-              msg.alias === currentUser
-                ? (theme === 'dark' ? 'bg-blue-900' : 'bg-blue-100')
-                : (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100')
+              msg.isSystem
+                ? theme === 'dark' 
+                  ? 'bg-gray-900 border border-gray-700 text-center italic' 
+                  : 'bg-gray-200 border border-gray-300 text-center italic'
+                : msg.alias === currentUser
+                  ? (theme === 'dark' ? 'bg-blue-900' : 'bg-blue-100')
+                  : (theme === 'dark' ? 'bg-gray-700' : 'bg-gray-100')
             }`}
           >
             <p className={`font-semibold ${
-              theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
+              msg.isSystem
+                ? theme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                : theme === 'dark' ? 'text-blue-300' : 'text-blue-700'
             }`}>
               {msg.alias}
             </p>
@@ -41,6 +55,7 @@ const Chat = ({ messages, onSendMessage, theme, currentUser, inputClassName }) =
             </p>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
       <form 
         onSubmit={handleSubmit} 

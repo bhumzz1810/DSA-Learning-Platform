@@ -30,6 +30,7 @@ rl.on("close", () => {
 `.trim();
 };
 
+
 export default function ProblemDetail() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
