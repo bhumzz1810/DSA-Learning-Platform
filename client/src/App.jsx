@@ -17,6 +17,9 @@ import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 import SocialLogin from "./pages/SocialLogin";
+import Onboarding from "./pages/Onboarding";
+import Leaderboard from "./pages/Leaderboard";
+import Profilepage from "./pages/Profilepage";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -59,6 +62,9 @@ function App() {
             <Route path="/coding-room/:roomId" element={<CodingRoom />} />
             <Route path="/playground" element={<CodingRoom />} />
             <Route path="/social-login" element={<SocialLogin />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/profile" element={<Profilepage />} />
 
             {/* ADMIN ROUTES */}
             <Route path="/admin/add-problem" element={<AddProblem />} />

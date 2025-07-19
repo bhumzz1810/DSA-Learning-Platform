@@ -38,6 +38,7 @@ app.use(
 );
 app.use(express.json());
 connectDB();
+rotateDailyChallenge(); // 🔁 rotate once on every restart for dev mode
 
 app.use(
   session({
@@ -53,7 +54,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Rotate challenge daily
+// Rotate challenge daily - FOR LIVE
 cron.schedule("0 0 * * *", () => {
   console.log("🔁 Rotating daily challenge...");
   rotateDailyChallenge();

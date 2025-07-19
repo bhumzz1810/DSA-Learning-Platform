@@ -5,10 +5,10 @@ import App from './App.jsx'
 import { ThemeProvider } from './components/RT_Pairing/ThemeContext.jsx';
 
 
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ThemeProvider>
-        <App />
-      </ThemeProvider>
-  </StrictMode>,
-)
+      <App />
+    </ThemeProvider>
+  </StrictMode>
+);

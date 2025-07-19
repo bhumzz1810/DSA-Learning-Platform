@@ -8,7 +8,16 @@ import timer from "../assets/icons/timer.png";
 import handshake from "../assets/icons/handshake.png";
 import free from "../assets/free.png";
 import pro from "../assets/pro.png";
-
+import { motion } from "framer-motion";
+// Background animation component
+const AnimatedBackground = () => (
+  <motion.div
+    className="absolute inset-0 bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-800 opacity-20 z-0"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 2, ease: "easeInOut" }}
+  />
+);
 const Homepage = () => {
   const navigate = useNavigate();
   const [isMonthly, setIsMonthly] = useState(true);
@@ -68,10 +77,14 @@ const Homepage = () => {
       </section>
 
       {/* About Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* About Section */}
+      <section className="relative py-20 bg-white">
+        {/* Background animation */}
+        <AnimatedBackground />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 relative">
+          {/* Section Header */}
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900">
+            <h2 className="text-4xl font-semibold text-gray-900">
               Why Choose DSArena?
             </h2>
             <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
@@ -80,27 +93,29 @@ const Homepage = () => {
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-12">
-            <div className="lg:w-1/2 space-y-8">
+          {/* Content and Stats */}
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+            {/* Left Column - Philosophy and Methodology */}
+            <div className="lg:w-1/2 space-y-6">
               <h3 className="text-2xl font-semibold text-gray-900">
                 Our Learning Philosophy
               </h3>
               <p className="text-gray-600">
                 Traditional coding platforms focus on solutions. We emphasize
                 the{" "}
-                <strong className="text-gray-900">
+                <strong className="text-blue-500">
                   problem-solving process
-                </strong>
+                </strong>{" "}
                 with step-by-step visualizations, complexity analysis, and
                 pattern recognition techniques used by FAANG engineers.
               </p>
               <a
                 href="/about"
-                className="inline-flex items-center text-blue-600 font-medium group"
+                className="inline-flex items-center text-blue-600 font-medium mt-6"
               >
                 Our Methodology
                 <svg
-                  className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform"
+                  className="ml-2 w-4 h-4 transition-transform"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -115,10 +130,11 @@ const Homepage = () => {
                 </svg>
               </a>
 
-              <div className="space-y-6 mt-8">
+              <div className="mt-8 space-y-6">
+                {/* Feature Cards with animations */}
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-900 p-2 rounded-full">
-                    <img src={ship} alt="Fast Learning" className="w-6 h-6" />
+                  <div className="bg-blue-500 p-2 rounded-full text-white">
+                    <i className="fas fa-bolt"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">
@@ -126,54 +142,73 @@ const Homepage = () => {
                     </h4>
                     <p className="text-gray-600 text-sm">
                       Master concepts 2x faster with our spatial repetition
-                      system
+                      system.
                     </p>
                   </div>
                 </div>
+
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-900 p-2 rounded-full">
-                    <img src={timer} alt="Time Efficient" className="w-6 h-6" />
+                  <div className="bg-gray-700 p-2 rounded-full text-white">
+                    <i className="fas fa-clock"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">
                       Time-Efficient
                     </h4>
                     <p className="text-gray-600 text-sm">
-                      15-min daily challenges that fit your schedule
+                      15-min daily challenges that fit your schedule.
                     </p>
                   </div>
                 </div>
+
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-900 p-2 rounded-full">
-                    <img src={handshake} alt="Community" className="w-6 h-6" />
+                  <div className="bg-green-500 p-2 rounded-full text-white">
+                    <i className="fas fa-users"></i>
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">
                       Expert Community
                     </h4>
                     <p className="text-gray-600 text-sm">
-                      Get unstuck with help from senior engineers
+                      Get unstuck with help from senior engineers.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="lg:w-1/2 grid grid-cols-3 gap-4">
-              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-                <span className="text-3xl font-bold text-gray-900">
+            {/* Right Column - Stats */}
+            <div className="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Stat Cards */}
+              <motion.div
+                className="bg-blue-100 p-6 rounded-xl text-center shadow-lg"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.2 }}
+              >
+                <span className="text-4xl font-bold text-blue-600">
                   10,000+
                 </span>
                 <p className="mt-2 text-gray-600">Active Learners</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-                <span className="text-3xl font-bold text-gray-900">350+</span>
+              </motion.div>
+              <motion.div
+                className="bg-yellow-100 p-6 rounded-xl text-center shadow-lg"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4 }}
+              >
+                <span className="text-4xl font-bold text-yellow-600">350+</span>
                 <p className="mt-2 text-gray-600">Hands-on Challenges</p>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-                <span className="text-3xl font-bold text-gray-900">92%</span>
+              </motion.div>
+              <motion.div
+                className="bg-green-100 p-6 rounded-xl text-center shadow-lg"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.6 }}
+              >
+                <span className="text-4xl font-bold text-green-600">92%</span>
                 <p className="mt-2 text-gray-600">Interview Success Rate</p>
-              </div>
+              </motion.div>
             </div>
           </div>
         </div>

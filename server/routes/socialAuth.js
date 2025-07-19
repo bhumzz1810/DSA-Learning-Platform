@@ -12,9 +12,12 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: req.user._id, role: req.user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     res.redirect(`http://localhost:5173/social-login?token=${token}`);
   }
 );
@@ -29,9 +32,12 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { failureRedirect: "/" }),
   (req, res) => {
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      { id: req.user._id, role: req.user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
     res.redirect(`http://localhost:5173/social-login?token=${token}`);
   }
 );
