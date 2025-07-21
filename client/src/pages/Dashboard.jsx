@@ -1,169 +1,508 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../components/RT_Pairing/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
-const DashboardCards = () => {
-  const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState('overview');
-  const [selectedBadge, setSelectedBadge] = useState(null);
-  const [selectedProblem, setSelectedProblem] = useState(null);
+// Animation variants
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.5, 
+      ease: 'easeOut' 
+    } 
+  },
+  hover: {
+    y: -5,
+    scale: 1.02,
+    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)"
+  }
+};
 
-  const userData = {
-    username: "codeMaster",
-    level: 3,
-    xp: 2450,
-    streak: 7,
-    badges: ["First Problem", "XP Rookie", "Hard Hitter", "Streak Starter", "Weekend Warrior"],
-    recentSolved: [
-      { title: "Reverse Linked List", category: "Linked List", difficulty: "Medium", solvedAt: "2025-07-17T14:25:00.000Z" },
-      { title: "Binary Tree Traversal", category: "Tree", difficulty: "Medium", solvedAt: "2025-07-16T11:20:00.000Z" },
-      { title: "Palindromic Substring", category: "String", difficulty: "Hard", solvedAt: "2025-07-15T09:15:00.000Z" }
-    ],
-    leaderboard: [
-      { username: "algoNinja", xp: 3850, level: 4 },
-      { username: "codeMaster", xp: 2450, level: 3 },
-      { username: "binaryQueen", xp: 2100, level: 2 }
-    ]
+const flipVariants = {
+  hidden: { rotateY: 90, opacity: 0 },
+  visible: { 
+    rotateY: 0, 
+    opacity: 1,
+    transition: { 
+      duration: 0.6,
+      type: 'spring',
+      stiffness: 100
+    }
+  }
+};
+
+const badgeVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: (i) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.3, delay: i * 0.1 },
+  }),
+  hover: {
+    scale: 1.1,
+    y: -3,
+    transition: { duration: 0.2 }
+  }
+};
+
+const problemVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: (i) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.4, delay: i * 0.1, ease: 'easeOut' },
+  }),
+  hover: {
+    y: -5,
+    zIndex: 1,
+    boxShadow: "0 10px 20px rgba(0, 0, 0, 0.2)"
+  }
+};
+
+const Dashboard = () => {
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState({ user: null });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [flipped, setFlipped] = useState(false);
+  const { theme, toggleTheme } = useTheme();
+
+  // Theme configuration with fallbacks
+  const themeConfig = {
+    light: {
+      bg: 'bg-gradient-to-br from-gray-50 to-gray-200',
+      card: 'bg-white/90 border-gray-200',
+      text: 'text-gray-900',
+      title: 'text-indigo-700',
+      subtitle: 'text-indigo-600',
+      button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+      loading: 'bg-gradient-to-br from-gray-50 to-gray-200',
+      accent: 'from-indigo-500 to-purple-600',
+      badge: 'bg-indigo-100 text-indigo-800',
+      flipFront: 'bg-white',
+      flipBack: 'bg-indigo-50'
+    },
+    dark: {
+      bg: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950',
+      card: 'bg-gray-800/90 border-gray-700',
+      text: 'text-gray-100',
+      title: 'text-indigo-300',
+      subtitle: 'text-indigo-200',
+      button: 'bg-indigo-600 hover:bg-indigo-500 text-white',
+      loading: 'bg-gradient-to-br from-gray-900 to-gray-800',
+      accent: 'from-indigo-500 to-purple-500',
+      badge: 'bg-indigo-900/50 text-indigo-100',
+      flipFront: 'bg-gray-800',
+      flipBack: 'bg-gray-700'
+    },
+    ocean: {
+      bg: 'bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950',
+      card: 'bg-blue-800/90 border-blue-700',
+      text: 'text-blue-50',
+      title: 'text-cyan-300',
+      subtitle: 'text-cyan-200',
+      button: 'bg-cyan-600 hover:bg-cyan-500 text-white',
+      loading: 'bg-gradient-to-br from-blue-900 to-blue-800',
+      accent: 'from-cyan-400 to-blue-500',
+      badge: 'bg-cyan-900/50 text-cyan-100',
+      flipFront: 'bg-blue-800',
+      flipBack: 'bg-blue-700'
+    },
+    forest: {
+      bg: 'bg-gradient-to-br from-green-900 via-green-800 to-green-950',
+      card: 'bg-green-800/90 border-green-700',
+      text: 'text-green-50',
+      title: 'text-emerald-300',
+      subtitle: 'text-emerald-200',
+      button: 'bg-emerald-600 hover:bg-emerald-500 text-white',
+      loading: 'bg-gradient-to-br from-green-900 to-green-800',
+      accent: 'from-emerald-400 to-teal-500',
+      badge: 'bg-emerald-900/50 text-emerald-100',
+      flipFront: 'bg-green-800',
+      flipBack: 'bg-green-700'
+    }
   };
 
-  // Updated professional color scheme:
-  const bgLight = 'bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 text-gray-900';
-  const cardBg = 'bg-white border border-gray-300 shadow-sm';
-  const tabActive = 'bg-blue-600 text-white shadow-md';
-  const tabInactive = 'bg-white text-gray-700 hover:bg-blue-50 border border-gray-300';
+  const currentTheme = themeConfig[theme] || themeConfig.light;
+
+  // Safe theme color extraction
+  const getThemeColor = (type) => {
+    if (!currentTheme?.accent) return 'indigo-500';
+    const parts = currentTheme.accent.split(' ');
+    if (type === 'from') return parts[0]?.replace('from-', '') || 'indigo-500';
+    if (type === 'to') return parts[2]?.replace('to-', '') || 'purple-500';
+    return 'indigo-500';
+  };
+
+  // Safe gradient application
+  const applyGradient = (element) => {
+    return currentTheme?.accent 
+      ? `${currentTheme.accent} ${element}`
+      : `from-indigo-500 to-purple-500 ${element}`;
+  };
+
+  const calculateXpProgress = () => {
+    if (!userData?.user?.level || userData.user.level <= 0) return 0;
+    const xpForNextLevel = 1000;
+    const currentXp = (userData.user.xp || 0) - ((userData.user.level - 1) * 1000);
+    return (currentXp / xpForNextLevel) * 100;
+  };
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/dashboard', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch dashboard data');
+        }
+
+        const data = await response.json();
+        // Ensure streak and totalSolved have fallback values
+        const userWithDefaults = {
+          ...data.user,
+          streak: data.user.streak || 0,
+          totalSolved: data.user.totalSolved || 0,
+          userRank: data.leaderboard?.yourRank || '--',
+        };
+        setUserData({ user: userWithDefaults });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+          className="w-14 h-14 border-4 border-t-transparent border-indigo-400 rounded-full shadow-lg"
+        />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
+        <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
+          <h2 className="text-2xl font-bold mb-4">Error Loading Dashboard</h2>
+          <p className="mb-4 text-red-400">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className={`px-4 py-2 rounded-lg ${currentTheme.button}`}
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!userData?.user) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
+        <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
+          <h2 className="text-2xl font-bold mb-4">No User Data Found</h2>
+          <p>Please check your connection and try again</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`min-h-screen p-6 ${bgLight}`}>
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-4xl font-extrabold text-blue-700">
-              Code Dashboard
-            </h1>
-            <div className="flex items-center gap-3 text-sm text-gray-600 font-medium">
-              <span>Light</span>
-              <div className="w-12 h-6 bg-gray-300 rounded-full p-1 flex items-center">
-                <motion.div className="w-5 h-5 bg-white rounded-full ml-auto shadow" layout />
-              </div>
-              <span>Dark</span>
-            </div>
-          </div>
+    <div className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}>
+    
+      {/* Animated Background Particles */}
+      <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              x: [0, 100, 0],
+              y: [0, 50, 0],
+              opacity: [0.3, 0.8, 0.3]
+            }}
+            transition={{
+              duration: 10 + Math.random() * 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            className={`absolute rounded-full bg-${getThemeColor('from')} blur-sm`}
+            style={{
+              width: `${Math.random() * 10 + 5}px`,
+              height: `${Math.random() * 10 + 5}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`
+            }}
+          />
+        ))}
+      </div>
 
-          <div className="flex flex-wrap gap-3">
-            {['overview', 'progress', 'achievements'].map(tab => (
-              <motion.button
-                key={tab}
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Hero Header */}
+        <motion.header 
+          className={`relative overflow-hidden rounded-3xl p-8 ${currentTheme.card}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
+          <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor('from')} blur-3xl opacity-20`}></div>
+          <div className="flex justify-between items-center relative z-10">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-bold">
+                Welcome back, <span className={`bg-clip-text ${applyGradient('')}`}>{userData.user.username.toUpperCase()}</span>!
+              </h1>
+              <p className={`text-lg mt-2 ${currentTheme.subtitle}`}>Here's your coding progress</p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => {
+                const themes = ['light', 'dark', 'ocean', 'forest'];
+                const currentIndex = themes.indexOf(theme);
+                const nextIndex = (currentIndex + 1) % themes.length;
+                toggleTheme(themes[nextIndex]);
+              }}
+              className={`p-3 rounded-full shadow-md border ${currentTheme.card}`}
+            >
+              {theme === 'light' ? '🌙' : 
+               theme === 'dark' ? '🌞' : 
+               theme === 'ocean' ? '🌲' : '🌊'}
+            </motion.button>
+          </div>
+        </motion.header>
+
+        {/* Profile Flip Card (Front Side Only) */}
+        <motion.div 
+          className="perspective-1000 w-full"
+          whileHover={{ scale: 1.01 }}
+        >
+          <motion.div
+            className={`relative w-full min-h-[300px] rounded-3xl shadow-xl ${currentTheme.flipFront}`}
+          >
+            {/* Front Side Only */}
+            <div className="p-8 h-full flex items-center gap-6">
+              <motion.div
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
-                  activeTab === tab ? tabActive : tabInactive
-                }`}
+                className={`w-24 h-24 rounded-full ${applyGradient(`flex items-center justify-center ${currentTheme.text} text-4xl font-bold shadow-md`)}`}
               >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </motion.button>
-            ))}
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <div className={`rounded-2xl p-8 ${cardBg}`}>
-              <div className="flex items-center gap-5 mb-6">
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-bold text-white shadow-md">
-                    {userData.username.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="absolute -bottom-2 -right-2 bg-blue-100 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                    Lvl {userData.level}
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-800">{userData.username}</h2>
-                  <p className="text-sm text-gray-500">Joined January 2025</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-6">
-                <div className="p-4 rounded-lg text-center border border-blue-200 bg-blue-50">
-                  <div className="text-2xl font-bold text-blue-700">{userData.streak}</div>
-                  <div className="text-xs text-blue-600 uppercase tracking-wide">Day Streak</div>
-                </div>
-                <div className="p-4 rounded-lg text-center border border-indigo-200 bg-indigo-50">
-                  <div className="text-2xl font-bold text-indigo-700">{userData.recentSolved.length}</div>
-                  <div className="text-xs text-indigo-600 uppercase tracking-wide">This Week</div>
-                </div>
-                <div className="p-4 rounded-lg text-center border border-gray-300 bg-gray-100">
-                  <div className="text-2xl font-bold text-gray-700">82%</div>
-                  <div className="text-xs text-gray-600 uppercase tracking-wide">Accuracy</div>
-                </div>
+                {userData.user.username.charAt(0).toUpperCase()}
+              </motion.div>
+              <div className="space-y-2">
+                <h2 className={`text-2xl font-bold ${currentTheme.title} uppercase`}>
+                  {userData.user.username}
+                </h2>
+                <p className={`text-base ${currentTheme.subtitle}`}>{userData.user.email}</p>
+                <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
+                  Joined {new Date(userData.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </p>
               </div>
             </div>
+          </motion.div>
+        </motion.div>
 
-            <div className={`rounded-2xl p-6 ${cardBg}`}>
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-semibold text-lg text-gray-800">XP Progress</h2>
-                <span className="text-sm text-gray-500">
-                  Level {userData.level} → {userData.level + 1}
-                </span>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* Leaderboard Card */}
+          <motion.div 
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            whileHover="hover"
+            onClick={() => navigate('/leaderboard')}
+            className={`rounded-3xl p-6 shadow-lg ${currentTheme.card} border border-opacity-20 cursor-pointer`}
+          >
+            <div className="flex items-center justify-between">
+              <h3 className={`text-lg font-semibold ${currentTheme.title}`}>🏆 Leaderboard</h3>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 opacity-70" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="mt-4 flex items-center">
+              <div className={`w-12 h-12 rounded-full ${applyGradient('flex items-center justify-center text-white text-xl')}`}>
+                👑
               </div>
-              <div className="w-full bg-blue-100 rounded-full h-3 mb-3">
-                <motion.div
+              <div className="ml-4">
+                <p className="text-sm opacity-80">Your rank</p>
+                <p className="text-xl font-bold"># {userData.user.userRank}</p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* XP Progress Card */}
+          <motion.div 
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            whileHover="hover"
+            className={`rounded-3xl p-6 shadow-lg ${currentTheme.card} border border-opacity-20`}
+          >
+            <h3 className={`text-lg font-semibold mb-4 ${currentTheme.title}`}>XP Progress</h3>
+            <div className="relative pt-1">
+              <div className="overflow-hidden h-3 rounded-full bg-gray-200/20">
+                <motion.div 
                   initial={{ width: 0 }}
-                  animate={{ width: `${(userData.xp % 1000) / 10}%` }}
-                  transition={{ duration: 1 }}
-                  className="h-full bg-blue-600 rounded-full shadow-md"
-                />
+                  animate={{ width: `${calculateXpProgress()}%` }}
+                  className={`h-full rounded-full relative ${applyGradient('')}`}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                </motion.div>
               </div>
-              <div className="flex justify-between text-sm text-blue-700 font-medium">
-                <span>{userData.xp % 1000}/1000 XP</span>
-                <span>{1000 - (userData.xp % 1000)} to next level</span>
+              <div className="flex justify-between text-xs mt-2">
+                <span>Level {userData.user.level || 0}</span>
+                <span className="font-bold">{userData.user.xp || 0}/1000 XP</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="space-y-8">
-            <div className={`rounded-2xl p-6 ${cardBg}`}>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="font-semibold text-lg text-gray-800">Badges</h2>
-                <span className="text-sm text-blue-600">{userData.badges.length} earned</span>
+          {/* Streak Card */}
+          <motion.div 
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            transition={{ delay: 0.1 }}
+            whileHover="hover"
+            className={`rounded-3xl p-6 shadow-lg ${currentTheme.card} border border-opacity-20`}
+          >
+            <h3 className={`text-lg font-semibold mb-4 ${currentTheme.title}`}>🔥 Streak</h3>
+            <div className="flex items-center justify-center">
+              <div className={`text-5xl font-bold ${applyGradient('bg-clip-text')}`}>
+                {userData.user.streak !== undefined ? userData.user.streak : 0}
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {userData.badges.map((badge, index) => (
+              <span className="ml-2 text-lg">days</span>
+            </div>
+            {/* Visual indicator for 0 streak */}
+            {(!userData.user.streak || userData.user.streak === 0) && (
+              <p className="text-xs text-center mt-2 opacity-70">Start solving problems to build your streak!</p>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Badges Section */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.4 }}
+          className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
+        >
+          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>🏅 Badges</h2>
+          <AnimatePresence>
+            <div className="flex flex-wrap gap-3">
+              {userData.user.badges?.length ? (
+                userData.user.badges.map((badge, i) => (
                   <motion.div
                     key={badge}
-                    whileHover={{ y: -3 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedBadge(badge)}
-                    className="p-4 rounded-xl text-center cursor-pointer bg-blue-50 hover:bg-blue-100 border border-blue-200"
+                    custom={i}
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    className={`px-4 py-2 rounded-full text-sm font-medium ${currentTheme.badge}`}
                   >
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-300 flex items-center justify-center text-2xl shadow text-white">
-                      {index % 3 === 0 ? '🏅' : index % 3 === 1 ? '🏆' : '🎖️'}
-                    </div>
-                    <div className="text-sm font-medium text-blue-800 truncate">{badge}</div>
+                    🏆 {badge}
                   </motion.div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-sm opacity-60"
+                >
+                  No badges earned yet.
+                </motion.p>
+              )}
             </div>
+          </AnimatePresence>
+        </motion.div>
 
-            <div className="rounded-2xl p-6 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-900 shadow-md">
-              <h2 className="font-semibold text-lg mb-3">Weekly Goal</h2>
-              <p className="text-sm opacity-90 mb-5">Complete 5 problems to earn bonus XP</p>
-              <div className="w-full bg-white bg-opacity-60 rounded-full h-2 mb-3">
-                <div
-                  className="h-full bg-blue-600 rounded-full"
-                  style={{ width: `${(userData.recentSolved.length / 5) * 100}%` }}
-                />
-              </div>
-              <div className="flex justify-between text-sm font-medium">
-                <span>{userData.recentSolved.length}/5 problems</span>
-                <span>+200 XP</span>
-              </div>
-            </div>
+        {/* Recently Solved Section */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.5 }}
+          className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
+        >
+          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>📘 Recently Solved</h2>
+          <div className="space-y-4">
+            {userData.user.recentSolved?.length ? (
+              userData.user.recentSolved.map((problem, index) => (
+                <motion.div
+                  key={`${problem.title}-${index}`}
+                  custom={index}
+                  variants={problemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  whileHover="hover"
+                  className={`rounded-xl p-4 sm:p-5 border ${currentTheme.card} transition-all duration-200`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className={`text-base sm:text-lg font-semibold ${currentTheme.title}`}>{problem.title}</h3>
+                      <div className="flex gap-2 mt-2 flex-wrap text-xs">
+                        <span className={`px-2.5 py-1 rounded-full ${currentTheme.badge}`}>
+                          {problem.category}
+                        </span>
+                        <span
+                          className={`px-2.5 py-1 rounded-full font-medium ${
+                            problem.difficulty === 'Easy' ? 'bg-green-100/70 text-green-800' :
+                            problem.difficulty === 'Medium' ? 'bg-yellow-100/70 text-yellow-800' :
+                            'bg-red-100/70 text-red-800'
+                          }`}
+                        >
+                          {problem.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-xs opacity-60 mt-1">
+                      {new Date(problem.solvedAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.4 }}
+                className="text-sm opacity-60"
+              >
+                You haven't solved anything yet.
+              </motion.p>
+            )}
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
-export default DashboardCards;
+export default Dashboard;

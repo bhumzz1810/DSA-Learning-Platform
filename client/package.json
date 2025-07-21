@@ -32,6 +32,7 @@
     "react-toastify": "^11.0.5",
     "socket.io-client": "^4.8.1",
     "tailwind-merge": "^3.3.1",
+    "tailwindcss-bg-patterns": "^0.3.0",
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.27"
   },

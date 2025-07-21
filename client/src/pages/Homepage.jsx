@@ -1,5 +1,3 @@
-import "../index.css";
-import "./Homepage.css";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bannerImg from "../assets/Homepage/banner_img.png";
@@ -9,7 +7,7 @@ import handshake from "../assets/icons/handshake.png";
 import free from "../assets/free.png";
 import pro from "../assets/pro.png";
 import { motion } from "framer-motion";
-// Background animation component
+
 const AnimatedBackground = () => (
   <motion.div
     className="absolute inset-0 bg-gradient-to-r from-blue-400 via-blue-600 to-indigo-800 opacity-20 z-0"
@@ -18,19 +16,20 @@ const AnimatedBackground = () => (
     transition={{ duration: 2, ease: "easeInOut" }}
   />
 );
+
 const Homepage = () => {
   const navigate = useNavigate();
   const [isMonthly, setIsMonthly] = useState(true);
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
+      name: "Divyanshu",
       role: "Software Engineer",
       rating: 4,
       text: "DSArena helped me ace my technical interviews. The interactive challenges are the closest thing to real coding tests.",
     },
     {
-      name: "Michael Chen",
+      name: "Nanji 160",
       role: "CS Student",
       rating: 5,
       text: "The visual explanations of algorithms made complex concepts click for me. Worth every penny of the Pro plan!",
@@ -77,12 +76,9 @@ const Homepage = () => {
       </section>
 
       {/* About Section */}
-      {/* About Section */}
       <section className="relative py-20 bg-white">
-        {/* Background animation */}
         <AnimatedBackground />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10 relative">
-          {/* Section Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl font-semibold text-gray-900">
               Why Choose DSArena?
@@ -93,9 +89,7 @@ const Homepage = () => {
             </p>
           </div>
 
-          {/* Content and Stats */}
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-            {/* Left Column - Philosophy and Methodology */}
             <div className="lg:w-1/2 space-y-6">
               <h3 className="text-2xl font-semibold text-gray-900">
                 Our Learning Philosophy
@@ -107,7 +101,7 @@ const Homepage = () => {
                   problem-solving process
                 </strong>{" "}
                 with step-by-step visualizations, complexity analysis, and
-                pattern recognition techniques used by FAANG engineers.
+                pattern recognition techniques usedss by FAANG engineers.
               </p>
               <a
                 href="/about"
@@ -131,7 +125,6 @@ const Homepage = () => {
               </a>
 
               <div className="mt-8 space-y-6">
-                {/* Feature Cards with animations */}
                 <div className="flex items-start gap-4">
                   <div className="bg-blue-500 p-2 rounded-full text-white">
                     <i className="fas fa-bolt"></i>
@@ -177,9 +170,7 @@ const Homepage = () => {
               </div>
             </div>
 
-            {/* Right Column - Stats */}
             <div className="lg:w-1/2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Stat Cards */}
               <motion.div
                 className="bg-blue-100 p-6 rounded-xl text-center shadow-lg"
                 initial={{ opacity: 0, y: 50 }}
@@ -229,17 +220,15 @@ const Homepage = () => {
           <div className="flex justify-center mb-12">
             <div className="inline-flex bg-gray-100 rounded-full p-1">
               <button
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                  isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
-                }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                  }`}
                 onClick={() => setIsMonthly(true)}
               >
                 Monthly
               </button>
               <button
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                  !isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
-                }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${!isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                  }`}
                 onClick={() => setIsMonthly(false)}
               >
                 Yearly (2 months free)
@@ -467,7 +456,7 @@ const Homepage = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={() => navigate("/subscribe")}
+                  onClick={() => navigate("/subscribe", { state: { plan: "pro" } })}
                   className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-md"
                 >
                   Get Pro Access

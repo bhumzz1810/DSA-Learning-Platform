@@ -20,6 +20,7 @@ import SocialLogin from "./pages/SocialLogin";
 import Onboarding from "./pages/Onboarding";
 import Leaderboard from "./pages/Leaderboard";
 import Profilepage from "./pages/Profilepage";
+import SubscriptionPage from "./pages/subscription";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -65,6 +66,8 @@ function App() {
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/profile" element={<Profilepage />} />
+            <Route path="/subscribe" element={<SubscriptionPage />} />
+
 
             {/* ADMIN ROUTES */}
             <Route path="/admin/add-problem" element={<AddProblem />} />
