@@ -1,4 +1,3 @@
-// src/components/ThemeContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
 
 const ThemeContext = createContext();
@@ -9,16 +8,12 @@ export const ThemeProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // Apply theme class to document
-    document.documentElement.classList.remove('light', 'dark', 'ocean', 'forest');
+    document.documentElement.className = '';
     document.documentElement.classList.add(theme);
-    // Save theme to localStorage
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const toggleTheme = (newTheme) => {
-    setTheme(newTheme);
-  };
+  const toggleTheme = (newTheme) => setTheme(newTheme);
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
@@ -29,8 +24,6 @@ export const ThemeProvider = ({ children }) => {
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
+  if (!context) throw new Error('useTheme must be used within a ThemeProvider');
   return context;
 };
