@@ -2,6 +2,33 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../components/RT_Pairing/ThemeContext';
 
+const THEME_COLORS = {
+  light: {
+    bg: 'bg-theme-light-bg',
+    text: 'text-theme-light-text',
+    card: 'bg-theme-light-card',
+    input: 'bg-theme-light-input border-theme-light-border text-theme-light-text',
+  },
+  dark: {
+    bg: 'bg-theme-dark-bg',
+    text: 'text-theme-dark-text',
+    card: 'bg-theme-dark-card',
+    input: 'bg-theme-dark-input border-theme-dark-border text-theme-dark-text',
+  },
+  ocean: {
+    bg: 'bg-theme-ocean-bg',
+    text: 'text-theme-ocean-text',
+    card: 'bg-theme-ocean-card',
+    input: 'bg-theme-ocean-input border-theme-ocean-border text-theme-ocean-text',
+  },
+  forest: {
+    bg: 'bg-theme-forest-bg',
+    text: 'text-theme-forest-text',
+    card: 'bg-theme-forest-card',
+    input: 'bg-theme-forest-input border-theme-forest-border text-theme-forest-text',
+  },
+};
+
 const JoinRoom = () => {
   const [roomId, setRoomId] = useState('');
   const [alias, setAlias] = useState('');
@@ -18,46 +45,38 @@ const JoinRoom = () => {
     navigate(`/coding-room?roomId=${roomId}&alias=${alias}`);
   };
 
+  const currentTheme = THEME_COLORS[theme] || THEME_COLORS.light;
+
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      <div className={`w-full max-w-md p-8 rounded-lg shadow-lg ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}>
+      <div className={`w-full max-w-md p-8 rounded-2xl shadow-xl ${currentTheme.card}`}>
         <h1 className="text-3xl font-bold mb-6 text-center">Pair Coding</h1>
-        
+
         <form onSubmit={handleJoinRoom} className="space-y-6">
-          <div>
-            
-            <input
-              type="text"
-              id="roomId"
-              value={roomId}
-              onChange={(e) => setRoomId(e.target.value)}
-              className={`w-full px-4 py-2 rounded border ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              placeholder="Enter room ID"
-            />
-          </div>
-          
-          <div>
-            
-            <input
-              type="text"
-              id="alias"
-              value={alias}
-              onChange={(e) => setAlias(e.target.value)}
-              className={`w-full px-4 py-2 rounded border ${theme === 'dark' ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'} focus:outline-none focus:ring-2 focus:ring-blue-500`}
-              placeholder="Enter your alias"
-            />
-          </div>
-          
+          <input
+            type="text"
+            placeholder="Enter Room ID"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+            className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentTheme.input}`}
+          />
+          <input
+            type="text"
+            placeholder="Enter your alias"
+            value={alias}
+            onChange={(e) => setAlias(e.target.value)}
+            className={`w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 ${currentTheme.input}`}
+          />
           {error && <p className="text-red-500 text-sm">{error}</p>}
-          
+
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition-colors"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all"
           >
             Join Room
           </button>
         </form>
-        
+
         <div className="mt-6">
           <ThemeSelector theme={theme} toggleTheme={toggleTheme} />
         </div>
@@ -68,15 +87,15 @@ const JoinRoom = () => {
 
 const ThemeSelector = ({ theme, toggleTheme }) => {
   const themes = [
-    { name: 'light', label: 'Light', bg: 'bg-gray-100' },
-    { name: 'dark', label: 'Dark', bg: 'bg-gray-900' },
-    { name: 'ocean', label: 'Ocean', bg: 'bg-blue-50' },
-    { name: 'forest', label: 'Forest', bg: 'bg-green-50' },
+    { name: 'light', label: 'Light', bg: 'bg-theme-light-bg' },
+    { name: 'dark', label: 'Dark', bg: 'bg-theme-dark-bg' },
+    { name: 'ocean', label: 'Ocean', bg: 'bg-theme-ocean-bg' },
+    { name: 'forest', label: 'Forest', bg: 'bg-theme-forest-bg' },
   ];
 
   return (
     <div className="space-y-2">
-      <p className={`text-sm font-medium ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Theme</p>
+      <p className="text-sm font-medium">Theme</p>
       <div className="flex space-x-2">
         {themes.map((t) => (
           <button
