@@ -43,8 +43,12 @@ router.post(
           return res.status(400).send("No subscription ID in session");
         }
         const stripeSub = await stripe.subscriptions.retrieve(
-          session.subscription
+          session.subscription,
+          {
+            expand: ["latest_invoice", "items.data.price"],
+          }
         );
+        console.log("Stripe Subscription Data:", stripeSub);
 
         const startUnix =
           stripeSub.start_date || stripeSub.current_period_start;

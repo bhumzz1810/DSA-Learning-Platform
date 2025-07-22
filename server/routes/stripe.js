@@ -33,8 +33,14 @@ router.post("/create-checkout-session", async (req, res) => {
           quantity: 1,
         },
       ],
+      subscription_data: {
+        trial_settings: {
+          end_behavior: {
+            missing_payment_method: "cancel",
+          },
+        },
+      },
       metadata: { userId },
-      subscription_data: {},
       success_url: `${req.headers.origin}/success`,
       cancel_url: `${req.headers.origin}/cancel`,
     });

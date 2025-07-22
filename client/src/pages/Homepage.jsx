@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bannerImg from "../assets/Homepage/banner_img.png";
 import ship from "../assets/icons/ship.png";
@@ -20,6 +20,19 @@ const AnimatedBackground = () => (
 const Homepage = () => {
   const navigate = useNavigate();
   const [isMonthly, setIsMonthly] = useState(true);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#pricing") {
+      const pricingSection = document.getElementById("pricing");
+      if (pricingSection) {
+        // Smooth scroll to pricing section
+        setTimeout(() => {
+          pricingSection.scrollIntoView({ behavior: "smooth" });
+        }, 100); // Delay ensures DOM is fully rendered
+      }
+    }
+  }, []);
 
   const testimonials = [
     {

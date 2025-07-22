@@ -2,7 +2,10 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 require("dotenv").config();
-router.post("/", async (req, res) => {
+const { authenticate } = require("../middleware/auth");
+const checkSubscription = require("../middleware/checkSubscription");
+
+router.post("/", authenticate, checkSubscription, async (req, res) => {
   const { prompt } = req.body;
 
   try {
