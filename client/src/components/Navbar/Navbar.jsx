@@ -10,11 +10,20 @@ const Navbar = () => {
   const location = useLocation(); // 👈 Track URL changes
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-
+  const [isSubscribed, setIsSubscribed] = useState(false);
   // Update isLoggedIn when route changes
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+    fetch(`${import.meta.env.VITE_API_URL}/auth/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched subscription status:", data),
+          setIsSubscribed(data.subscriptionActive);
+      })
+      .catch(() => setIsSubscribed(false));
     const handleClickOutside = (e) => {
       if (!e.target.closest(".relative")) {
         setShowDropdown(false);
@@ -31,7 +40,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar sticky top-0 z-50 bg-white shadow-md">
       <div className="navbar-left">
         <img src={logoIcon} alt="DSArena logo" className="logo-icon-large" />
       </div>
@@ -46,9 +55,23 @@ const Navbar = () => {
           )}
           <li onClick={() => navigate("/problems")}>Problems</li>
           {isLoggedIn && (
-            <>
-              <li onClick={() => navigate("/join-room")}>Editor</li>
-            </>
+            <li
+              onClick={() =>
+                isSubscribed
+                  ? navigate("/join-room")
+                  : (window.location.href = "/#pricing")
+              }
+              className={`cursor-pointer relative group ${
+                isSubscribed ? "" : "text-gray-400"
+              }`}
+              title={
+                isSubscribed
+                  ? "Access collaborative editor"
+                  : "Subscribe to unlock the Editor and AI suggestions"
+              }
+            >
+              Editor {isSubscribed ? "" : "🔒"}
+            </li>
           )}
         </ul>
 
