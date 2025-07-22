@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { cn } from "../lib/utils";
 import axios from "axios";
@@ -60,6 +60,8 @@ export default function Problems() {
   const problemsPerPage = 9;
   const [bookmarkedIds, setBookmarkedIds] = useState([]);
   const [dailyOnly, setDailyOnly] = useState(false);
+  const navigate = useNavigate(); // inside your component
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -81,8 +83,10 @@ export default function Problems() {
       }
     };
     const fetchBookmarks = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) return; // ✅ Don't fetch if not logged in
+
       try {
-        const token = localStorage.getItem("token");
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
@@ -127,6 +131,10 @@ export default function Problems() {
   // Function to toggle bookmark
   const toggleBookmark = async (problemId) => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     try {
       if (bookmarkedIds.includes(problemId)) {
         await axios.delete(
@@ -395,6 +403,36 @@ export default function Problems() {
                 Next
               </button>
             </nav>
+          </div>
+        )}
+
+        {showLoginPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Login Required
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                You must be logged in to bookmark challenges.
+              </p>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setShowLoginPrompt(false)}
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLoginPrompt(false);
+                    navigate("/login");
+                  }}
+                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
+                >
+                  Login
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

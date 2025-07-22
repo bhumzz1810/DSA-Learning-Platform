@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
-import alertSound from "../assets/music/warning.mp3";
+import alertSound from "../../public/music/warning.mp3";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
