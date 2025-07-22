@@ -34,6 +34,9 @@ const userSchema = new mongoose.Schema({
   bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
   notes: [noteSchema],
   streak: { type: Number, default: 0 },
+  stripeCustomerId: { type: String },
+  stripeSubscriptionId: { type: String },
+  subscribed: { type: Boolean, default: false },
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now },
 });

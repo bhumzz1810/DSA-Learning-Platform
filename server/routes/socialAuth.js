@@ -18,7 +18,18 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    res.redirect(`http://localhost:5173/social-login?token=${token}`);
+    const userData = encodeURIComponent(
+      JSON.stringify({
+        id: req.user._id,
+        email: req.user.email,
+        username: req.user.username,
+        role: req.user.role,
+      })
+    );
+
+    res.redirect(
+      `http://localhost:5173/social-login?token=${token}&user=${userData}`
+    );
   }
 );
 
@@ -38,7 +49,18 @@ router.get(
       { expiresIn: "7d" }
     );
 
-    res.redirect(`http://localhost:5173/social-login?token=${token}`);
+    const userData = encodeURIComponent(
+      JSON.stringify({
+        id: req.user._id,
+        email: req.user.email,
+        username: req.user.username,
+        role: req.user.role,
+      })
+    );
+
+    res.redirect(
+      `http://localhost:5173/social-login?token=${token}&user=${userData}`
+    );
   }
 );
 

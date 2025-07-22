@@ -22,6 +22,9 @@ const socialAuthRoutes = require("./routes/socialAuth");
 const dailyChallengeRoute = require("./routes/dailyChallenge");
 const cron = require("node-cron");
 const rotateDailyChallenge = require("./utils/dailyRotation");
+const stripeRoutes = require("./routes/stripe.js");
+const webhookRoute = require("./routes/webhook");
+app.use("/api", webhookRoute);
 
 require("./config/passport");
 
@@ -76,6 +79,7 @@ app.use("/api/solved-problems", userDashboardRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api", dailyChallengeRoute);
+app.use("/api/stripe", stripeRoutes);
 
 // Socket.IO Setup
 setupSocketServer(server);
