@@ -220,9 +220,9 @@ export default function Problems() {
                 onChange={() => setDailyOnly(!dailyOnly)}
                 className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <label htmlFor="dailyOnly" className="text-sm text-gray-700">
+              <span htmlFor="dailyOnly" className="text-sm text-gray-700">
                 Show only Daily Challenge
-              </label>
+              </span>
             </div>
           </div>
         </div>
