@@ -3,6 +3,7 @@ const router = express.Router();
 const { authenticate } = require("../middleware/auth");
 const User = require("../models/User");
 const Submission = require("../models/Submission");
+const Subscription = require("../models/Subscription");
 
 // GET /api/dashboard
 router.get("/dashboard", authenticate, async (req, res) => {
@@ -25,6 +26,36 @@ router.get("/dashboard", authenticate, async (req, res) => {
         solvedAt: s.solvedAt,
       }));
 
+    // Get subscription data
+    const subscriptionData = await Subscription.findOne({ 
+      userId: req.user._id,
+      status: { $in: ['active', 'trialing', 'past_due'] }
+    }).sort({ currentPeriodEnd: -1 }).lean();
+
+    let subscription = null;
+    if (subscriptionData) {
+      // Format plan name for display
+      let planName;
+      switch(subscriptionData.planName) {
+        case 'monthly':
+          planName = 'Monthly Premium';
+          break;
+        case 'annual':
+          planName = 'Annual Premium';
+          break;
+        default:
+          planName = subscriptionData.planName;
+      }
+
+      subscription = {
+        plan: planName,
+        status: subscriptionData.status,
+        startDate: subscriptionData.currentPeriodStart,
+        endDate: subscriptionData.currentPeriodEnd,
+        isActive: ['active', 'trialing'].includes(subscriptionData.status)
+      };
+    }
+
     // Leaderboard users
     const allUsers = await User.find({})
       .select("username xp level solvedProblems")
@@ -42,7 +73,8 @@ router.get("/dashboard", authenticate, async (req, res) => {
       allUsers.findIndex((u) => u._id.toString() === req.user._id.toString()) +
       1;
 
-    res.json({
+    // Prepare response
+    const response = {
       user: {
         username: user.username,
         email: user.email,
@@ -57,20 +89,26 @@ router.get("/dashboard", authenticate, async (req, res) => {
       leaderboard: {
         topUsers,
         yourRank,
-      },
-    });
+      }
+    };
+
+    // Only include subscription if it exists
+    if (subscription) {
+      response.user.subscription = subscription;
+    }
+
+    res.json(response);
   } catch (err) {
     console.error("Dashboard error:", err);
     res.status(500).json({ error: "Failed to load dashboard" });
   }
 });
 
+// GET /api/dashboard/solved-problems
 router.get("/solved-problems", authenticate, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).lean();
-
     const solved = user.solvedProblems || [];
-
     const submissionIds = solved.map((s) => s.submissionId);
 
     // Fetch submission details and populate problem info
@@ -98,6 +136,7 @@ router.get("/solved-problems", authenticate, async (req, res) => {
   }
 });
 
+// GET /api/dashboard/submissions/latest/:problemId
 router.get("/submissions/latest/:problemId", authenticate, async (req, res) => {
   try {
     const { problemId } = req.params;

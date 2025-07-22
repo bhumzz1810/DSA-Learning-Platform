@@ -206,7 +206,7 @@ const Homepage = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 bg-white">
+      <section id="pricing" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900">
@@ -220,15 +220,17 @@ const Homepage = () => {
           <div className="flex justify-center mb-12">
             <div className="inline-flex bg-gray-100 rounded-full p-1">
               <button
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
-                  }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                  isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                }`}
                 onClick={() => setIsMonthly(true)}
               >
                 Monthly
               </button>
               <button
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${!isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
-                  }`}
+                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
+                  !isMonthly ? "bg-white shadow text-gray-900" : "text-gray-600"
+                }`}
                 onClick={() => setIsMonthly(false)}
               >
                 Yearly (2 months free)
@@ -456,7 +458,14 @@ const Homepage = () => {
                   </li>
                 </ul>
                 <button
-                  onClick={() => navigate("/subscribe", { state: { plan: "pro" } })}
+                  onClick={() =>
+                    navigate("/subscribe", {
+                      state: {
+                        plan: "pro",
+                        billing: isMonthly ? "monthly" : "yearly",
+                      },
+                    })
+                  }
                   className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-md"
                 >
                   Get Pro Access

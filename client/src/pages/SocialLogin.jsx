@@ -2,11 +2,17 @@ import { useEffect } from "react";
 
 const SocialLogin = () => {
   useEffect(() => {
-    const token = new URLSearchParams(window.location.search).get("token");
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const user = params.get("user"); // ✅ Get user from URL
 
     if (token) {
       console.log("Token received:", token);
       localStorage.setItem("token", token);
+
+      if (user) {
+        localStorage.setItem("user", user); // ✅ Save user object
+      }
 
       try {
         const payloadData = JSON.parse(atob(token.split(".")[1]));

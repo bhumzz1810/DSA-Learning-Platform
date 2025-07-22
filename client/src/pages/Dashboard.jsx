@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../components/RT_Pairing/ThemeContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 // Animation variants
 const cardVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0, 
-    transition: { 
-      duration: 0.5, 
-      ease: 'easeOut' 
-    } 
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: 'easeOut'
+    }
   },
   hover: {
     y: -5,
@@ -23,10 +23,10 @@ const cardVariants = {
 
 const flipVariants = {
   hidden: { rotateY: 90, opacity: 0 },
-  visible: { 
-    rotateY: 0, 
+  visible: {
+    rotateY: 0,
     opacity: 1,
-    transition: { 
+    transition: {
       duration: 0.6,
       type: 'spring',
       stiffness: 100
@@ -69,6 +69,8 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
   const [flipped, setFlipped] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const [dailyChallenge, setDailyChallenge] = useState(null);
+  const [loadingDaily, setLoadingDaily] = useState(true);
 
   // Theme configuration with fallbacks
   const themeConfig = {
@@ -139,7 +141,7 @@ const Dashboard = () => {
 
   // Safe gradient application
   const applyGradient = (element) => {
-    return currentTheme?.accent 
+    return currentTheme?.accent
       ? `${currentTheme.accent} ${element}`
       : `from-indigo-500 to-purple-500 ${element}`;
   };
@@ -182,7 +184,31 @@ const Dashboard = () => {
       }
     };
 
+    const fetchDailyChallenge = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/problems', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch daily challenge');
+        }
+
+        const data = await response.json();
+        setDailyChallenge(data);
+      } catch (err) {
+        console.error("Error fetching daily challenge:", err);
+        setDailyChallenge(null);
+      } finally {
+        setLoadingDaily(false);
+      }
+    };
+
     fetchDashboardData();
+    fetchDailyChallenge();
   }, []);
 
   if (loading) {
@@ -203,7 +229,7 @@ const Dashboard = () => {
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">Error Loading Dashboard</h2>
           <p className="mb-4 text-red-400">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className={`px-4 py-2 rounded-lg ${currentTheme.button}`}
           >
@@ -227,7 +253,7 @@ const Dashboard = () => {
 
   return (
     <div className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}>
-    
+
       {/* Animated Background Particles */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         {Array.from({ length: 20 }).map((_, i) => (
@@ -256,7 +282,7 @@ const Dashboard = () => {
 
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Hero Header */}
-        <motion.header 
+        <motion.header
           className={`relative overflow-hidden rounded-3xl p-8 ${currentTheme.card}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -282,46 +308,17 @@ const Dashboard = () => {
               }}
               className={`p-3 rounded-full shadow-md border ${currentTheme.card}`}
             >
-              {theme === 'light' ? '🌙' : 
-               theme === 'dark' ? '🌞' : 
-               theme === 'ocean' ? '🌲' : '🌊'}
+              {theme === 'light' ? '🌙' :
+                theme === 'dark' ? '🌞' :
+                  theme === 'ocean' ? '🌲' : '🌊'}
             </motion.button>
           </div>
         </motion.header>
 
-        {/* Profile Flip Card (Front Side Only) */}
-        <motion.div 
-          className="perspective-1000 w-full"
-          whileHover={{ scale: 1.01 }}
-        >
-          <motion.div
-            className={`relative w-full min-h-[300px] rounded-3xl shadow-xl ${currentTheme.flipFront}`}
-          >
-            {/* Front Side Only */}
-            <div className="p-8 h-full flex items-center gap-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className={`w-24 h-24 rounded-full ${applyGradient(`flex items-center justify-center ${currentTheme.text} text-4xl font-bold shadow-md`)}`}
-              >
-                {userData.user.username.charAt(0).toUpperCase()}
-              </motion.div>
-              <div className="space-y-2">
-                <h2 className={`text-2xl font-bold ${currentTheme.title} uppercase`}>
-                  {userData.user.username}
-                </h2>
-                <p className={`text-base ${currentTheme.subtitle}`}>{userData.user.email}</p>
-                <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
-                  Joined {new Date(userData.user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Leaderboard Card */}
-          <motion.div 
+          <motion.div
             variants={cardVariants}
             initial="hidden"
             animate="visible"
@@ -331,10 +328,10 @@ const Dashboard = () => {
           >
             <div className="flex items-center justify-between">
               <h3 className={`text-lg font-semibold ${currentTheme.title}`}>🏆 Leaderboard</h3>
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 opacity-70" 
-                viewBox="0 0 20 20" 
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 opacity-70"
+                viewBox="0 0 20 20"
                 fill="currentColor"
               >
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -352,7 +349,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* XP Progress Card */}
-          <motion.div 
+          <motion.div
             variants={cardVariants}
             initial="hidden"
             animate="visible"
@@ -362,7 +359,7 @@ const Dashboard = () => {
             <h3 className={`text-lg font-semibold mb-4 ${currentTheme.title}`}>XP Progress</h3>
             <div className="relative pt-1">
               <div className="overflow-hidden h-3 rounded-full bg-gray-200/20">
-                <motion.div 
+                <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${calculateXpProgress()}%` }}
                   className={`h-full rounded-full relative ${applyGradient('')}`}
@@ -378,7 +375,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Streak Card */}
-          <motion.div 
+          <motion.div
             variants={cardVariants}
             initial="hidden"
             animate="visible"
@@ -400,6 +397,104 @@ const Dashboard = () => {
           </motion.div>
         </div>
 
+        {/* Daily Challenge Card */}
+        {/* Daily Challenge Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.3 }}
+          className={`rounded-3xl p-6 shadow-lg ${currentTheme.card} border border-opacity-20`}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h2 className={`text-xl sm:text-2xl font-bold ${currentTheme.title}`}>
+              🔥 Daily Challenge
+            </h2>
+            <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+            </span>
+          </div>
+
+          {loadingDaily ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+          ) : dailyChallenge ? (
+            <div className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className={`text-lg font-semibold ${currentTheme.title} mb-1`}>
+                    {dailyChallenge.title}
+                  </h3>
+                  <p className={`text-sm ${currentTheme.subtitle} line-clamp-2`}>
+                    {dailyChallenge.description}
+                  </p>
+                </div>
+                <span
+                  className={`px-2 py-1 text-xs font-semibold rounded-full min-w-[70px] text-center ${dailyChallenge.difficulty === 'Easy'
+                      ? 'bg-green-100 text-green-700'
+                      : dailyChallenge.difficulty === 'Medium'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-700'
+                    }`}
+                >
+                  {dailyChallenge.difficulty}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <span className={`text-sm ${currentTheme.subtitle}`}>
+                  {dailyChallenge.category || "Algorithm"}
+                </span>
+                <Link
+  to={`/problems/${dailyChallenge._id}`}
+  className={`px-4 py-2 rounded-lg text-sm font-medium ${currentTheme.button} flex items-center gap-1`}
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-4 w-4"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13 10V3L4 14h7v7l9-11h-7z"
+    />
+  </svg>
+  Solve Now
+</Link>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className={`w-16 h-16 mx-auto rounded-full ${applyGradient('flex items-center justify-center text-white text-2xl mb-4')}`}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className={`text-lg font-semibold ${currentTheme.title}`}>
+                No Challenge Today
+              </h3>
+              <p className={`text-sm ${currentTheme.subtitle} opacity-80 mt-1`}>
+                Check back later for new challenges
+              </p>
+            </div>
+          )}
+        </motion.div>
         {/* Badges Section */}
         <motion.div
           variants={cardVariants}
@@ -439,6 +534,85 @@ const Dashboard = () => {
           </AnimatePresence>
         </motion.div>
 
+        {/* Subscription Section */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          transition={{ delay: 0.3 }}
+          className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
+        >
+          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>💎 Subscription</h2>
+          {userData.user.subscription ? (
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className={`text-lg font-semibold ${currentTheme.title}`}>
+                    {userData.user.subscription.plan}
+                  </h3>
+                  <p className={`text-sm ${currentTheme.subtitle}`}>
+                    {userData.user.subscription.status === 'active' ? (
+                      <span className="text-green-500">Active</span>
+                    ) : (
+                      <span className="text-yellow-500">{userData.user.subscription.status}</span>
+                    )}
+                  </p>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`px-4 py-2 rounded-lg ${currentTheme.button}`}
+                  onClick={() => navigate('/subscription')}
+                >
+                  Manage
+                </motion.button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className={`text-sm ${currentTheme.subtitle} opacity-70`}>Started</p>
+                  <p className="font-medium">
+                    {new Date(userData.user.subscription.startDate).toLocaleDateString()}
+                  </p>
+                </div>
+                <div>
+                  <p className={`text-sm ${currentTheme.subtitle} opacity-70`}>
+                    {userData.user.subscription.status === 'active' ? 'Renews' : 'Expires'}
+                  </p>
+                  <p className="font-medium">
+                    {new Date(userData.user.subscription.endDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-6">
+              <div className={`w-16 h-16 mx-auto rounded-full ${applyGradient('flex items-center justify-center text-white text-2xl mb-4')}`}>
+                💎
+              </div>
+              <h3 className={`text-lg font-semibold mb-2 ${currentTheme.title}`}>No Active Subscription</h3>
+              <p className={`text-sm mb-4 ${currentTheme.subtitle} opacity-80`}>
+                Upgrade to unlock premium features
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-6 py-2 rounded-lg ${currentTheme.button}`}
+                onClick={() => {
+                  navigate('/');
+                  setTimeout(() => {
+                    const pricingSection = document.getElementById('pricing');
+                    if (pricingSection) {
+                      pricingSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }, 100);
+                }}
+              >
+                View Plans
+              </motion.button>
+            </div>
+          )}
+        </motion.div>
+
         {/* Recently Solved Section */}
         <motion.div
           variants={cardVariants}
@@ -468,11 +642,10 @@ const Dashboard = () => {
                           {problem.category}
                         </span>
                         <span
-                          className={`px-2.5 py-1 rounded-full font-medium ${
-                            problem.difficulty === 'Easy' ? 'bg-green-100/70 text-green-800' :
+                          className={`px-2.5 py-1 rounded-full font-medium ${problem.difficulty === 'Easy' ? 'bg-green-100/70 text-green-800' :
                             problem.difficulty === 'Medium' ? 'bg-yellow-100/70 text-yellow-800' :
-                            'bg-red-100/70 text-red-800'
-                          }`}
+                              'bg-red-100/70 text-red-800'
+                            }`}
                         >
                           {problem.difficulty}
                         </span>

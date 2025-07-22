@@ -86,6 +86,7 @@ const LoginForm = () => {
       if (!res.ok) throw new Error(data.message || "Something went wrong");
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Save user too
 
       // ✅ Decode token to get user role
       const payloadData = JSON.parse(atob(data.token.split(".")[1]));
