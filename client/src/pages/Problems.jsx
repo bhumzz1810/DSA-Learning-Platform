@@ -216,7 +216,15 @@ export default function Problems() {
                   </p>
                 </div>
                 <button
-                  onClick={() => navigate("/#pricing")}
+                     onClick={() => {
+                  navigate("/");
+                  setTimeout(() => {
+                    const pricingSection = document.getElementById("Pricing");
+                    if (pricingSection) {
+                      pricingSection.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }, 100);
+                }}
                   className="px-5 py-2 mt-2 md:mt-0 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition"
                 >
                   View Subscription Plans

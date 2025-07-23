@@ -8,7 +8,7 @@ const Leaderboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { theme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   const themeConfig = {
     light: {
@@ -30,7 +30,7 @@ const Leaderboard = () => {
       bg: 'bg-gradient-to-br from-green-900 via-green-800 to-green-950',
       text: 'text-green-50',
       card: 'bg-green-800 border-green-700',
-    }
+    },
   };
 
   const currentTheme = themeConfig[theme] || themeConfig.dark;
@@ -38,16 +38,16 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/dashboard', {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/dashboard", {
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch leaderboard data');
+          throw new Error("Failed to fetch leaderboard data");
         }
 
         const data = await response.json();
@@ -76,7 +76,7 @@ const Leaderboard = () => {
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">Error Loading Leaderboard</h2>
           <p className="mb-4 text-red-400">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white"
           >
@@ -89,7 +89,34 @@ const Leaderboard = () => {
 
   return (
     <div className={`min-h-screen px-8 py-10 ${currentTheme.bg} ${currentTheme.text}`}>
-      <h1 className="text-3xl font-bold mb-8">Leaderboard</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold">LeaderBoard</h1>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm opacity-60">Theme:</span>
+          <button
+            onClick={() => {
+              const themes = ["light", "dark", "ocean", "forest"];
+              const currentIndex = themes.indexOf(theme);
+              const nextIndex = (currentIndex + 1) % themes.length;
+              toggleTheme(themes[nextIndex]); // ✅ Changes theme without reload
+            }}
+            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20"
+            title={`Current: ${theme} — Click to change`}
+          >
+            <span>
+              {theme === "light"
+                ? "🌙"
+                : theme === "dark"
+                ? "🌞"
+                : theme === "ocean"
+                ? "🌊"
+                : "🌲"}
+            </span>
+            <span className="capitalize">{theme}</span>
+          </button>
+        </div>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Left: Top Users + Table */}
@@ -100,10 +127,10 @@ const Leaderboard = () => {
 
         {/* Right: User Stats */}
         <div className="w-full lg:max-w-sm">
-          <UserStatsCard 
-            user={data?.user} 
-            leaderboard={data?.leaderboard} 
-            theme={theme} 
+          <UserStatsCard
+            user={data?.user}
+            leaderboard={data?.leaderboard}
+            theme={theme}
           />
         </div>
       </div>
