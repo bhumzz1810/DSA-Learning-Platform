@@ -42,6 +42,6 @@ const SubscriptionPage = () => {
       </button>
     </div>
   );
-};
+}
 
 export default SubscriptionPage;
