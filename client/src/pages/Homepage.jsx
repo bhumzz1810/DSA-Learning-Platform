@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import DarkVeil from "../components/Darkveil";
 import Hero from "../components/Hero";
@@ -11,10 +11,10 @@ import Newsletter from "../components/Newsletter";
 import About from "../components/About";
 
 const Homepage = () => {
+  const [isYearly, setIsYearly] = useState(false);
+
   return (
     <div className="w-full min-h-screen text-white font-sans">
-
-      {/* 🔥 Only Hero Section gets the animated background */}
       <div className="relative w-full h-screen overflow-hidden">
         <DarkVeil />
         <div className="relative z-10">
@@ -22,10 +22,9 @@ const Homepage = () => {
         </div>
       </div>
 
-      {/* 🔻 Other sections below */}
       <About />
       <Features />
-      <Pricing />
+      <Pricing isYearly={isYearly} setIsYearly={setIsYearly} />
       <Testimonials />
       <Newsletter />
       <Contact />

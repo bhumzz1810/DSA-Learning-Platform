@@ -12,7 +12,7 @@ const Hero = () => {
             </p>
             <img src={bannerImg} alt="Devices" className="mx-auto max-w-[750px] mb-10" />
             <div className="flex justify-center gap-6">
-                <button className="min-w-[200px] px-6 py-2 rounded-full text-white backdrop-blur-md bg-white/10 border border-gray-300/40 hover:bg-white/20 transition">
+                <button className="min-w-[200px] px-6 py-2 rounded-full text-white   bg-white/10 border border-gray-300/40 hover:bg-white/20 transition">
                     Explore Features
                 </button>
                 <button className="bg-cyan-400 min-w-[200px] text-black px-6 py-2 rounded-full hover:bg-cyan-300 transition">

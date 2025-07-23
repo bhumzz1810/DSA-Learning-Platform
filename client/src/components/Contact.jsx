@@ -2,8 +2,8 @@ import React from "react";
 
 const Contact = () => {
     return (
-        <section className="bg-[#0a0f1f] py-20 px-6 text-white text-center">
-            <h2 className="text-3xl font-bold mb-4">Contact Us</h2>
+        <section className="bg-black py-20 px-6 text-white text-center">
+            <h2 className="text-3xl text-white font-bold mb-4">Contact Us</h2>
             <p className="text-gray-400 mb-10 max-w-xl mx-auto">
                 Have questions, feedback, or just want to say hi? Drop us a message!
             </p>
@@ -15,22 +15,22 @@ const Contact = () => {
                         <input
                             type="text"
                             placeholder="Your Name"
-                            className="bg-white/5 backdrop-blur-md w-full p-3 rounded-lg border border-[#2d2d3a] placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition"
+                            className="   w-full p-3 rounded-lg border placeholder-gray-400 transition"
                         />
                         <input
                             type="email"
                             placeholder="Your Email"
-                            className="bg-white/5 backdrop-blur-md w-full p-3 rounded-lg border border-[#2d2d3a] placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition"
+                            className="  w-full p-3 rounded-lg border border-[#2d2d3a] placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition"
                         />
                     </div>
                     <textarea
                         placeholder="Your Message"
                         rows="5"
-                        className="bg-white/5 backdrop-blur-md w-full p-3 rounded-lg border border-[#2d2d3a] placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition"
+                        className="bg-white/5   w-full p-3 rounded-lg border border-[#2d2d3a] placeholder-gray-400 focus:outline-none focus:border-cyan-500 transition"
                     ></textarea>
                     <button
                         type="submit"
-                        className="w-full bg-cyan-500 text-white font-medium py-3 rounded-lg hover:bg-cyan-600 transition"
+                        className="w-full bg-cyan-500 text-white font-medium py-3 rounded-full hover:bg-cyan-600 transition"
                     >
                         Send Message
                     </button>
