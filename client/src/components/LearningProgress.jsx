@@ -39,26 +39,30 @@ const LearningProgress = ({ user, theme }) => {
   if (!user) return null;
 
   const progressPercentage = Math.min(100, Math.floor((user.xp / 1000) * 100));
+  const levelProgress = user.level ? `${user.level}` : "1";
 
   return (
-    <div>
-      <h2 className={`text-xl font-semibold mb-2 text-left ${currentTheme.text}`}>
-        Current Learning Progress
+    <div className={`rounded-xl p-6 border ${currentTheme.border} ${themeConfig[theme]?.bg || themeConfig.dark.bg}`}>
+      <h2 className={`text-xl font-semibold mb-4 text-left ${currentTheme.text}`}>
+        Learning Progress
       </h2>
-      <div className={`flex justify-between text-sm mb-1 ${currentTheme.text}`}>
-        <p>Data Structures and Algorithms</p>
-        <p>{progressPercentage}%</p>
+      <div className="mb-6">
+        <p className={`text-sm ${currentTheme.secondary} mb-1`}>Level {levelProgress}</p>
+        <div className={`h-2 w-full ${currentTheme.progressBg} rounded mb-2`}>
+          <div 
+            className={`h-full ${currentTheme.progressFill} rounded`} 
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+        <p className={`text-sm ${currentTheme.positive}`}>
+          {user.xp} / 1000 XP ({progressPercentage}%)
+        </p>
       </div>
-      <div className={`h-2 w-full ${currentTheme.progressBg} rounded mb-2`}>
-        <div 
-          className={`h-full ${currentTheme.progressFill} rounded`} 
-          style={{ width: `${progressPercentage}%` }}
-        />
+      <div className="flex justify-between text-sm mb-4">
+        <p className={currentTheme.text}>Problems Solved:</p>
+        <p className={currentTheme.text}>{user.totalSolved || 0}</p>
       </div>
-      <p className={`text-sm ${currentTheme.positive} mb-4`}>
-        {user.xp} / 1000 XP
-      </p>
-      <button className={`${currentTheme.button} px-4 py-2 rounded-full`}>
+      <button className={`${currentTheme.button} px-4 py-2 rounded-full w-full`}>
         Continue Learning
       </button>
     </div>

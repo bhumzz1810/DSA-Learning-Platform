@@ -34,17 +34,22 @@ const XPProgressChart = ({ user, theme }) => {
 
   if (!user) return null;
 
+  // Calculate XP change (mock data - replace with real calculations)
+  const xpChange = 10; // This should be calculated from user's recent activity
+
   return (
-    <div className={`rounded-xl p-6 border ${currentTheme.border} w-full md:max-w-3xl ${currentTheme.bg}`}>
+    <div className={`rounded-xl p-6 border ${currentTheme.border} ${currentTheme.bg}`}>
       <h2 className={`text-xl text-left font-semibold mb-4 ${currentTheme.text}`}>
         XP Progress
       </h2>
-      <p className={`text-4xl font-bold mb-2 ${currentTheme.text}`}>
-        {user.xp}
-      </p>
-      <p className={`${currentTheme.positive} text-sm mb-4`}>
-        Current XP +10%
-      </p>
+      <div className="flex items-end gap-2 mb-2">
+        <p className={`text-4xl font-bold ${currentTheme.text}`}>
+          {user.xp}
+        </p>
+        <p className={`${currentTheme.positive} text-sm mb-2`}>
+          +{xpChange}%
+        </p>
+      </div>
       <div className={`h-40 ${currentTheme.chartBg} rounded flex items-center justify-center ${currentTheme.text}`}>
         [ XP Line Graph Placeholder ]
       </div>

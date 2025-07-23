@@ -70,6 +70,7 @@ function App() {
             <Route path="/subscribe" element={<SubscriptionPage />} />
             <Route path="/settings" element={<Settings />} />
 
+
             {/* ADMIN ROUTES */}
             <Route path="/admin/add-problem" element={<AddProblem />} />
             <Route path="/admin/problems" element={<ProblemList />} />
