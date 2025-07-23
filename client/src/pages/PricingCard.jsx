@@ -43,7 +43,7 @@ const Pricing = () => {
   const [isYearly, setIsYearly] = useState(false);
 
   return (
-    <section className="bg-[#0a0f1f] py-20 px-6 text-white text-center backdrop-blur-lg">
+    <section className=" py-20 px-6 text-white text-center backdrop-blur-lg">
       <h2 className="text-3xl font-bold mb-2">Pricing</h2>
       <p className="mb-8 text-gray-400">Choose a plan that fits your learning style.</p>
 

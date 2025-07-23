@@ -25,10 +25,10 @@ const aboutCards = [
 
 const About = () => {
   return (
-    <section className="bg-[#0a0f1f] py-20 px-6 text-white text-center relative">
+    <section className="bg-[#000000] py-10 px-6 text-white text-center relative">
       <div className="max-w-6xl mx-auto">
         <motion.h2
-          className="text-3xl font-bold mb-4"
+          className="text-3xl text-white font-bold mb-4"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
