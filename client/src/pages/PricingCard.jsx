@@ -69,7 +69,7 @@ const Pricing = ({ isYearly, setIsYearly }) => {
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
         {plans.map((plan, index) => (
           <motion.div
             key={index}
@@ -77,7 +77,7 @@ const Pricing = ({ isYearly, setIsYearly }) => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
             viewport={{ once: true }}
-            className={`relative rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 shadow-md text-left transition hover:border-cyan-500 ${plan.popular ? "ring-2 ring-cyan-500" : ""
+            className={`relative flex flex-col justify-between h-full rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 shadow-md text-left transition hover:border-cyan-500 ${plan.popular ? "ring-2 ring-cyan-500" : ""
               }`}
           >
             {plan.popular && (
@@ -85,31 +85,34 @@ const Pricing = ({ isYearly, setIsYearly }) => {
                 Most Popular
               </div>
             )}
-            <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
-            <p className="text-4xl font-bold mb-4">
-              {plan.price === 0
-                ? "Free"
-                : `$${isYearly ? plan.price * 10 : plan.price}`}
-              <span className="text-base font-normal text-gray-400 ml-1">
-                /{isYearly ? "yr" : "mo"}
-              </span>
-            </p>
-            <ul className="text-gray-300 space-y-3 text-sm mb-6">
-              {plan.features.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2">
-                  <span className="text-cyan-400">{feature.icon}</span>
-                  {feature.text}
-                </li>
-              ))}
-            </ul>
-            {/* Route to /subscribe with plan info */}
+
+            {/* Content Wrapper */}
+            <div>
+              <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
+              <p className="text-4xl font-bold mb-4">
+                {plan.price === 0 ? "Free" : `$${isYearly ? plan.price * 10 : plan.price}`}
+                <span className="text-base font-normal text-gray-400 ml-1">
+                  /{isYearly ? "yr" : "mo"}
+                </span>
+              </p>
+              <ul className="text-gray-300 space-y-3 text-sm mb-6">
+                {plan.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="text-cyan-400">{feature.icon}</span>
+                    {feature.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Button Stuck at Bottom */}
             <button
               onClick={() =>
                 navigate("/subscribe", {
                   state: { plan: plan.name, billing: isYearly ? "yearly" : "monthly" },
                 })
               }
-              className="w-full bg-cyan-500 text-white py-2 rounded-lg hover:bg-cyan-600 transition"
+              className="mt-auto w-full bg-cyan-500 text-white py-2 rounded-full hover:bg-cyan-600 transition"
             >
               {plan.price === 0 ? "Get Started" : "Go Pro"}
             </button>
