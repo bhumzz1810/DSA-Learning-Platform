@@ -184,28 +184,33 @@ const Dashboard = () => {
       }
     };
 
-    const fetchDailyChallenge = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/problems', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch daily challenge');
-        }
-
-        const data = await response.json();
-        setDailyChallenge(data);
-      } catch (err) {
-        console.error("Error fetching daily challenge:", err);
-        setDailyChallenge(null);
-      } finally {
-        setLoadingDaily(false);
+  const fetchDailyChallenge = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/problems', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
       }
-    };
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch problems');
+    }
+
+    const data = await response.json();
+    
+    // Find the problem where isDaily is true
+    const dailyProblem = data.find(problem => problem.isDaily);
+    
+    setDailyChallenge(dailyProblem || null);
+
+  } catch (err) {
+    console.error("Error fetching daily challenge:", err);
+    setDailyChallenge(null);
+  } finally {
+    setLoadingDaily(false);
+  }
+};
 
     fetchDashboardData();
     fetchDailyChallenge();
@@ -398,103 +403,105 @@ const Dashboard = () => {
         </div>
 
         {/* Daily Challenge Card */}
-        {/* Daily Challenge Card */}
-        <motion.div
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.3 }}
-          className={`rounded-3xl p-6 shadow-lg ${currentTheme.card} border border-opacity-20`}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className={`text-xl sm:text-2xl font-bold ${currentTheme.title}`}>
-              🔥 Daily Challenge
-            </h2>
-            <span className="text-xs px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-            </span>
-          </div>
-
-          {loadingDaily ? (
-            <div className="flex justify-center items-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            </div>
-          ) : dailyChallenge ? (
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className={`text-lg font-semibold ${currentTheme.title} mb-1`}>
-                    {dailyChallenge.title}
-                  </h3>
-                  <p className={`text-sm ${currentTheme.subtitle} line-clamp-2`}>
-                    {dailyChallenge.description}
-                  </p>
-                </div>
-                <span
-                  className={`px-2 py-1 text-xs font-semibold rounded-full min-w-[70px] text-center ${dailyChallenge.difficulty === 'Easy'
-                      ? 'bg-green-100 text-green-700'
-                      : dailyChallenge.difficulty === 'Medium'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-700'
-                    }`}
-                >
-                  {dailyChallenge.difficulty}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <span className={`text-sm ${currentTheme.subtitle}`}>
-                  {dailyChallenge.category || "Algorithm"}
-                </span>
-                <Link
-  to={`/problems/${dailyChallenge._id}`}
-  className={`px-4 py-2 rounded-lg text-sm font-medium ${currentTheme.button} flex items-center gap-1`}
+   {/* Daily Challenge Card */}
+<motion.div 
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5 }}
+  className={`rounded-xl shadow-md p-6 mb-8 ${currentTheme.card}`}
 >
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-4 w-4"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M13 10V3L4 14h7v7l9-11h-7z"
-    />
-  </svg>
-  Solve Now
-</Link>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-6">
-              <div className={`w-16 h-16 mx-auto rounded-full ${applyGradient('flex items-center justify-center text-white text-2xl mb-4')}`}>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-8 w-8"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-              <h3 className={`text-lg font-semibold ${currentTheme.title}`}>
-                No Challenge Today
-              </h3>
-              <p className={`text-sm ${currentTheme.subtitle} opacity-80 mt-1`}>
-                Check back later for new challenges
-              </p>
-            </div>
-          )}
-        </motion.div>
+  <div className="flex justify-between items-center mb-4">
+    <h2 className={`text-2xl font-bold ${currentTheme.title}`}>
+      🔥 Daily Challenge
+    </h2>
+    <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+      {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+    </span>
+  </div>
+
+  {loadingDaily ? (
+    <div className="flex justify-center py-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+    </div>
+  ) : dailyChallenge ? (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1">
+          <h3 className={`text-xl font-semibold ${currentTheme.title}`}>
+            {dailyChallenge.title}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            {dailyChallenge.description}
+          </p>
+        </div>
+        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+          dailyChallenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100' :
+          dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
+          'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
+        }`}>
+          {dailyChallenge.difficulty}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap gap-2 mt-4">
+        <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100 rounded-full text-sm">
+          {dailyChallenge.category}
+        </span>
+        {dailyChallenge.hints?.length > 0 && (
+          <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-100 rounded-full text-sm">
+            {dailyChallenge.hints.length} Hint{dailyChallenge.hints.length !== 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <Link
+          to={`/problems/${dailyChallenge._id}`}
+          className={`px-6 py-2 rounded-lg font-medium ${currentTheme.button} flex items-center gap-2`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+          Solve Challenge
+        </Link>
+      </div>
+    </div>
+  ) : (
+    <div className="text-center py-8">
+      <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-8 w-8 text-gray-500 dark:text-gray-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+      </div>
+      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+        No Challenge Today
+      </h3>
+      <p className="text-gray-600 dark:text-gray-400 mt-1">
+        Check back tomorrow for a new challenge
+      </p>
+    </div>
+  )}
+</motion.div>
         {/* Badges Section */}
         <motion.div
           variants={cardVariants}
