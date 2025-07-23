@@ -499,8 +499,8 @@ const GlobalSpotlight = ({
 
 const BentoCardGrid = ({ children, gridRef }) => (
     <div
-        className="bento-section grid gap-2 p-3 max-w-[54rem] select-none relative"
-        style={{ fontSize: "clamp(1rem, 0.9rem + 0.5vw, 1.5rem)" }}
+        className="bento-section bg-black grid gap-2 p-3 max-w-full select-none relative"
+        style={{ fontSize: "clamp(2rem, 0.9rem + 0.5vw, 1.5rem)" }}
         ref={gridRef}
     >
         {children}
@@ -683,9 +683,11 @@ const Features = ({
 
             <BentoCardGrid gridRef={gridRef}>
                 <h3 className="text-white font-semibold text-center">Features</h3>
+                <p className="text-gray-300 text-sm text-center mb-6">
+                    Explore our platform's unique features designed to enhance your coding journey.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-w-6xl mx-auto w-full">
                     {cardData.map((card, index) => {
-                        const baseClassName = `card flex flex-col justify-between relative h-[260px] min-h-[260px] w-full max-w-full p-5 rounded-[20px] border border-solid font-light overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${enableBorderGlow ? "card--border-glow" : ""
+                        const baseClassName = `card flex flex-col justify-between relative h-[200px] min-h-[100px] w-[full] max-w-[400px] p-5 rounded-[20px] border border-solid font-light overflow-hidden transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(0,0,0,0.15)] ${enableBorderGlow ? "card--border-glow" : ""
                             }`;
 
 
@@ -713,9 +715,9 @@ const Features = ({
                                     enableMagnetism={enableMagnetism}
                                 >
                                     <div className="card__content flex flex-col items-start gap-1">
-                                        <div className="text-4xl mb-4">{card.icon}</div>
-                                        <h3 className="text-base font-semibold">{card.title}</h3>
-                                        <p className="text-xs text-gray-300 leading-5">{card.description}</p>
+                                        <div className="text-5xl mb-4">{card.icon}</div>
+                                        <h3 className="text-xl font-semibold">{card.title}</h3>
+                                        <p className="text-sm text-gray-300 leading-5">{card.description}</p>
                                     </div>
 
 

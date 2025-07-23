@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FaCheckCircle,
@@ -39,14 +40,17 @@ const plans = [
   },
 ];
 
-const Pricing = () => {
-  const [isYearly, setIsYearly] = useState(false);
+const Pricing = ({ isYearly, setIsYearly }) => {
+  const navigate = useNavigate(); // ⬅️ Hook for navigation
 
   return (
-    <section className=" py-20 px-6 text-white text-center backdrop-blur-lg">
-      <h2 className="text-3xl font-bold mb-2">Pricing</h2>
-      <p className="mb-8 text-gray-400">Choose a plan that fits your learning style.</p>
+    <section className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg">
+      <h2 className="text-3xl text-white font-bold mb-2">Pricing</h2>
+      <p className="mb-8 text-sm text-gray-400">
+        Choose a plan that fits your learning style.
+      </p>
 
+      {/* Toggle */}
       <div className="flex justify-center mb-10">
         <button
           onClick={() => setIsYearly(false)}
@@ -64,6 +68,7 @@ const Pricing = () => {
         </button>
       </div>
 
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
         {plans.map((plan, index) => (
           <motion.div
@@ -72,7 +77,7 @@ const Pricing = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
             viewport={{ once: true }}
-            className={`relative rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 backdrop-blur-md shadow-md text-left transition hover:border-cyan-500 ${plan.popular ? "ring-2 ring-cyan-500" : ""
+            className={`relative rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 shadow-md text-left transition hover:border-cyan-500 ${plan.popular ? "ring-2 ring-cyan-500" : ""
               }`}
           >
             {plan.popular && (
@@ -82,7 +87,9 @@ const Pricing = () => {
             )}
             <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
             <p className="text-4xl font-bold mb-4">
-              {plan.price === 0 ? "Free" : `$${isYearly ? plan.price * 10 : plan.price}`}
+              {plan.price === 0
+                ? "Free"
+                : `$${isYearly ? plan.price * 10 : plan.price}`}
               <span className="text-base font-normal text-gray-400 ml-1">
                 /{isYearly ? "yr" : "mo"}
               </span>
@@ -95,7 +102,15 @@ const Pricing = () => {
                 </li>
               ))}
             </ul>
-            <button className="w-full bg-cyan-500 text-white py-2 rounded-lg hover:bg-cyan-600 transition">
+            {/* Route to /subscribe with plan info */}
+            <button
+              onClick={() =>
+                navigate("/subscribe", {
+                  state: { plan: plan.name, billing: isYearly ? "yearly" : "monthly" },
+                })
+              }
+              className="w-full bg-cyan-500 text-white py-2 rounded-lg hover:bg-cyan-600 transition"
+            >
               {plan.price === 0 ? "Get Started" : "Go Pro"}
             </button>
           </motion.div>
