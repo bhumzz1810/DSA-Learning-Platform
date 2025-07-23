@@ -612,7 +612,7 @@
 .container {
   position: relative;
   width: 280px;
-  height: 420px; /* Make square(ish), tweak as needed */
+  height: 420px; 
   display: flex;
   justify-content: center;
   align-items: center;

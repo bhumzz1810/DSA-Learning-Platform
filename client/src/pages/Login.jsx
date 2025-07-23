@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
-import alertSound from "../assets/music/warning.mp3";
+import alertSound from "../../public/music/warning.mp3";
+import { toast } from "react-toastify";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -30,10 +31,10 @@ const LoginForm = () => {
     };
   }, []);
 
-  const speak = (msg) => {
-    const speech = new SpeechSynthesisUtterance(msg);
-    speechSynthesis.speak(speech);
-  };
+  // const speak = (msg) => {
+  //   const speech = new SpeechSynthesisUtterance(msg);
+  //   speechSynthesis.speak(speech);
+  // };
 
   const handleLoginClick = () => {
     setShowLogin(true);
@@ -86,21 +87,31 @@ const LoginForm = () => {
       if (!res.ok) throw new Error(data.message || "Something went wrong");
 
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Save user too
 
       // ✅ Decode token to get user role
       const payloadData = JSON.parse(atob(data.token.split(".")[1]));
       const role = payloadData.role;
       localStorage.setItem("role", role);
 
-      alert(`${showLogin ? "Login" : "Signup"} successful!`);
-      setError("");
+      toast.success(`${showLogin ? "Login" : "Signup"} successful!`, {
+        position: "top-right",
+        autoClose: 2500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
 
-      // ✅ Redirect based on role
-      if (role === "admin") {
-        navigate("/admin/problems");
-      } else {
-        navigate("/dashboard");
-      }
+      // ✅ Delay redirect until after 2.5s so alert is visible
+      setTimeout(() => {
+        if (role === "admin") {
+          navigate("/admin/problems");
+        } else {
+          navigate("/dashboard");
+        }
+      }, 1500); // enough time to show the popup
     } catch (err) {
       setError(err.message);
     }
@@ -291,6 +302,24 @@ const LoginForm = () => {
           </div>
         )}
       </div>
+      {error && (
+        <div className="fixed top-6 right-6 z-50 bg-red-100 border border-red-400 text-red-700 px-6 py-3 rounded-lg shadow-md flex items-center">
+          <svg
+            className="w-5 h-5 mr-2 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M18.364 5.636l-12.728 12.728M5.636 5.636l12.728 12.728"
+            />
+          </svg>
+          <span>{error}</span>
+        </div>
+      )}
     </div>
   );
 };
