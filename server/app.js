@@ -80,7 +80,7 @@ app.use("/api/notes", noteRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api", dailyChallengeRoute);
 app.use("/api/stripe", stripeRoutes);
-
+app.use("/api/auth", require("./routes/authStatus"));
 // Socket.IO Setup
 setupSocketServer(server);
 

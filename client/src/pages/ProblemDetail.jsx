@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import { FiMaximize, FiMinimize } from "react-icons/fi";
@@ -30,7 +30,6 @@ rl.on("close", () => {
 `.trim();
 };
 
-
 export default function ProblemDetail() {
   const { id } = useParams();
   const [problem, setProblem] = useState(null);
@@ -57,6 +56,8 @@ export default function ProblemDetail() {
   const [bookmarked, setBookmarked] = useState(false);
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const navigate = useNavigate(); // inside your component
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -223,6 +224,11 @@ export default function ProblemDetail() {
 
   // ProblemDetail.jsx
   const handleSubmit = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       console.log("Using token:", token ? "exists" : "missing");
@@ -294,9 +300,17 @@ export default function ProblemDetail() {
         });
 
         try {
-          const res = await axios.post("http://localhost:5000/api/suggest", {
-            prompt: textUntilPosition,
-          });
+          const res = await axios.post(
+            "http://localhost:5000/api/suggest",
+            {
+              prompt: textUntilPosition,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
 
           const suggestionText = res.data.suggestion.trim();
 
@@ -648,6 +662,36 @@ export default function ProblemDetail() {
             </div>
           )}
         </div>
+
+        {showLoginPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 text-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Login Required
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                You must be logged in to bookmark challenges.
+              </p>
+              <div className="flex justify-center gap-4">
+                <button
+                  onClick={() => setShowLoginPrompt(false)}
+                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowLoginPrompt(false);
+                    navigate("/login");
+                  }}
+                  className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
+                >
+                  Login
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
