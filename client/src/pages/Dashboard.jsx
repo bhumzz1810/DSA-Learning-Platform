@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../components/RT_Pairing/ThemeContext";
 import { useNavigate, Link } from "react-router-dom";
+import { 
+  Trophy, Award, Medal, Crown, Star, 
+  Rocket, Flame, Gem, ShieldCheck, ThumbsUp, Brain 
+} from "lucide-react";
 
 // Animation variants
 const cardVariants = {
@@ -75,60 +79,70 @@ const Dashboard = () => {
   // Theme configuration with fallbacks
   const themeConfig = {
     light: {
-      bg: "bg-gradient-to-br from-gray-50 to-gray-200",
-      card: "bg-white/90 border-gray-200",
-      text: "text-gray-900",
+      bg: "bg-white",
+      
+      border: "border-gray-200",
+      text: "text-gray-800",
       title: "text-indigo-700",
-      subtitle: "text-indigo-600",
-      button: "bg-indigo-600 hover:bg-indigo-700 text-white",
-      loading: "bg-gradient-to-br from-gray-50 to-gray-200",
-      accent: "from-indigo-500 to-purple-600",
+      accent: "text-indigo-600",
+      button: "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white",
+      rank: "text-indigo-600",
+      premium: "text-yellow-600",
       badge: "bg-indigo-100 text-indigo-800",
-      flipFront: "bg-white",
-      flipBack: "bg-indigo-50",
     },
     dark: {
-      bg: "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950",
-      card: "bg-gray-800/90 border-gray-700",
-      text: "text-gray-100",
+      bg: "bg-gray-800",
+      border: "border-gray-700",
+      text: "text-white",
       title: "text-indigo-300",
-      subtitle: "text-indigo-200",
-      button: "bg-indigo-600 hover:bg-indigo-500 text-white",
-      loading: "bg-gradient-to-br from-gray-900 to-gray-800",
-      accent: "from-indigo-500 to-purple-500",
-      badge: "bg-indigo-900/50 text-indigo-100",
-      flipFront: "bg-gray-800",
-      flipBack: "bg-gray-700",
+      accent: "text-indigo-200",
+      button: "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-500 hover:to-purple-600 text-white",
+      rank: "text-indigo-300",
+      premium: "text-yellow-400",
+            badge: "bg-cyan-900/50 text-cyan-100"
+
     },
     ocean: {
-      bg: "bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950",
-      card: "bg-blue-800/90 border-blue-700",
-      text: "text-blue-50",
+      bg: "bg-blue-800",
+      border: "border-blue-700",
+      text: "text-white",
       title: "text-cyan-300",
-      subtitle: "text-cyan-200",
-      button: "bg-cyan-600 hover:bg-cyan-500 text-white",
-      loading: "bg-gradient-to-br from-blue-900 to-blue-800",
-      accent: "from-cyan-400 to-blue-500",
-      badge: "bg-cyan-900/50 text-cyan-100",
-      flipFront: "bg-blue-800",
-      flipBack: "bg-blue-700",
+      accent: "text-cyan-200",
+      button: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white",
+      rank: "text-cyan-300",
+      premium: "text-yellow-300",
+
     },
     forest: {
-      bg: "bg-gradient-to-br from-green-900 via-green-800 to-green-950",
-      card: "bg-green-800/90 border-green-700",
-      text: "text-green-50",
+      bg: "bg-green-800",
+      border: "border-green-700",
+      text: "text-white",
       title: "text-emerald-300",
-      subtitle: "text-emerald-200",
-      button: "bg-emerald-600 hover:bg-emerald-500 text-white",
-      loading: "bg-gradient-to-br from-green-900 to-green-800",
-      accent: "from-emerald-400 to-teal-500",
-      badge: "bg-emerald-900/50 text-emerald-100",
-      flipFront: "bg-green-800",
-      flipBack: "bg-green-700",
-    },
+      accent: "text-emerald-200",
+      button: "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white",
+      rank: "text-emerald-300",
+      premium: "text-yellow-300",
+    }
   };
 
   const currentTheme = themeConfig[theme] || themeConfig.light;
+
+  // Badge icons
+ const badgeIcons = [
+    <Trophy className="w-8 h-8 text-yellow-400" />,
+    <Award className="w-8 h-8 text-blue-400" />,
+    <Medal className="w-8 h-8 text-purple-400" />,
+    <Crown className="w-8 h-8 text-green-400" />,
+    <Star className="w-8 h-8 text-orange-400" />,
+    <Rocket className="w-8 h-8 text-pink-400" />,
+    <Flame className="w-8 h-8 text-red-500" />,
+    <Gem className="w-8 h-8 text-teal-400" />,
+    <ShieldCheck className="w-8 h-8 text-indigo-500" />,
+    <ThumbsUp className="w-8 h-8 text-lime-400" />,
+    <Brain className="w-8 h-8 text-rose-400" />,
+  ];
+
+
 
   // Safe theme color extraction
   const getThemeColor = (type) => {
@@ -185,33 +199,33 @@ const Dashboard = () => {
       }
     };
 
-  const fetchDailyChallenge = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/problems', {
-      headers: {
-        'Authorization': `Bearer ${token}`,
+    const fetchDailyChallenge = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/problems', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch problems');
+        }
+
+        const data = await response.json();
+
+        // Find the problem where isDaily is true
+        const dailyProblem = data.find(problem => problem.isDaily);
+
+        setDailyChallenge(dailyProblem || null);
+
+      } catch (err) {
+        console.error("Error fetching daily challenge:", err);
+        setDailyChallenge(null);
+      } finally {
+        setLoadingDaily(false);
       }
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch problems');
-    }
-
-    const data = await response.json();
-    
-    // Find the problem where isDaily is true
-    const dailyProblem = data.find(problem => problem.isDaily);
-    
-    setDailyChallenge(dailyProblem || null);
-
-  } catch (err) {
-    console.error("Error fetching daily challenge:", err);
-    setDailyChallenge(null);
-  } finally {
-    setLoadingDaily(false);
-  }
-};
+    };
 
     fetchDashboardData();
     fetchDailyChallenge();
@@ -298,7 +312,7 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Hero Header */}
         <motion.header
-          className={`relative overflow-hidden rounded-3xl p-8 ${currentTheme.card}`}
+          className={`relative overflow-hidden rounded-3xl border border-opacity-20 p-8 ${currentTheme.card}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
@@ -309,7 +323,7 @@ const Dashboard = () => {
               "from"
             )} blur-3xl opacity-20`}
           ></div>
-          <div className="flex justify-between items-center relative z-10">
+          <div className=" rounded-3xl flex justify-between items-center relative z-10">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold">
                 Welcome back,{" "}
@@ -322,6 +336,7 @@ const Dashboard = () => {
                 Here's your coding progress
               </p>
             </div>
+
             <motion.button
               whileHover={{ scale: 1.1, rotate: 10 }}
               whileTap={{ scale: 0.9 }}
@@ -336,10 +351,10 @@ const Dashboard = () => {
               {theme === "light"
                 ? "🌙"
                 : theme === "dark"
-                ? "🌞"
-                : theme === "ocean"
-                ? "🌲"
-                : "🌊"}
+                  ? "🌞"
+                  : theme === "ocean"
+                    ? "🌲"
+                    : "🌊"}
             </motion.button>
           </div>
         </motion.header>
@@ -451,147 +466,135 @@ const Dashboard = () => {
         </div>
 
         {/* Daily Challenge Card */}
-   {/* Daily Challenge Card */}
-<motion.div 
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
-  className={`rounded-xl shadow-md p-6 mb-8 ${currentTheme.card}`}
->
-  <div className="flex justify-between items-center mb-4">
-    <h2 className={`text-2xl font-bold ${currentTheme.title}`}>
-      🔥 Daily Challenge
-    </h2>
-    <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
-      {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
-    </span>
-  </div>
-
-  {loadingDaily ? (
-    <div className="flex justify-center py-8">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-    </div>
-  ) : dailyChallenge ? (
-    <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h3 className={`text-xl font-semibold ${currentTheme.title}`}>
-            {dailyChallenge.title}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
-            {dailyChallenge.description}
-          </p>
-        </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-          dailyChallenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100' :
-          dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
-          'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
-        }`}>
-          {dailyChallenge.difficulty}
-        </span>
-      </div>
-
-      <div className="flex flex-wrap gap-2 mt-4">
-        <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100 rounded-full text-sm">
-          {dailyChallenge.category}
-        </span>
-        {dailyChallenge.hints?.length > 0 && (
-          <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-100 rounded-full text-sm">
-            {dailyChallenge.hints.length} Hint{dailyChallenge.hints.length !== 1 ? 's' : ''}
-          </span>
-        )}
-      </div>
-
-      <div className="mt-6 flex justify-end">
-        <Link
-          to={`/problems/${dailyChallenge._id}`}
-          className={`px-6 py-2 rounded-lg font-medium ${currentTheme.button} flex items-center gap-2`}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className={`rounded-xl  border border-opacity-20  shadow-md p-6 mb-8 ${currentTheme.card}`}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5"
-            viewBox="0 0 20 20"
-            fill="currentColor"
+          <div className="flex justify-between items-center mb-4">
+            <h2 className={`text-2xl font-bold ${currentTheme.title}`}>
+              🔥 Daily Challenge
+            </h2>
+            <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+            </span>
+          </div>
+
+          {loadingDaily ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+          ) : dailyChallenge ? (
+            <div className="space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className={`text-xl font-semibold ${currentTheme.title}`}>
+                    {dailyChallenge.title}
+                  </h3>
+                  <p className={`${currentTheme.text} mt-2`}>
+                    {dailyChallenge.description}
+                  </p>
+                </div>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${dailyChallenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100' :
+                    dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
+                      'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
+                  }`}>
+                  {dailyChallenge.difficulty}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mt-4">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-100 rounded-full text-sm">
+                  {dailyChallenge.category}
+                </span>
+                {dailyChallenge.hints?.length > 0 && (
+                  <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-100 rounded-full text-sm">
+                    {dailyChallenge.hints.length} Hint{dailyChallenge.hints.length !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+
+              <div className="mt-6 flex justify-end">
+                <Link
+                  to={`/problems/${dailyChallenge._id}`}
+                  className={`px-6 py-2 rounded-lg font-medium ${currentTheme.button} flex items-center gap-2`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Solve Challenge
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-8 w-8 text-gray-500 dark:text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                No Challenge Today
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                Check back tomorrow for a new challenge
+              </p>
+            </div>
+          )}
+        </motion.div>
+        {/* Badges Section */}
+  {/* Badges Section */}
+<motion.section
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.4 }}
+  className={`mb-8 p-6 border border-opacity-20 rounded-xl ${currentTheme.card}`}
+>
+  <h2 className={`text-2xl font-bold mb-4 ${currentTheme.title}`}>🏅 Earned Badges</h2>
+  {userData.user.badges?.length > 0 ? (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <AnimatePresence>
+        {userData.user.badges.map((badge, i) => (
+          <motion.div
+            key={badge}
+            custom={i}
+            variants={badgeVariants}
+            initial="hidden"
+            animate="visible"
+            whileHover="hover"
+            className={`flex flex-col items-center p-4 rounded-lg ${currentTheme.badge}`}
           >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Solve Challenge
-        </Link>
-      </div>
+            {badgeIcons[i % badgeIcons.length]}
+            <p className="mt-2 text-lg text-center">{badge}</p>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   ) : (
-    <div className="text-center py-8">
-      <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mb-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-8 w-8 text-gray-500 dark:text-gray-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-      </div>
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-        No Challenge Today
-      </h3>
-      <p className="text-gray-600 dark:text-gray-400 mt-1">
-        Check back tomorrow for a new challenge
-      </p>
-    </div>
+    <p className={`${currentTheme.text} opacity-80`}>No badges earned yet. Solve problems to earn badges!</p>
   )}
-</motion.div>
-        {/* Badges Section */}
-        <motion.div
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ delay: 0.4 }}
-          className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
-        >
-          <h2
-            className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}
-          >
-            🏅 Badges
-          </h2>
-          <AnimatePresence>
-            <div className="flex flex-wrap gap-3">
-              {userData.user.badges?.length ? (
-                userData.user.badges.map((badge, i) => (
-                  <motion.div
-                    key={badge}
-                    custom={i}
-                    variants={badgeVariants}
-                    initial="hidden"
-                    animate="visible"
-                    whileHover="hover"
-                    className={`px-4 py-2 rounded-full text-sm font-medium ${currentTheme.badge}`}
-                  >
-                    🏆 {badge}
-                  </motion.div>
-                ))
-              ) : (
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                  className="text-sm opacity-60"
-                >
-                  No badges earned yet.
-                </motion.p>
-              )}
-            </div>
-          </AnimatePresence>
-        </motion.div>
+</motion.section>
 
         {/* Subscription Section */}
         <motion.div
@@ -673,7 +676,7 @@ const Dashboard = () => {
                 onClick={() => {
                   navigate("/");
                   setTimeout(() => {
-                    const pricingSection = document.getElementById("pricing");
+                    const pricingSection = document.getElementById("Pricing");
                     if (pricingSection) {
                       pricingSection.scrollIntoView({ behavior: "smooth" });
                     }
@@ -725,13 +728,12 @@ const Dashboard = () => {
                           {problem.category}
                         </span>
                         <span
-                          className={`px-2.5 py-1 rounded-full font-medium ${
-                            problem.difficulty === "Easy"
+                          className={`px-2.5 py-1 rounded-full font-medium ${problem.difficulty === "Easy"
                               ? "bg-green-100/70 text-green-800"
                               : problem.difficulty === "Medium"
-                              ? "bg-yellow-100/70 text-yellow-800"
-                              : "bg-red-100/70 text-red-800"
-                          }`}
+                                ? "bg-yellow-100/70 text-yellow-800"
+                                : "bg-red-100/70 text-red-800"
+                            }`}
                         >
                           {problem.difficulty}
                         </span>

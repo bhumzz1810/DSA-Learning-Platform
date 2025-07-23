@@ -77,8 +77,9 @@ const Pricing = ({ isYearly, setIsYearly }) => {
   };
 
   return (
-    <section className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg">
-      <h2 className="text-3xl font-bold mb-2">Pricing</h2>
+    <section id="Pricing" className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg">
+      <h2 className="text-3xl text-white font-bold mb-2">Pricing</h2>
+
       <p className="mb-8 text-sm text-gray-400">
         Choose a plan that fits your learning style.
       </p>
