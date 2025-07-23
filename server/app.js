@@ -23,8 +23,9 @@ const dailyChallengeRoute = require("./routes/dailyChallenge");
 const cron = require("node-cron");
 const rotateDailyChallenge = require("./utils/dailyRotation");
 const stripeRoutes = require("./routes/stripe.js");
-const webhookRoute = require("./routes/webhook");
-app.use("/api", webhookRoute);
+// const webhookRoute = require("./routes/webhook");
+// ✅ Correct route registration
+app.use("/api/stripe", require("./routes/webhook"));
 
 require("./config/passport");
 

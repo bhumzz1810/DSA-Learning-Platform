@@ -59,7 +59,7 @@ const Navbar = () => {
               onClick={() =>
                 isSubscribed
                   ? navigate("/join-room")
-                  : (window.location.href = "/#pricing")
+                  : navigate("/", { state: { scrollToPricing: true } })
               }
               className={`cursor-pointer relative group ${
                 isSubscribed ? "" : "text-gray-400"

@@ -41,7 +41,7 @@ router.post("/create-checkout-session", async (req, res) => {
         },
       },
       metadata: { userId },
-      success_url: `${req.headers.origin}/success`,
+      success_url: `${req.headers.origin}`,
       cancel_url: `${req.headers.origin}/cancel`,
     });
 
