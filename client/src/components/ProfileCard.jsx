@@ -8,6 +8,7 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
       secondary: 'text-gray-600',
       button: 'bg-gray-200 hover:bg-gray-300 border-gray-400',
       rank: 'text-blue-500',
+      premium: 'text-yellow-600',
     },
     dark: {
       bg: 'bg-gray-800',
@@ -17,6 +18,7 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
       secondary: 'text-gray-400',
       button: 'bg-gray-700 hover:bg-gray-600 border-gray-500',
       rank: 'text-cyan-400',
+      premium: 'text-yellow-400',
     },
     ocean: {
       bg: 'bg-blue-800',
@@ -26,6 +28,7 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
       secondary: 'text-blue-200',
       button: 'bg-blue-700 hover:bg-blue-600 border-blue-500',
       rank: 'text-cyan-300',
+      premium: 'text-yellow-300',
     },
     forest: {
       bg: 'bg-green-800',
@@ -35,6 +38,7 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
       secondary: 'text-green-200',
       button: 'bg-green-700 hover:bg-green-600 border-green-500',
       rank: 'text-emerald-300',
+      premium: 'text-yellow-300',
     }
   };
 
@@ -43,13 +47,16 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
   if (!user) return null;
 
   const joinDate = new Date(user.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric'
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   });
 
-  // Get rank from leaderboard data
-  const userRank = leaderboard?.yourRank || '--';
-  
-
+  const subscriptionEndDate = new Date(user.subscription.endDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   return (
     <div
@@ -64,7 +71,7 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
         <div className="relative">
           <div className="w-24 h-24 rounded-full bg-gray-500" />
           <div className={`absolute -top-2 -right-2 px-2 py-1 rounded-full text-xs font-bold ${currentTheme.rank} bg-opacity-90 ${theme === 'light' ? 'bg-white' : 'bg-gray-900'}`}>
-            #{userRank}
+            #{user.rank}
           </div>
         </div>
         <div>
@@ -77,6 +84,11 @@ const ProfileCard = ({ user, leaderboard, theme }) => {
           <p className={`text-sm mt-1 ${currentTheme.secondary}`}>
             Email: <span className={currentTheme.accent}>{user.email}</span>
           </p>
+          {user.subscription?.isActive && (
+            <p className={`text-sm mt-1 ${currentTheme.premium}`}>
+              {user.subscription.plan} (ends {subscriptionEndDate})
+            </p>
+          )}
           <div className="flex gap-4 mt-3">
             <button className={`${currentTheme.button} px-4 py-1 rounded border`}>
               Github

@@ -42,13 +42,17 @@ const EarnedBadges = ({ badges, theme }) => {
   return (
     <div className={`rounded-xl p-6 border ${currentTheme.border} ${currentTheme.bg}`}>
       <h2 className={`text-xl font-semibold mb-4 text-left ${currentTheme.text}`}>
-        Earned Badges
+        Earned Badges ({badges.length})
       </h2>
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {badges.map((badge, i) => (
-          <div key={i} className="text-center">
-            <div className="w-12 h-12 bg-yellow-400 rounded-full mx-auto" />
-            <p className={`text-xs mt-1 ${currentTheme.secondary}`}>{badge}</p>
+          <div key={i} className="flex flex-col items-center">
+            <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold">#{i+1}</span>
+            </div>
+            <p className={`text-xs mt-1 text-center ${currentTheme.secondary}`}>
+              {badge}
+            </p>
           </div>
         ))}
       </div>
