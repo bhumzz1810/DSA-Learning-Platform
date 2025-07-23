@@ -1,5 +1,4 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   FaCheckCircle,
@@ -12,6 +11,7 @@ import {
   FaEye,
   FaTrophy,
 } from "react-icons/fa";
+import SubscriptionModal from "../components/Subscription/SubscriptionModal";
 
 const plans = [
   {
@@ -23,7 +23,6 @@ const plans = [
       { text: "Pair Coding", icon: <FaUserFriends /> },
       { text: "Limited Progress Tracking", icon: <FaChartLine /> },
     ],
-    popular: false,
   },
   {
     name: "Pro",
@@ -36,39 +35,74 @@ const plans = [
       { text: "Visual Algorithm Flow", icon: <FaEye /> },
       { text: "Gamified Progress", icon: <FaChartLine /> },
     ],
-    popular: true,
   },
 ];
 
 const Pricing = ({ isYearly, setIsYearly }) => {
-  const navigate = useNavigate(); // ⬅️ Hook for navigation
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+
+  const handleSubscribeClick = (plan) => {
+    setSelectedPlan(plan.name);
+    setShowModal(true);
+  };
+
+  const handleConfirmSubscription = async () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) return alert("Please log in to subscribe.");
+
+    try {
+      const res = await fetch("/api/stripe/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          email: user.email,
+          billing: isYearly ? "yearly" : "monthly",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("Stripe response missing URL:", data);
+      }
+    } catch (err) {
+      console.error("Error during checkout:", err);
+    }
+
+    setShowModal(false);
+  };
 
   return (
     <section id="Pricing" className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg">
       <h2 className="text-3xl text-white font-bold mb-2">Pricing</h2>
+
       <p className="mb-8 text-sm text-gray-400">
         Choose a plan that fits your learning style.
       </p>
 
-      {/* Toggle */}
       <div className="flex justify-center mb-10">
         <button
           onClick={() => setIsYearly(false)}
-          className={`px-4 py-2 rounded-l-full ${!isYearly ? "bg-cyan-500 text-white" : "bg-gray-800"
-            }`}
+          className={`px-4 py-2 rounded-l-full ${
+            !isYearly ? "bg-cyan-500 text-white" : "bg-gray-800"
+          }`}
         >
           Monthly
         </button>
         <button
           onClick={() => setIsYearly(true)}
-          className={`px-4 py-2 rounded-r-full ${isYearly ? "bg-cyan-500 text-white" : "bg-gray-800"
-            }`}
+          className={`px-4 py-2 rounded-r-full ${
+            isYearly ? "bg-cyan-500 text-white" : "bg-gray-800"
+          }`}
         >
           Yearly (Save 20%)
         </button>
       </div>
 
-      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
         {plans.map((plan, index) => (
           <motion.div
@@ -77,20 +111,14 @@ const Pricing = ({ isYearly, setIsYearly }) => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
             viewport={{ once: true }}
-            className={`relative flex flex-col justify-between h-full rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 shadow-md text-left transition hover:border-cyan-500 ${plan.popular ? "ring-2 ring-cyan-500" : ""
-              }`}
+            className="flex flex-col justify-between rounded-2xl p-6 border border-[#2d2d3a] bg-white/5 shadow-md text-left"
           >
-            {plan.popular && (
-              <div className="absolute -top-3 right-4 bg-cyan-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-lg">
-                Most Popular
-              </div>
-            )}
-
-            {/* Content Wrapper */}
             <div>
               <h3 className="text-xl font-semibold mb-2">{plan.name}</h3>
               <p className="text-4xl font-bold mb-4">
-                {plan.price === 0 ? "Free" : `$${isYearly ? plan.price * 10 : plan.price}`}
+                {plan.price === 0
+                  ? "Free"
+                  : `$${isYearly ? plan.price * 10 : plan.price}`}
                 <span className="text-base font-normal text-gray-400 ml-1">
                   /{isYearly ? "yr" : "mo"}
                 </span>
@@ -105,13 +133,8 @@ const Pricing = ({ isYearly, setIsYearly }) => {
               </ul>
             </div>
 
-            {/* Button Stuck at Bottom */}
             <button
-              onClick={() =>
-                navigate("/subscribe", {
-                  state: { plan: plan.name, billing: isYearly ? "yearly" : "monthly" },
-                })
-              }
+              onClick={() => handleSubscribeClick(plan)}
               className="mt-auto w-full bg-cyan-500 text-white py-2 rounded-full hover:bg-cyan-600 transition"
             >
               {plan.price === 0 ? "Get Started" : "Go Pro"}
@@ -119,6 +142,13 @@ const Pricing = ({ isYearly, setIsYearly }) => {
           </motion.div>
         ))}
       </div>
+
+      <SubscriptionModal
+        isOpen={showModal}
+        planName={selectedPlan}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleConfirmSubscription}
+      />
     </section>
   );
 };
