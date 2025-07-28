@@ -14,21 +14,28 @@ router.get("/status", authenticate, async (req, res) => {
       return res.json({ subscriptionActive: false });
     }
 
-    const startDate = new Date(sub.currentPeriodStart);
-    let expectedEndDate = new Date(startDate);
+    let isActive = false;
 
-    if (sub.planName === "monthly") {
-      expectedEndDate.setMonth(expectedEndDate.getMonth() + 1);
-    } else if (sub.planName === "yearly") {
-      expectedEndDate.setFullYear(expectedEndDate.getFullYear() + 1);
+    try {
+      const startDate = new Date(sub.currentPeriodStart);
+      let expectedEndDate = new Date(startDate);
+
+      // Calculate subscription end date based on plan
+      if (sub.planName === "monthly") {
+        expectedEndDate.setMonth(expectedEndDate.getMonth() + 1);
+      } else if (sub.planName === "yearly") {
+        expectedEndDate.setFullYear(expectedEndDate.getFullYear() + 1);
+      }
+
+      isActive = expectedEndDate > new Date();
+    } catch (dateErr) {
+      console.error("Error calculating subscription expiry date:", dateErr);
     }
 
-    const isActive = expectedEndDate > new Date();
-
-    res.json({ subscriptionActive: isActive });
+    return res.json({ subscriptionActive: isActive });
   } catch (err) {
     console.error("Subscription status error:", err);
-    res.status(500).json({ error: "Could not verify subscription" });
+    return res.status(500).json({ error: "Could not verify subscription" });
   }
 });
 

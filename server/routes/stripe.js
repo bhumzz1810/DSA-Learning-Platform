@@ -5,23 +5,46 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2022-11-15", // specify Stripe API version explicitly
+});
 
 router.post("/create-checkout-session", async (req, res) => {
-  const { userId, email, billing } = req.body; // 👈 now accepting billing
+  const { userId, email, billing } = req.body;
+
+  if (!userId || !email || !billing) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
   console.log("👉 Incoming subscription request:", req.body);
 
-  // Determine which price ID to use based on billing type
+  // Sanitize billing input strictly
+  const allowedBilling = ["monthly", "yearly"];
+  if (!allowedBilling.includes(billing)) {
+    return res.status(400).json({ error: "Invalid billing type" });
+  }
+
   const priceId =
     billing === "yearly"
       ? process.env.STRIPE_YEARLY_PRICE_ID
       : process.env.STRIPE_MONTHLY_PRICE_ID;
 
   try {
-    const customer = await stripe.customers.create({
+    // Check if customer with this email already exists in Stripe
+    let customers = await stripe.customers.list({
       email,
-      metadata: { userId },
+      limit: 1,
     });
+
+    let customer;
+    if (customers.data.length > 0) {
+      customer = customers.data[0];
+    } else {
+      customer = await stripe.customers.create({
+        email,
+        metadata: { userId },
+      });
+    }
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -29,7 +52,7 @@ router.post("/create-checkout-session", async (req, res) => {
       customer: customer.id,
       line_items: [
         {
-          price: priceId, // 👈 dynamically chosen
+          price: priceId,
           quantity: 1,
         },
       ],
@@ -41,7 +64,7 @@ router.post("/create-checkout-session", async (req, res) => {
         },
       },
       metadata: { userId },
-      success_url: `${req.headers.origin}`,
+      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/cancel`,
     });
 

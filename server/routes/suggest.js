@@ -8,11 +8,15 @@ const checkSubscription = require("../middleware/checkSubscription");
 router.post("/", authenticate, checkSubscription, async (req, res) => {
   const { prompt } = req.body;
 
+  if (!prompt || typeof prompt !== "string" || prompt.trim().length === 0) {
+    return res.status(400).json({ error: "Prompt is required and must be a non-empty string" });
+  }
+
   try {
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-3.5-turbo", // or use gpt-4 if available
+        model: "gpt-3.5-turbo", // or gpt-4 if available
         messages: [
           {
             role: "system",
@@ -30,10 +34,15 @@ router.post("/", authenticate, checkSubscription, async (req, res) => {
       }
     );
 
-    const suggestion = response.data.choices[0].message.content;
+    const suggestion = response.data.choices?.[0]?.message?.content;
+
+    if (!suggestion) {
+      return res.status(500).json({ error: "No suggestion received from AI" });
+    }
+
     res.json({ suggestion });
   } catch (error) {
-    console.error("AI Suggestion Error:", error.response?.data || error);
+    console.error("AI Suggestion Error:", error.response?.data || error.message || error);
     res.status(500).json({ error: "Failed to fetch suggestion" });
   }
 });

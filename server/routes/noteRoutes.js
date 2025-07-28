@@ -7,8 +7,17 @@ const {
   deleteNote,
 } = require("../controllers/noteController");
 
-router.get("/:problemId", authenticate, getNote);
-router.post("/:problemId", authenticate, saveNote);
-router.delete("/:problemId", authenticate, deleteNote);
+// Input validation middleware (optional but recommended)
+function validateProblemId(req, res, next) {
+  const { problemId } = req.params;
+  if (!problemId || !problemId.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ error: "Invalid problem ID" });
+  }
+  next();
+}
+
+router.get("/:problemId", authenticate, validateProblemId, getNote);
+router.post("/:problemId", authenticate, validateProblemId, saveNote);
+router.delete("/:problemId", authenticate, validateProblemId, deleteNote);
 
 module.exports = router;

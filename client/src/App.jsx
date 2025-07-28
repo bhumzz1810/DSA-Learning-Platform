@@ -22,6 +22,8 @@ import Leaderboard from "./pages/Leaderboard";
 import Profilepage from "./pages/Profilepage";
 import SubscriptionPage from "./pages/subscription";
 import Settings from "./pages/Settings";
+import QuizPage from './pages/QuizPage';
+
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -69,6 +71,7 @@ function App() {
             <Route path="/profile" element={<Profilepage />} />
             <Route path="/subscribe" element={<SubscriptionPage />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/quiz" element={<QuizPage />} />
 
 
             {/* ADMIN ROUTES */}

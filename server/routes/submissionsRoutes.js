@@ -83,27 +83,7 @@ router.post("/", authenticate, async (req, res) => {
       throw e;
     }
 
-    // XP/Level update logic
-    // if (status === "Accepted") {
-    //   const user = req.user;
 
-    //   const alreadyAccepted = await Submission.alreadyAccepted(
-    //     user._id,
-    //     problemId
-    //   );
-    //   if (!alreadyAccepted) {
-    //     user.xp += 100;
-    //     user.level = Math.floor(user.xp / 500) + 1;
-
-    //     user.solvedProblems.push({
-    //       submissionId: submission._id,
-    //       problemId,
-    //       solvedAt: new Date(),
-    //     });
-
-    //     await user.save();
-    //   }
-    // }
 
     res.status(201).json({ message: "Submission saved successfully" });
   } catch (err) {

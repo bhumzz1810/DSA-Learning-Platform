@@ -2,6 +2,30 @@ const router = require("express").Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
+// Helper to generate JWT token
+function generateToken(user) {
+  return jwt.sign(
+    { id: user._id, role: user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+}
+
+function buildRedirectUrl(user, token) {
+  // Use encodeURIComponent safely for user data
+  const userData = encodeURIComponent(
+    JSON.stringify({
+      id: user._id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    })
+  );
+  // Consider moving client URL to env var for flexibility
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  return `${clientUrl}/social-login?token=${token}&user=${userData}`;
+}
+
 // GOOGLE LOGIN
 router.get(
   "/google",
@@ -12,24 +36,14 @@ router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    const token = jwt.sign(
-      { id: req.user._id, role: req.user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    const userData = encodeURIComponent(
-      JSON.stringify({
-        id: req.user._id,
-        email: req.user.email,
-        username: req.user.username,
-        role: req.user.role,
-      })
-    );
-
-    res.redirect(
-      `http://localhost:5173/social-login?token=${token}&user=${userData}`
-    );
+    try {
+      const token = generateToken(req.user);
+      const redirectUrl = buildRedirectUrl(req.user, token);
+      res.redirect(redirectUrl);
+    } catch (err) {
+      console.error("Google callback error:", err);
+      res.redirect("/?error=authentication_failed");
+    }
   }
 );
 
@@ -43,24 +57,14 @@ router.get(
   "/github/callback",
   passport.authenticate("github", { failureRedirect: "/" }),
   (req, res) => {
-    const token = jwt.sign(
-      { id: req.user._id, role: req.user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    const userData = encodeURIComponent(
-      JSON.stringify({
-        id: req.user._id,
-        email: req.user.email,
-        username: req.user.username,
-        role: req.user.role,
-      })
-    );
-
-    res.redirect(
-      `http://localhost:5173/social-login?token=${token}&user=${userData}`
-    );
+    try {
+      const token = generateToken(req.user);
+      const redirectUrl = buildRedirectUrl(req.user, token);
+      res.redirect(redirectUrl);
+    } catch (err) {
+      console.error("GitHub callback error:", err);
+      res.redirect("/?error=authentication_failed");
+    }
   }
 );
 

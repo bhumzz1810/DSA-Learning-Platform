@@ -34,7 +34,11 @@ const Navbar = () => {
   }, [location]); // 👈 re-check login status on every page change
 
   const handleLogout = () => {
+   
+    // Clear token and redirect to login
     localStorage.removeItem("token");
+    // clear localStorage.
+    localStorage.clear();
     setIsLoggedIn(false);
     navigate("/login");
   };

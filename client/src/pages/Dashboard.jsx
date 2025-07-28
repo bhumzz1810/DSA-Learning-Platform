@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "../components/RT_Pairing/ThemeContext";
 import { useNavigate, Link } from "react-router-dom";
-import { 
-  Trophy, Award, Medal, Crown, Star, 
-  Rocket, Flame, Gem, ShieldCheck, ThumbsUp, Brain 
+import {
+  Trophy, Award, Medal, Crown, Star,
+  Rocket, Flame, Gem, ShieldCheck, ThumbsUp, Brain
 } from "lucide-react";
+
+
+// const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
 
 // Animation variants
 const cardVariants = {
@@ -80,7 +84,7 @@ const Dashboard = () => {
   const themeConfig = {
     light: {
       bg: "bg-white",
-      
+
       border: "border-gray-200",
       text: "text-gray-800",
       title: "text-indigo-700",
@@ -99,7 +103,7 @@ const Dashboard = () => {
       button: "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-500 hover:to-purple-600 text-white",
       rank: "text-indigo-300",
       premium: "text-yellow-400",
-            badge: "bg-cyan-900/50 text-cyan-100"
+      badge: "bg-cyan-900/50 text-cyan-100"
 
     },
     ocean: {
@@ -128,7 +132,7 @@ const Dashboard = () => {
   const currentTheme = themeConfig[theme] || themeConfig.light;
 
   // Badge icons
- const badgeIcons = [
+  const badgeIcons = [
     <Trophy className="w-8 h-8 text-yellow-400" />,
     <Award className="w-8 h-8 text-blue-400" />,
     <Medal className="w-8 h-8 text-purple-400" />,
@@ -169,35 +173,49 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+    // In your fetchDashboardData function:
+   const fetchDashboardData = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch("http://localhost:5000/api/dashboard", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
+    if (!response.ok) {
+      throw new Error("Failed to fetch dashboard data");
+    }
 
-        const data = await response.json();
-        // Ensure streak and totalSolved have fallback values
-        const userWithDefaults = {
-          ...data.user,
-          streak: data.user.streak || 0,
-          totalSolved: data.user.totalSolved || 0,
-          userRank: data.leaderboard?.yourRank || "--",
-        };
-        setUserData({ user: userWithDefaults });
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const data = await response.json();
+    console.log("API Response:", data); // Debugging log
+
+    // Improved rank handling
+    const rank = data.rank ||
+      data.user?.rank ||
+      data.leaderboard?.yourRank ||
+      data.leaderboard?.rank ||
+      "--";
+
+    setUserData({
+      user: {
+        ...data.user,
+        streak: data.user.streak || 0,
+        totalSolved: data.user.totalSolved || 0,
+        userRank: typeof rank === 'number' ? rank : (rank === "--" ? rank : parseInt(rank) || "--"),
+        quizAttempts: data.user.quizAttempts || 0, // Make sure this is a number
+      },
+      quizStats: data.quizStats, // Add quizStats at root level
+      leaderboard: data.leaderboard // Add leaderboard data
+    });
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     const fetchDailyChallenge = async () => {
       try {
@@ -393,14 +411,24 @@ const Dashboard = () => {
                   "flex items-center justify-center text-white text-xl"
                 )}`}
               >
-                👑
+                {typeof userData.user.userRank === 'number'
+                  ? userData.user.userRank <= 3
+                    ? ["🥇", "🥈", "🥉"][userData.user.userRank - 1]
+                    : "🏅"
+                  : "👑"}
               </div>
               <div className="ml-4">
                 <p className="text-sm opacity-80">Your rank</p>
-                <p className="text-xl font-bold"># {userData.user.userRank}</p>
+                <p className="text-xl font-bold">
+                  {typeof userData.user.userRank === 'number'
+                    ? `#${userData.user.userRank}`
+                    : userData.user.userRank}
+                </p>
               </div>
             </div>
           </motion.div>
+
+
 
           {/* XP Progress Card */}
           <motion.div
@@ -463,7 +491,207 @@ const Dashboard = () => {
               </p>
             )}
           </motion.div>
+
         </div>
+
+
+        
+          {/* Quiz Progress Card */}
+            {/* Full-width Interactive Quiz Card */}
+<motion.div
+  variants={cardVariants}
+  initial="hidden"
+  animate="visible"
+  whileHover={{ scale: 1.01 }}
+  transition={{ delay: 0.6 }}
+  className={`rounded-3xl w-full p-6 sm:p-8 shadow-xl ${currentTheme.card} border border-opacity-20 relative overflow-hidden group`}
+>
+  {/* Animated background elements */}
+  <div className={`absolute inset-0 bg-gradient-to-br from-${getThemeColor("from")}/5 to-${getThemeColor("to")}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+  <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-${getThemeColor("from")} opacity-10 blur-xl group-hover:opacity-20 transition-opacity duration-300`}></div>
+  <div className={`absolute -bottom-5 -left-5 w-20 h-20 rounded-full bg-${getThemeColor("to")} opacity-10 blur-lg group-hover:opacity-20 transition-opacity duration-500`}></div>
+  
+  <div className="relative z-10">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+      <div className="flex items-center gap-4">
+        <motion.div 
+          whileHover={{ rotate: 15, scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className={`p-4 rounded-2xl ${applyGradient("text-white shadow-lg")}`}
+        >
+          <Brain className="w-8 h-8" />
+        </motion.div>
+        <div>
+          <h2 className={`text-2xl sm:text-3xl font-bold ${currentTheme.title}`}>
+            Quiz Progress
+          </h2>
+          <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
+            Test your knowledge and track your improvement
+          </p>
+        </div>
+      </div>
+      
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => navigate("/quiz")}
+        className={`px-6 py-3 rounded-lg ${currentTheme.button} font-medium flex items-center gap-2`}
+      >
+        <Rocket className="w-5 h-5" />
+        {userData.user.quizAttempts > 0 ? "New Quiz" : "Start Quiz"}
+      </motion.button>
+    </div>
+
+    {userData.user.quizAttempts > 0 ? (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Stats with animated hover effects */}
+        <motion.div 
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+          className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
+        >
+          <div className="text-4xl font-bold mb-2 flex items-center">
+            {userData.user.quizAttempts}
+            <motion.span 
+              animate={{ scale: [1, 1.1, 1] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="ml-2 text-2xl"
+            >
+              📊
+            </motion.span>
+          </div>
+          <p className="text-sm opacity-80">Total Attempts</p>
+        </motion.div>
+
+        <motion.div 
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+          className={`p-5 rounded-xl bg-green-100/30 dark:bg-green-900/30 text-green-800 dark:text-green-100 flex flex-col items-center`}
+        >
+          <div className="text-4xl font-bold mb-2 flex items-center">
+            {userData.quizStats?.totalCorrect || 0}
+            <motion.span 
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ repeat: Infinity, duration: 3 }}
+              className="ml-2 text-2xl"
+            >
+              ✅
+            </motion.span>
+          </div>
+          <p className="text-sm opacity-80">Correct Answers</p>
+        </motion.div>
+
+        <motion.div 
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+          className={`p-5 rounded-xl bg-red-100/30 dark:bg-red-900/30 text-red-800 dark:text-red-100 flex flex-col items-center`}
+        >
+          <div className="text-4xl font-bold mb-2 flex items-center">
+            {userData.quizStats?.totalIncorrect || 0}
+            <motion.span 
+              animate={{ x: [-2, 2, -2] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              className="ml-2 text-2xl"
+            >
+              ❌
+            </motion.span>
+          </div>
+          <p className="text-sm opacity-80">Incorrect Answers</p>
+        </motion.div>
+
+        <motion.div 
+          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+          className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
+        >
+          <div className="text-4xl font-bold mb-2 flex items-center">
+            {userData.quizStats ? 
+              `${Math.round(
+                (userData.quizStats.totalCorrect / 
+                (userData.quizStats.totalCorrect + userData.quizStats.totalIncorrect) * 100)
+              )}%` :
+              "0%"}
+            <motion.span 
+              animate={{ y: [0, -3, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="ml-2 text-2xl"
+            >
+              🎯
+            </motion.span>
+          </div>
+          <p className="text-sm opacity-80">Accuracy Rate</p>
+        </motion.div>
+      </div>
+    ) : (
+      <div className="flex flex-col md:flex-row items-center gap-8 py-6">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.05, 1],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{ 
+            duration: 6,
+            repeat: Infinity,
+            repeatType: "reverse"
+          }}
+          className="w-40 h-40 flex items-center justify-center"
+        >
+          <div className={`relative w-full h-full ${applyGradient("rounded-full opacity-20")}`}></div>
+          <div className={`absolute text-6xl ${applyGradient("bg-clip-text text-transparent")}`}>
+            ?
+          </div>
+        </motion.div>
+        
+        <div className="flex-1 text-center md:text-left">
+          <h3 className={`text-2xl font-bold ${currentTheme.title} mb-3`}>
+            Ready for Your First Quiz Challenge?
+          </h3>
+          <p className={`text-lg mb-6 ${currentTheme.subtitle} opacity-90 max-w-lg mx-auto md:mx-0`}>
+            Test your knowledge with our interactive coding quizzes. Track your progress, earn achievements, and climb the leaderboard!
+          </p>
+          <motion.button
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: `0 5px 15px rgba(${getThemeColor("from")}, 0.3)`
+            }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => navigate("/quiz")}
+            className={`px-8 py-4 rounded-xl ${currentTheme.button} font-semibold text-lg flex items-center justify-center gap-3 mx-auto md:mx-0`}
+          >
+            <Rocket className="w-6 h-6" />
+            Start Quiz Journey
+          </motion.button>
+        </div>
+      </div>
+    )}
+
+    {/* Animated progress bar for attempts */}
+    {userData.user.quizAttempts > 0 && (
+      <div className="mt-8">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium">Quiz Mastery Progress</span>
+          <span className="text-sm font-medium">
+            Level {Math.floor(userData.user.quizAttempts / 5) + 1}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+          <motion.div 
+            initial={{ width: 0 }}
+            animate={{ 
+              width: `${(userData.user.quizAttempts % 5) * 20}%`,
+              backgroundColor: getComputedStyle(document.documentElement)
+                .getPropertyValue(`--color-${getThemeColor("from").split('-')[0]}`)
+            }}
+            transition={{ duration: 1.5, type: "spring" }}
+            className="h-3 rounded-full relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+          </motion.div>
+        </div>
+        <div className="flex justify-between text-xs mt-2 opacity-70">
+          <span>{userData.user.quizAttempts} quizzes taken</span>
+          <span>{5 - (userData.user.quizAttempts % 5)} to next level</span>
+        </div>
+      </div>
+    )}
+  </div>
+</motion.div>
 
         {/* Daily Challenge Card */}
         <motion.div
@@ -497,8 +725,8 @@ const Dashboard = () => {
                   </p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${dailyChallenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100' :
-                    dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
-                      'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
+                  dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
+                    'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
                   }`}>
                   {dailyChallenge.difficulty}
                 </span>
@@ -564,37 +792,36 @@ const Dashboard = () => {
           )}
         </motion.div>
         {/* Badges Section */}
-  {/* Badges Section */}
-<motion.section
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ delay: 0.4 }}
-  className={`mb-8 p-6 border border-opacity-20 rounded-xl ${currentTheme.card}`}
->
-  <h2 className={`text-2xl font-bold mb-4 ${currentTheme.title}`}>🏅 Earned Badges</h2>
-  {userData.user.badges?.length > 0 ? (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-      <AnimatePresence>
-        {userData.user.badges.map((badge, i) => (
-          <motion.div
-            key={badge}
-            custom={i}
-            variants={badgeVariants}
-            initial="hidden"
-            animate="visible"
-            whileHover="hover"
-            className={`flex flex-col items-center p-4 rounded-lg ${currentTheme.badge}`}
-          >
-            {badgeIcons[i % badgeIcons.length]}
-            <p className="mt-2 text-lg text-center">{badge}</p>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  ) : (
-    <p className={`${currentTheme.text} opacity-80`}>No badges earned yet. Solve problems to earn badges!</p>
-  )}
-</motion.section>
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className={`mb-8 w-full p-6 border border-opacity-20 rounded-xl ${currentTheme.card}`}
+        >
+          <h2 className={`text-2xl font-bold mb-4 ${currentTheme.title}`}>🏅 Earned Badges</h2>
+          {userData.user.badges?.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <AnimatePresence>
+                {userData.user.badges.map((badge, i) => (
+                  <motion.div
+                    key={badge}
+                    custom={i}
+                    variants={badgeVariants}
+                    initial="hidden"
+                    animate="visible"
+                    whileHover="hover"
+                    className={`flex flex-col items-center p-4 rounded-lg ${currentTheme.badge}`}
+                  >
+                    {badgeIcons[i % badgeIcons.length]}
+                    <p className="mt-2 text-lg text-center">{badge}</p>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <p className={`${currentTheme.text} opacity-80`}>No badges earned yet. Solve problems to earn badges!</p>
+          )}
+        </motion.section>
 
         {/* Subscription Section */}
         <motion.div
@@ -729,10 +956,10 @@ const Dashboard = () => {
                         </span>
                         <span
                           className={`px-2.5 py-1 rounded-full font-medium ${problem.difficulty === "Easy"
-                              ? "bg-green-100/70 text-green-800"
-                              : problem.difficulty === "Medium"
-                                ? "bg-yellow-100/70 text-yellow-800"
-                                : "bg-red-100/70 text-red-800"
+                            ? "bg-green-100/70 text-green-800"
+                            : problem.difficulty === "Medium"
+                              ? "bg-yellow-100/70 text-yellow-800"
+                              : "bg-red-100/70 text-red-800"
                             }`}
                         >
                           {problem.difficulty}

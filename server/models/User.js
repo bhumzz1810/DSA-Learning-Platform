@@ -1,4 +1,3 @@
-// models/User.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const Submission = require("../models/Submission");
@@ -10,8 +9,20 @@ const noteSchema = new mongoose.Schema({
 });
 
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true, trim: true },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate: {
+      validator: function (email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      },
+      message: "Invalid email format",
+    },
+  },
   passwordHash: { type: String, required: false },
   googleId: String,
   githubId: String,
@@ -29,7 +40,6 @@ const userSchema = new mongoose.Schema({
       solvedAt: { type: Date, default: Date.now },
     },
   ],
-
   badges: [String],
   bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
   notes: [noteSchema],
@@ -39,9 +49,27 @@ const userSchema = new mongoose.Schema({
   subscribed: { type: Boolean, default: false },
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now },
+
+  attemptedQuestionsCount: { type: Number, default: 0 },
+  attemptedQuestionIds: { type: [String], default: [] },
+
+  quizScores: [
+    {
+      score: { type: Number, default: 0 },
+      date: { type: Date, default: Date.now },
+      category: {
+        type: String,
+        enum: ["JavaScript", "React", "Node.js", "MongoDB", "Frontend", "Backend"],
+      },
+    },
+  ],
+
+  quizStats: {
+    correct: { type: Number, default: 0 },
+    incorrect: { type: Number, default: 0 },
+  },
 });
 
-// 🔐 Hashing logic
 userSchema.methods.setPassword = async function (password) {
   this.passwordHash = await bcrypt.hash(password, 12);
 };
@@ -50,26 +78,14 @@ userSchema.methods.validatePassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };
 
-// 🔄 Award XP and Level Up
-userSchema.methods.awardXpForProblem = function (
-  problemId,
-  xpPerProblem = 100
-) {
-  // Check if problem was already solved
-  if (
-    !this.solvedProblems.some(
-      (p) => p.problemId.toString() === problemId.toString()
-    )
-  ) {
+userSchema.methods.awardXpForProblem = function (problemId, xpPerProblem = 100) {
+  if (!this.solvedProblems.some((p) => p.problemId.toString() === problemId.toString())) {
     this.solvedProblems.push(problemId);
     this.xp += xpPerProblem;
-
-    // Calculate level (e.g., every 500 XP = new level)
     this.level = Math.floor(this.xp / 500) + 1;
-
-    return true; // Means update happened
+    return true;
   }
-  return false; // Already solved, no update
+  return false;
 };
 
 userSchema.methods.updateBadges = async function () {
@@ -78,20 +94,16 @@ userSchema.methods.updateBadges = async function () {
   const streak = this.streak || 0;
   const badges = new Set(this.badges);
 
-  // Problem count
   if (solved >= 1) badges.add("First Problem");
   if (solved >= 5) badges.add("DSA Explorer");
   if (solved >= 10) badges.add("DSA Warrior");
 
-  // XP-based
   if (xp >= 100) badges.add("XP Rookie");
   if (xp >= 500) badges.add("XP Master");
 
-  // Streak
   if (streak >= 3) badges.add("3-Day Streak");
   if (streak >= 7) badges.add("7-Day Streak");
 
-  // Difficulty-based (optional, needs aggregation)
   const submissions = await Submission.find({
     userId: this._id,
     status: "Accepted",
