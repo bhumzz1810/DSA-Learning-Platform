@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
+import { ToastContainer, Slide } from "react-toastify";
 
 import Problems from "./pages/Problems";
 import ProblemDetail from "./pages/ProblemDetail";
@@ -13,9 +13,6 @@ import ProblemList from "./pages/admin/ProblemList";
 import EditProblem from "./pages/admin/EditProblem";
 import JoinRoom from "./pages/JoinRoom";
 import CodingRoom from "./pages/CodingRoom";
-import { ToastContainer, Slide } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./index.css";
 import SocialLogin from "./pages/SocialLogin";
 import Onboarding from "./pages/Onboarding";
 import Leaderboard from "./pages/Leaderboard";
@@ -24,6 +21,10 @@ import SubscriptionPage from "./pages/subscription";
 import Settings from "./pages/Settings";
 import QuizPage from './pages/QuizPage';
 
+import "react-toastify/dist/ReactToastify.css";
+import "./index.css";
+
+import UserAuthRoute from "./components/UserAuthRoute";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -44,43 +45,114 @@ function App() {
         transition={Slide}
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
       />
-      <BrowserRouter>
+
+      <HashRouter>
         <LayoutWrapper>
           <Routes>
-            {/* USER ROUTES */}
-            <Route path="/" element={<Homepage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/problems" element={<Problems />} />
-            <Route path="/problems/:id" element={<ProblemDetail />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/join-room" element={<JoinRoom />} />
-            <Route path="/coding-room" element={<CodingRoom />} />
-            <Route path="/coding-room/:roomId" element={<CodingRoom />} />
-            <Route path="/playground" element={<CodingRoom />} />
-            <Route path="/social-login" element={<SocialLogin />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/leaderboard" element={<Leaderboard />} />
-            <Route path="/profile" element={<Profilepage />} />
-            <Route path="/subscribe" element={<SubscriptionPage />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/quiz" element={<QuizPage />} />
+            {/* PUBLIC ROUTES */}
+            <Route path="/" element={
+              <UserAuthRoute type="public">
+                <Homepage />
+              </UserAuthRoute>
+            } />
+            <Route path="/login" element={
+              <UserAuthRoute type="public">
+                <LoginPage />
+              </UserAuthRoute>
+            } />
+            <Route path="/social-login" element={
+              <UserAuthRoute type="public">
+                <SocialLogin />
+              </UserAuthRoute>
+            } />
 
+            {/* PRIVATE ROUTES */}
+            <Route path="/problems" element={
+              <UserAuthRoute type="private">
+                <Problems />
+              </UserAuthRoute>
+            } />
+            <Route path="/problems/:id" element={
+              <UserAuthRoute type="private">
+                <ProblemDetail />
+              </UserAuthRoute>
+            } />
+            <Route path="/dashboard" element={
+              <UserAuthRoute type="private">
+                <Dashboard />
+              </UserAuthRoute>
+            } />
+            <Route path="/join-room" element={
+              <UserAuthRoute type="private">
+                <JoinRoom />
+              </UserAuthRoute>
+            } />
+            <Route path="/coding-room" element={
+              <UserAuthRoute type="private">
+                <CodingRoom />
+              </UserAuthRoute>
+            } />
+            <Route path="/coding-room/:roomId" element={
+              <UserAuthRoute type="private">
+                <CodingRoom />
+              </UserAuthRoute>
+            } />
+            <Route path="/playground" element={
+              <UserAuthRoute type="private">
+                <CodingRoom />
+              </UserAuthRoute>
+            } />
+            <Route path="/onboarding" element={
+              <UserAuthRoute type="private">
+                <Onboarding />
+              </UserAuthRoute>
+            } />
+            <Route path="/leaderboard" element={
+              <UserAuthRoute type="private">
+                <Leaderboard />
+              </UserAuthRoute>
+            } />
+            <Route path="/profile" element={
+              <UserAuthRoute type="private">
+                <Profilepage />
+              </UserAuthRoute>
+            } />
+            <Route path="/subscribe" element={
+              <UserAuthRoute type="private">
+                <SubscriptionPage />
+              </UserAuthRoute>
+            } />
+            <Route path="/settings" element={
+              <UserAuthRoute type="private">
+                <Settings />
+              </UserAuthRoute>
+            } />
+            <Route path="/quiz" element={
+              <UserAuthRoute type="private">
+                <QuizPage />
+              </UserAuthRoute>
+            } />
 
             {/* ADMIN ROUTES */}
-            <Route path="/admin/add-problem" element={<AddProblem />} />
-            <Route path="/admin/problems" element={<ProblemList />} />
-            <Route path="/admin/problems/edit/:id" element={<EditProblem />} />
+            <Route path="/admin/add-problem" element={
+              <UserAuthRoute type="private">
+                <AddProblem />
+              </UserAuthRoute>
+            } />
+            <Route path="/admin/problems" element={
+              <UserAuthRoute type="private">
+                <ProblemList />
+              </UserAuthRoute>
+            } />
+            <Route path="/admin/problems/edit/:id" element={
+              <UserAuthRoute type="private">
+                <EditProblem />
+              </UserAuthRoute>
+            } />
           </Routes>
         </LayoutWrapper>
-      </BrowserRouter>
+      </HashRouter>
     </>
   );
 }

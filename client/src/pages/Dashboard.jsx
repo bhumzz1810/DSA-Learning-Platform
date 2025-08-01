@@ -1,15 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Helmet } from "react-helmet";
 import { useTheme } from "../components/RT_Pairing/ThemeContext";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Trophy, Award, Medal, Crown, Star,
   Rocket, Flame, Gem, ShieldCheck, ThumbsUp, Brain
 } from "lucide-react";
-
-
-// const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
 
 // Animation variants
 const cardVariants = {
@@ -84,7 +81,6 @@ const Dashboard = () => {
   const themeConfig = {
     light: {
       bg: "bg-white",
-
       border: "border-gray-200",
       text: "text-gray-800",
       title: "text-indigo-700",
@@ -104,7 +100,6 @@ const Dashboard = () => {
       rank: "text-indigo-300",
       premium: "text-yellow-400",
       badge: "bg-cyan-900/50 text-cyan-100"
-
     },
     ocean: {
       bg: "bg-blue-800",
@@ -115,7 +110,6 @@ const Dashboard = () => {
       button: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white",
       rank: "text-cyan-300",
       premium: "text-yellow-300",
-
     },
     forest: {
       bg: "bg-green-800",
@@ -146,7 +140,10 @@ const Dashboard = () => {
     <Brain className="w-8 h-8 text-rose-400" />,
   ];
 
-
+  // Generate meta description based on user data
+  const metaDescription = userData?.user 
+    ? `${userData.user.username}'s coding dashboard - Level ${userData.user.level || 0}, ${userData.user.totalSolved || 0} problems solved, ${userData.user.streak || 0}-day streak`
+    : 'Personal coding dashboard to track your programming progress, achievements, and stats';
 
   // Safe theme color extraction
   const getThemeColor = (type) => {
@@ -167,55 +164,51 @@ const Dashboard = () => {
   const calculateXpProgress = () => {
     if (!userData?.user?.level || userData.user.level <= 0) return 0;
     const xpForNextLevel = 1000;
-    const currentXp =
-      (userData.user.xp || 0) - (userData.user.level - 1) * 1000;
+    const currentXp = (userData.user.xp || 0) - (userData.user.level - 1) * 1000;
     return (currentXp / xpForNextLevel) * 100;
   };
 
   useEffect(() => {
-    // In your fetchDashboardData function:
-   const fetchDashboardData = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const response = await fetch("http://localhost:5000/api/dashboard", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch dashboard data");
-    }
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
 
-    const data = await response.json();
-    console.log("API Response:", data); // Debugging log
+        const data = await response.json();
+        console.log("API Response:", data);
 
-    // Improved rank handling
-    const rank = data.rank ||
-      data.user?.rank ||
-      data.leaderboard?.yourRank ||
-      data.leaderboard?.rank ||
-      "--";
+        const rank = data.rank ||
+          data.user?.rank ||
+          data.leaderboard?.yourRank ||
+          data.leaderboard?.rank ||
+          "--";
 
-    setUserData({
-      user: {
-        ...data.user,
-        streak: data.user.streak || 0,
-        totalSolved: data.user.totalSolved || 0,
-        userRank: typeof rank === 'number' ? rank : (rank === "--" ? rank : parseInt(rank) || "--"),
-        quizAttempts: data.user.quizAttempts || 0, // Make sure this is a number
-      },
-      quizStats: data.quizStats, // Add quizStats at root level
-      leaderboard: data.leaderboard // Add leaderboard data
-    });
-  } catch (err) {
-    setError(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
+        setUserData({
+          user: {
+            ...data.user,
+            streak: data.user.streak || 0,
+            totalSolved: data.user.totalSolved || 0,
+            userRank: typeof rank === 'number' ? rank : (rank === "--" ? rank : parseInt(rank) || "--"),
+            quizAttempts: data.user.quizAttempts || 0,
+          },
+          quizStats: data.quizStats,
+          leaderboard: data.leaderboard
+        });
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     const fetchDailyChallenge = async () => {
       try {
@@ -231,12 +224,8 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-
-        // Find the problem where isDaily is true
         const dailyProblem = data.find(problem => problem.isDaily);
-
         setDailyChallenge(dailyProblem || null);
-
       } catch (err) {
         console.error("Error fetching daily challenge:", err);
         setDailyChallenge(null);
@@ -251,9 +240,7 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}
-      >
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
@@ -265,9 +252,7 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}
-      >
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">Error Loading Dashboard</h2>
           <p className="mb-4 text-red-400">{error}</p>
@@ -284,9 +269,7 @@ const Dashboard = () => {
 
   if (!userData?.user) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}
-      >
+      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">No User Data Found</h2>
           <p>Please check your connection and try again</p>
@@ -296,9 +279,24 @@ const Dashboard = () => {
   }
 
   return (
-    <div
-      className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}
-    >
+    <div className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}>
+      {/* SEO Meta Tags */}
+      <Helmet>
+        <title>{userData?.user ? `${userData.user.username}'s Dashboard` : 'My Coding Dashboard'}</title>
+        <meta name="description" content={metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:title" content={userData?.user ? `${userData.user.username}'s Coding Progress` : 'Coding Dashboard'} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:image" content="https://yourdomain.com/images/dashboard-preview.png" />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content={window.location.href} />
+        <meta property="twitter:title" content={userData?.user ? `${userData.user.username}'s Coding Progress` : 'Coding Dashboard'} />
+        <meta property="twitter:description" content={metaDescription} />
+        <meta property="twitter:image" content="https://yourdomain.com/images/dashboard-preview.png" />
+        <link rel="canonical" href={window.location.href} />
+      </Helmet>
+
       {/* Animated Background Particles */}
       <div className="fixed inset-0 overflow-hidden -z-10 pointer-events-none">
         {Array.from({ length: 20 }).map((_, i) => (
@@ -314,9 +312,7 @@ const Dashboard = () => {
               repeat: Infinity,
               ease: "linear",
             }}
-            className={`absolute rounded-full bg-${getThemeColor(
-              "from"
-            )} blur-sm`}
+            className={`absolute rounded-full bg-${getThemeColor("from")} blur-sm`}
             style={{
               width: `${Math.random() * 10 + 5}px`,
               height: `${Math.random() * 10 + 5}px`,
@@ -336,12 +332,8 @@ const Dashboard = () => {
           transition={{ duration: 0.8 }}
         >
           <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
-          <div
-            className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor(
-              "from"
-            )} blur-3xl opacity-20`}
-          ></div>
-          <div className=" rounded-3xl flex justify-between items-center relative z-10">
+          <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor("from")} blur-3xl opacity-20`}></div>
+          <div className="rounded-3xl flex justify-between items-center relative z-10">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold">
                 Welcome back,{" "}
@@ -428,8 +420,6 @@ const Dashboard = () => {
             </div>
           </motion.div>
 
-
-
           {/* XP Progress Card */}
           <motion.div
             variants={cardVariants}
@@ -446,9 +436,7 @@ const Dashboard = () => {
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${calculateXpProgress()}%` }}
-                  className={`h-full rounded-full relative ${applyGradient(
-                    ""
-                  )}`}
+                  className={`h-full rounded-full relative ${applyGradient("")}`}
                 >
                   <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                 </motion.div>
@@ -476,229 +464,224 @@ const Dashboard = () => {
             </h3>
             <div className="flex items-center justify-center">
               <div
-                className={`text-5xl font-bold ${applyGradient(
-                  "bg-clip-text"
-                )}`}
+                className={`text-5xl font-bold ${applyGradient("bg-clip-text")}`}
               >
                 {userData.user.streak !== undefined ? userData.user.streak : 0}
               </div>
               <span className="ml-2 text-lg">days</span>
             </div>
-            {/* Visual indicator for 0 streak */}
             {(!userData.user.streak || userData.user.streak === 0) && (
               <p className="text-xs text-center mt-2 opacity-70">
                 Start solving problems to build your streak!
               </p>
             )}
           </motion.div>
-
         </div>
 
-
-        
-          {/* Quiz Progress Card */}
-            {/* Full-width Interactive Quiz Card */}
-<motion.div
-  variants={cardVariants}
-  initial="hidden"
-  animate="visible"
-  whileHover={{ scale: 1.01 }}
-  transition={{ delay: 0.6 }}
-  className={`rounded-3xl w-full p-6 sm:p-8 shadow-xl ${currentTheme.card} border border-opacity-20 relative overflow-hidden group`}
->
-  {/* Animated background elements */}
-  <div className={`absolute inset-0 bg-gradient-to-br from-${getThemeColor("from")}/5 to-${getThemeColor("to")}/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-  <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-${getThemeColor("from")} opacity-10 blur-xl group-hover:opacity-20 transition-opacity duration-300`}></div>
-  <div className={`absolute -bottom-5 -left-5 w-20 h-20 rounded-full bg-${getThemeColor("to")} opacity-10 blur-lg group-hover:opacity-20 transition-opacity duration-500`}></div>
-  
-  <div className="relative z-10">
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-      <div className="flex items-center gap-4">
-        <motion.div 
-          whileHover={{ rotate: 15, scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className={`p-4 rounded-2xl ${applyGradient("text-white shadow-lg")}`}
+        {/* Full-width Interactive Quiz Card */}
+        <motion.div
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover={{ scale: 1.01 }}
+          transition={{ delay: 0.6 }}
+          className={`rounded-3xl w-full p-6 sm:p-8 shadow-xl ${currentTheme.card} border border-opacity-20 relative overflow-hidden group`}
         >
-          <Brain className="w-8 h-8" />
-        </motion.div>
-        <div>
-          <h2 className={`text-2xl sm:text-3xl font-bold ${currentTheme.title}`}>
-            Quiz Progress
-          </h2>
-          <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
-            Test your knowledge and track your improvement
-          </p>
-        </div>
-      </div>
-      
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => navigate("/quiz")}
-        className={`px-6 py-3 rounded-lg ${currentTheme.button} font-medium flex items-center gap-2`}
-      >
-        <Rocket className="w-5 h-5" />
-        {userData.user.quizAttempts > 0 ? "New Quiz" : "Start Quiz"}
-      </motion.button>
-    </div>
-
-    {userData.user.quizAttempts > 0 ? (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Stats with animated hover effects */}
-        <motion.div 
-          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-          className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
-        >
-          <div className="text-4xl font-bold mb-2 flex items-center">
-            {userData.user.quizAttempts}
-            <motion.span 
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="ml-2 text-2xl"
-            >
-              📊
-            </motion.span>
-          </div>
-          <p className="text-sm opacity-80">Total Attempts</p>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-          className={`p-5 rounded-xl bg-green-100/30 dark:bg-green-900/30 text-green-800 dark:text-green-100 flex flex-col items-center`}
-        >
-          <div className="text-4xl font-bold mb-2 flex items-center">
-            {userData.quizStats?.totalCorrect || 0}
-            <motion.span 
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ repeat: Infinity, duration: 3 }}
-              className="ml-2 text-2xl"
-            >
-              ✅
-            </motion.span>
-          </div>
-          <p className="text-sm opacity-80">Correct Answers</p>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-          className={`p-5 rounded-xl bg-red-100/30 dark:bg-red-900/30 text-red-800 dark:text-red-100 flex flex-col items-center`}
-        >
-          <div className="text-4xl font-bold mb-2 flex items-center">
-            {userData.quizStats?.totalIncorrect || 0}
-            <motion.span 
-              animate={{ x: [-2, 2, -2] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="ml-2 text-2xl"
-            >
-              ❌
-            </motion.span>
-          </div>
-          <p className="text-sm opacity-80">Incorrect Answers</p>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-          className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
-        >
-          <div className="text-4xl font-bold mb-2 flex items-center">
-            {userData.quizStats ? 
-              `${Math.round(
-                (userData.quizStats.totalCorrect / 
-                (userData.quizStats.totalCorrect + userData.quizStats.totalIncorrect) * 100)
-              )}%` :
-              "0%"}
-            <motion.span 
-              animate={{ y: [0, -3, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="ml-2 text-2xl"
-            >
-              🎯
-            </motion.span>
-          </div>
-          <p className="text-sm opacity-80">Accuracy Rate</p>
-        </motion.div>
-      </div>
-    ) : (
-      <div className="flex flex-col md:flex-row items-center gap-8 py-6">
-        <motion.div 
-          animate={{ 
-            scale: [1, 1.05, 1],
-            rotate: [0, 5, -5, 0]
-          }}
-          transition={{ 
-            duration: 6,
-            repeat: Infinity,
-            repeatType: "reverse"
-          }}
-          className="w-40 h-40 flex items-center justify-center"
-        >
-          <div className={`relative w-full h-full ${applyGradient("rounded-full opacity-20")}`}></div>
-          <div className={`absolute text-6xl ${applyGradient("bg-clip-text text-transparent")}`}>
-            ?
-          </div>
-        </motion.div>
-        
-        <div className="flex-1 text-center md:text-left">
-          <h3 className={`text-2xl font-bold ${currentTheme.title} mb-3`}>
-            Ready for Your First Quiz Challenge?
-          </h3>
-          <p className={`text-lg mb-6 ${currentTheme.subtitle} opacity-90 max-w-lg mx-auto md:mx-0`}>
-            Test your knowledge with our interactive coding quizzes. Track your progress, earn achievements, and climb the leaderboard!
-          </p>
-          <motion.button
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: `0 5px 15px rgba(${getThemeColor("from")}, 0.3)`
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{
+              background: `linear-gradient(to bottom right, ${getThemeColor("from")}1A, ${getThemeColor("to")}1A)`,
             }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate("/quiz")}
-            className={`px-8 py-4 rounded-xl ${currentTheme.button} font-semibold text-lg flex items-center justify-center gap-3 mx-auto md:mx-0`}
-          >
-            <Rocket className="w-6 h-6" />
-            Start Quiz Journey
-          </motion.button>
-        </div>
-      </div>
-    )}
+          ></div>
+          <div
+            className="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-xl group-hover:opacity-20 transition-opacity duration-300"
+            style={{ backgroundColor: getThemeColor("from") }}
+          ></div>
+          <div
+            className="absolute -bottom-5 -left-5 w-20 h-20 rounded-full opacity-10 blur-lg group-hover:opacity-20 transition-opacity duration-500"
+            style={{ backgroundColor: getThemeColor("to") }}
+          ></div>
 
-    {/* Animated progress bar for attempts */}
-    {userData.user.quizAttempts > 0 && (
-      <div className="mt-8">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium">Quiz Mastery Progress</span>
-          <span className="text-sm font-medium">
-            Level {Math.floor(userData.user.quizAttempts / 5) + 1}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ 
-              width: `${(userData.user.quizAttempts % 5) * 20}%`,
-              backgroundColor: getComputedStyle(document.documentElement)
-                .getPropertyValue(`--color-${getThemeColor("from").split('-')[0]}`)
-            }}
-            transition={{ duration: 1.5, type: "spring" }}
-            className="h-3 rounded-full relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
-          </motion.div>
-        </div>
-        <div className="flex justify-between text-xs mt-2 opacity-70">
-          <span>{userData.user.quizAttempts} quizzes taken</span>
-          <span>{5 - (userData.user.quizAttempts % 5)} to next level</span>
-        </div>
-      </div>
-    )}
-  </div>
-</motion.div>
+          <div className="relative z-10">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div className="flex items-center gap-4">
+                <motion.div
+                  whileHover={{ rotate: 15, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className={`p-4 rounded-2xl flex items-center justify-center ${applyGradient("text-white shadow-lg")}`}
+                >
+                  <span className="text-3xl">🧠</span>
+                </motion.div>
+
+                <div>
+                  <h2 className={`text-2xl sm:text-3xl font-bold ${currentTheme.title}`}>
+                    Quiz Progress
+                  </h2>
+                  <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
+                    Test your knowledge and track your improvement
+                  </p>
+                </div>
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate("/quiz")}
+                className={`px-6 py-3 rounded-lg ${currentTheme.button} font-medium flex items-center gap-2`}
+              >
+                <Rocket className="w-5 h-5" />
+                {userData.user.quizAttempts > 0 ? "New Quiz" : "Start Quiz"}
+              </motion.button>
+            </div>
+
+            {userData.user.quizAttempts > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
+                >
+                  <div className="text-4xl font-bold mb-2 flex items-center">
+                    {userData.user.quizAttempts}
+                    <motion.span
+                      animate={{ scale: [1, 1.1, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="ml-2 text-2xl"
+                    >
+                      📊
+                    </motion.span>
+                  </div>
+                  <p className="text-sm opacity-80">Total Attempts</p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  className={`p-5 rounded-xl bg-green-100/30 dark:bg-green-900/30 text-green-800 dark:text-green-100 flex flex-col items-center`}
+                >
+                  <div className="text-4xl font-bold mb-2 flex items-center">
+                    {userData.quizStats?.totalCorrect || 0}
+                    <motion.span
+                      animate={{ rotate: [0, 10, -10, 0] }}
+                      transition={{ repeat: Infinity, duration: 3 }}
+                      className="ml-2 text-2xl"
+                    >
+                      ✅
+                    </motion.span>
+                  </div>
+                  <p className="text-sm opacity-80">Correct Answers</p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  className={`p-5 rounded-xl bg-red-100/30 dark:bg-red-900/30 text-red-800 dark:text-red-100 flex flex-col items-center`}
+                >
+                  <div className="text-4xl font-bold mb-2 flex items-center">
+                    {userData.quizStats?.totalIncorrect || 0}
+                    <motion.span
+                      animate={{ x: [-2, 2, -2] }}
+                      transition={{ repeat: Infinity, duration: 1.5 }}
+                      className="ml-2 text-2xl"
+                    >
+                      ❌
+                    </motion.span>
+                  </div>
+                  <p className="text-sm opacity-80">Incorrect Answers</p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
+                >
+                  <div className="text-4xl font-bold mb-2 flex items-center">
+                    {userData.quizStats
+                      ? `${Math.round(
+                        (userData.quizStats.totalCorrect /
+                          (userData.quizStats.totalCorrect + userData.quizStats.totalIncorrect)) *
+                        100
+                      )}%`
+                      : "0%"}
+                    <motion.span
+                      animate={{ y: [0, -3, 0] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="ml-2 text-2xl"
+                    >
+                      🎯
+                    </motion.span>
+                  </div>
+                  <p className="text-sm opacity-80">Accuracy Rate</p>
+                </motion.div>
+              </div>
+            ) : (
+              <div className="flex flex-col md:flex-row items-center gap-8 py-6">
+                <motion.div
+                  animate={{
+                    scale: [1, 1.05, 1],
+                    rotate: [0, 5, -5, 0],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                  }}
+                  className="w-40 h-40 flex items-center justify-center"
+                >
+                  <div className={`relative w-full h-full ${applyGradient("rounded-full opacity-20")}`}></div>
+                  <div className={`absolute text-6xl ${applyGradient("bg-clip-text text-transparent")}`}>?</div>
+                </motion.div>
+
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className={`text-2xl font-bold ${currentTheme.title} mb-3`}>Ready for Your First Quiz Challenge?</h3>
+                  <p className={`text-lg mb-6 ${currentTheme.subtitle} opacity-90 max-w-lg mx-auto md:mx-0`}>
+                    Test your knowledge with our interactive coding quizzes. Track your progress, earn achievements, and climb the leaderboard!
+                  </p>
+                  <motion.button
+                    whileHover={{
+                      scale: 1.05,
+                      boxShadow: `0 5px 15px rgba(${getThemeColor("from")}, 0.3)`,
+                    }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate("/quiz")}
+                    className={`px-8 py-4 rounded-xl ${currentTheme.button} font-semibold text-lg flex items-center justify-center gap-3 mx-auto md:mx-0`}
+                  >
+                    <Rocket className="w-6 h-6" />
+                    Start Quiz Journey
+                  </motion.button>
+                </div>
+              </div>
+            )}
+
+            {userData.user.quizAttempts > 0 && (
+              <div className="mt-8">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium">Quiz Mastery Progress</span>
+                  <span className="text-sm font-medium">Level {Math.floor(userData.user.quizAttempts / 5) + 1}</span>
+                </div>
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width: `${(userData.user.quizAttempts % 5) * 20}%`,
+                      backgroundColor: getThemeColor("from"),
+                    }}
+                    transition={{ duration: 1.5, type: "spring" }}
+                    className="h-3 rounded-full relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
+                  </motion.div>
+                </div>
+                <div className="flex justify-between text-xs mt-2 opacity-70">
+                  <span>{userData.user.quizAttempts} quizzes taken</span>
+                  <span>{5 - (userData.user.quizAttempts % 5)} to next level</span>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
 
         {/* Daily Challenge Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`rounded-xl  border border-opacity-20  shadow-md p-6 mb-8 ${currentTheme.card}`}
+          className={`rounded-xl border border-opacity-20 shadow-md p-6 mb-8 ${currentTheme.card}`}
         >
           <div className="flex justify-between items-center mb-4">
             <h2 className={`text-2xl font-bold ${currentTheme.title}`}>
@@ -791,6 +774,7 @@ const Dashboard = () => {
             </div>
           )}
         </motion.div>
+
         {/* Badges Section */}
         <motion.section
           initial={{ opacity: 0 }}
@@ -831,9 +815,7 @@ const Dashboard = () => {
           transition={{ delay: 0.3 }}
           className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
         >
-          <h2
-            className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}
-          >
+          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>
             💎 Subscription
           </h2>
           {userData.user.subscription ? (
@@ -888,9 +870,7 @@ const Dashboard = () => {
               >
                 💎
               </div>
-              <h3
-                className={`text-lg font-semibold mb-2 ${currentTheme.title}`}
-              >
+              <h3 className={`text-lg font-semibold mb-2 ${currentTheme.title}`}>
                 No Active Subscription
               </h3>
               <p className={`text-sm mb-4 ${currentTheme.subtitle} opacity-80`}>
@@ -924,9 +904,7 @@ const Dashboard = () => {
           transition={{ delay: 0.5 }}
           className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
         >
-          <h2
-            className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}
-          >
+          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>
             📘 Recently Solved
           </h2>
           <div className="space-y-4">
@@ -943,15 +921,11 @@ const Dashboard = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3
-                        className={`text-base sm:text-lg font-semibold ${currentTheme.title}`}
-                      >
+                      <h3 className={`text-base sm:text-lg font-semibold ${currentTheme.title}`}>
                         {problem.title}
                       </h3>
                       <div className="flex gap-2 mt-2 flex-wrap text-xs">
-                        <span
-                          className={`px-2.5 py-1 rounded-full ${currentTheme.badge}`}
-                        >
+                        <span className={`px-2.5 py-1 rounded-full ${currentTheme.badge}`}>
                           {problem.category}
                         </span>
                         <span

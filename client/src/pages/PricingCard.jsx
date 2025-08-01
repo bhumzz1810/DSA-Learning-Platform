@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   FaCheckCircle,
   FaCode,
@@ -39,41 +41,65 @@ const plans = [
 ];
 
 const Pricing = ({ isYearly, setIsYearly }) => {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubscribeClick = (plan) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      toast.info("Please login to subscribe to premium features");
+      navigate("/login", { 
+        state: { 
+          from: "/pricing",
+          message: "You need to login to subscribe to our premium plans" 
+        } 
+      });
+      return;
+    }
     setSelectedPlan(plan.name);
     setShowModal(true);
   };
 
   const handleConfirmSubscription = async () => {
+    setIsLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) return alert("Please log in to subscribe.");
 
     try {
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify({
           userId: user.id,
           email: user.email,
           billing: isYearly ? "yearly" : "monthly",
+          plan: selectedPlan,
         }),
       });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
 
       const data = await res.json();
 
       if (data.url) {
         window.location.href = data.url;
       } else {
+        toast.error("Failed to initiate payment. Please try again.");
         console.error("Stripe response missing URL:", data);
       }
     } catch (err) {
+      toast.error(err.message || "Subscription failed. Please try again.");
       console.error("Error during checkout:", err);
+    } finally {
+      setIsLoading(false);
+      setShowModal(false);
     }
-
-    setShowModal(false);
   };
 
   return (
@@ -135,7 +161,11 @@ const Pricing = ({ isYearly, setIsYearly }) => {
 
             <button
               onClick={() => handleSubscribeClick(plan)}
-              className="mt-auto w-full bg-cyan-500 text-white py-2 rounded-full hover:bg-cyan-600 transition"
+              className={`mt-auto w-full py-2 rounded-full transition ${
+                plan.price === 0
+                  ? "bg-gray-700 hover:bg-gray-600"
+                  : "bg-cyan-500 hover:bg-cyan-600"
+              }`}
             >
               {plan.price === 0 ? "Get Started" : "Go Pro"}
             </button>
@@ -146,6 +176,8 @@ const Pricing = ({ isYearly, setIsYearly }) => {
       <SubscriptionModal
         isOpen={showModal}
         planName={selectedPlan}
+        isYearly={isYearly}
+        isLoading={isLoading}
         onClose={() => setShowModal(false)}
         onConfirm={handleConfirmSubscription}
       />
