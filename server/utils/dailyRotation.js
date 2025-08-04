@@ -2,12 +2,22 @@ const Problem = require("../models/Problem");
 
 const rotateDailyChallenge = async () => {
   try {
-    await Problem.updateMany({}, { $set: { isDaily: false } }); // Clear old one
+    // Clear the old daily challenge(s)
+    const clearResult = await Problem.updateMany(
+      { isDaily: true },
+      { $set: { isDaily: false } }
+    );
 
-    const random = await Problem.aggregate([{ $sample: { size: 1 } }]);
-    if (random.length > 0) {
-      await Problem.findByIdAndUpdate(random[0]._id, { isDaily: true });
-      console.log("✅ New daily challenge selected:", random[0].title);
+    console.log(`🧹 Cleared ${clearResult.modifiedCount} previous daily challenge(s)`);
+
+    // Pick a new random problem
+    const [randomProblem] = await Problem.aggregate([{ $sample: { size: 1 } }]);
+
+    if (randomProblem) {
+      await Problem.findByIdAndUpdate(randomProblem._id, { isDaily: true });
+      console.log("✅ New daily challenge selected:", randomProblem.title);
+    } else {
+      console.warn("⚠️ No problems found to set as daily challenge");
     }
   } catch (err) {
     console.error("❌ Failed to rotate daily challenge:", err);

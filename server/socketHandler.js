@@ -5,9 +5,7 @@ const rooms = new Map();
 const cleanupRoom = (roomId, io) => {
   if (rooms.has(roomId)) {
     const room = rooms.get(roomId);
-    const activeUsers = Array.from(room.users.values()).filter(
-      (u) => u.isActive
-    );
+    const activeUsers = Array.from(room.users.values()).filter((u) => u.isActive);
 
     if (activeUsers.length === 0) {
       rooms.delete(roomId);
@@ -66,11 +64,13 @@ function setupSocketServer(server) {
     io.to(roomId).emit("users-updated", Array.from(room.users.values()));
     socket.emit("files-updated", room.files.filter(f => f.path && f.name));
 
+    // Messages
     socket.on("send-message", (data) => {
       if (typeof data.message !== "string" || !data.alias) return;
       io.to(roomId).emit("new-message", data);
     });
 
+    // Files added
     socket.on("files-added", ({ roomId: rid, files }) => {
       if (rid !== roomId) return;
       if (!rooms.has(roomId)) return;
@@ -87,6 +87,7 @@ function setupSocketServer(server) {
       console.log(`Files added to room ${roomId}:`, validFiles.map(f => f.name));
     });
 
+    // File content request
     socket.on("request-file", ({ filePath }) => {
       if (!filePath) return;
       const room = rooms.get(roomId);
@@ -102,6 +103,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // Code change broadcast
     socket.on("code-change", ({ filePath, newCode }) => {
       if (!filePath || typeof newCode !== "string") return;
       const room = rooms.get(roomId);
@@ -111,6 +113,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // Save file content
     socket.on("save-file", ({ filePath, content }) => {
       if (!filePath || typeof content !== "string") return;
       const room = rooms.get(roomId);
@@ -123,6 +126,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // File delete request
     socket.on("file-delete-request", ({ roomId: rid, filePath, fileName, requester, deleteRequestId }) => {
       if (rid !== roomId || !filePath || !fileName || !deleteRequestId) return;
       const room = rooms.get(roomId);
@@ -137,9 +141,7 @@ function setupSocketServer(server) {
         responses: [],
         timeout: null,
       };
-      const otherUsers = Array.from(room.users.values()).filter(
-        u => u.alias !== requester && u.isActive
-      );
+      const otherUsers = Array.from(room.users.values()).filter(u => u.alias !== requester && u.isActive);
       if (otherUsers.length === 0) {
         room.files = room.files.filter(f => f.path !== filePath);
         delete room.code[filePath];
@@ -161,6 +163,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // File delete response
     socket.on("file-delete-response", ({ roomId: rid, filePath, approve, responder, deleteRequestId }) => {
       if (rid !== roomId || !filePath || !deleteRequestId) return;
       const room = rooms.get(roomId);
@@ -171,9 +174,7 @@ function setupSocketServer(server) {
       room.deleteRequests[deleteRequestId].responses.push({ approve, responder });
       console.log(`Response ${approve ? 'Yes' : 'No'} from ${responder} for ${filePath} (id: ${deleteRequestId})`);
 
-      const otherUsers = Array.from(room.users.values()).filter(
-        u => u.alias !== room.deleteRequests[deleteRequestId].requester && u.isActive
-      );
+      const otherUsers = Array.from(room.users.values()).filter(u => u.alias !== room.deleteRequests[deleteRequestId].requester && u.isActive);
       if (room.deleteRequests[deleteRequestId].responses.length === otherUsers.length) {
         clearTimeout(room.deleteRequests[deleteRequestId].timeout);
         if (room.deleteRequests[deleteRequestId].responses.every(r => r.approve)) {
@@ -190,6 +191,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // File renamed
     socket.on("file-renamed", ({ roomId: rid, oldPath, newPath, newName }) => {
       if (rid !== roomId || !oldPath || !newPath || !newName) return;
       const room = rooms.get(roomId);
@@ -205,16 +207,19 @@ function setupSocketServer(server) {
       }
     });
 
+    // Cursor updates
     socket.on("cursor-update", ({ filePath, position, userId }) => {
       if (!filePath || !position || !userId) return;
       socket.to(roomId).emit("cursor-update", { filePath, position, userId });
     });
 
+    // Code executed event
     socket.on("code-executed", ({ roomId: rid, output, executedBy }) => {
       if (rid !== roomId || !output || !executedBy) return;
       io.to(roomId).emit("code-executed", { output, executedBy });
     });
 
+    // Clear room
     socket.on("clear-room", () => {
       const room = rooms.get(roomId);
       if (room) {
@@ -227,6 +232,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // Leave room event
     socket.on("leave-room", ({ roomId: rid, alias }) => {
       if (rid !== roomId) return;
       if (rooms.has(roomId)) {
@@ -239,6 +245,7 @@ function setupSocketServer(server) {
       }
     });
 
+    // Handle disconnect
     socket.on("disconnect", () => {
       console.log("❌ Disconnected:", socket.id);
       if (rooms.has(roomId)) {

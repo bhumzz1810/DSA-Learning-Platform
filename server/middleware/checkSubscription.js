@@ -1,9 +1,13 @@
 const Subscription = require("../models/Subscription");
 
 const checkSubscription = async (req, res, next) => {
-  console.log("Checking subscription for user:", req.user._id);
-
   try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    console.log("Checking subscription for user:", req.user._id);
+
     const subscription = await Subscription.findOne({
       userId: req.user._id,
       status: { $in: ["active", "trialing"] },
@@ -13,19 +17,21 @@ const checkSubscription = async (req, res, next) => {
       return res.status(403).json({ error: "Subscription required" });
     }
 
-    // If Stripe didn't provide currentPeriodEnd correctly, calculate it manually
-    const startDate = new Date(subscription.currentPeriodStart);
-    let expectedEndDate = new Date(startDate);
+    const now = new Date();
+    let endDate = subscription.currentPeriodEnd;
 
-    if (subscription.planName === "monthly") {
-      expectedEndDate.setMonth(expectedEndDate.getMonth() + 1);
-    } else if (subscription.planName === "yearly") {
-      expectedEndDate.setFullYear(expectedEndDate.getFullYear() + 1);
+    // If currentPeriodEnd is missing or invalid, calculate manually
+    if (!endDate || isNaN(new Date(endDate).getTime())) {
+      const startDate = new Date(subscription.currentPeriodStart);
+      if (subscription.planName === "monthly") {
+        startDate.setMonth(startDate.getMonth() + 1);
+      } else if (subscription.planName === "yearly") {
+        startDate.setFullYear(startDate.getFullYear() + 1);
+      }
+      endDate = startDate;
     }
 
-    const isValid = expectedEndDate > new Date();
-
-    if (!isValid) {
+    if (new Date(endDate) <= now) {
       return res.status(403).json({ error: "Subscription expired" });
     }
 

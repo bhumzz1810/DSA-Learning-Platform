@@ -35,9 +35,9 @@ router.post(
       const customerId = session.customer;
       const subscriptionId = session.subscription;
 
-      if (!userId) {
-        console.error("❌ Missing userId in session metadata");
-        return res.status(400).send("Missing userId");
+      if (!userId || !customerId || !subscriptionId) {
+        console.error("❌ Missing critical Stripe session metadata");
+        return res.status(400).send("Missing required metadata");
       }
 
       try {
@@ -45,23 +45,26 @@ router.post(
           expand: ["latest_invoice", "items.data.price"],
         });
 
-        const startUnix =
-          stripeSub.start_date || stripeSub.current_period_start;
-        const endUnix =
-          stripeSub.billing_cycle_anchor || stripeSub.current_period_end;
+        const startUnix = stripeSub.start_date || stripeSub.current_period_start;
+        const endUnix = stripeSub.billing_cycle_anchor || stripeSub.current_period_end;
 
-        const newSub = new Subscription({
-          userId,
-          stripeCustomerId: customerId,
-          stripeSubscriptionId: subscriptionId,
-          planName: stripeSub.items.data[0]?.price.nickname || "Premium Plan",
-          priceId: stripeSub.items.data[0]?.price.id,
-          status: stripeSub.status,
-          currentPeriodStart: new Date(startUnix * 1000),
-          currentPeriodEnd: new Date(endUnix * 1000),
-        });
+        // Upsert subscription: avoid duplicate subscriptions for user
+        await Subscription.findOneAndUpdate(
+          { stripeSubscriptionId: subscriptionId },
+          {
+            userId,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            planName: stripeSub.items.data[0]?.price.nickname || "Premium Plan",
+            priceId: stripeSub.items.data[0]?.price.id,
+            status: stripeSub.status,
+            currentPeriodStart: new Date(startUnix * 1000),
+            currentPeriodEnd: new Date(endUnix * 1000),
+          },
+          { upsert: true, new: true, setDefaultsOnInsert: true }
+        );
 
-        await newSub.save();
+        // Update user with subscription info and flag
         await User.findByIdAndUpdate(userId, {
           subscribed: true,
           stripeCustomerId: customerId,
@@ -74,6 +77,7 @@ router.post(
         return res.status(500).send("Subscription error");
       }
     }
+
 
     res.sendStatus(200);
   }
