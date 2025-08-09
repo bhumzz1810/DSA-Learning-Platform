@@ -1,35 +1,29 @@
 import { useEffect } from "react";
 
 const SocialLogin = () => {
+  // SocialLogin.jsx
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
-    const user = params.get("user"); // ✅ Get user from URL
+    const userParam = params.get("user");
 
-    if (token) {
-      console.log("Token received:", token);
-      localStorage.setItem("token", token);
+    if (!token) return (window.location.href = "/login");
 
-      if (user) {
-        localStorage.setItem("user", user); // ✅ Save user object
-      }
+    localStorage.setItem("token", token);
 
-      try {
-        const payloadData = JSON.parse(atob(token.split(".")[1]));
-        const role = payloadData.role;
-        console.log("User role:", role);
+    if (userParam) {
+      // decode → parse → re-serialize cleanly
+      const parsed = JSON.parse(decodeURIComponent(userParam));
+      localStorage.setItem("user", JSON.stringify(parsed));
+    }
 
-        // ✅ This forces a full page reload — safest for now
-        if (role === "admin") {
-          window.location.href = "/admin/problems";
-        } else {
-          window.location.href = "/dashboard";
-        }
-      } catch (err) {
-        console.error("Error decoding token:", err);
-        window.location.href = "/login";
-      }
-    } else {
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1])); // ok for most JWTs
+      const role = payload.role;
+      window.location.href =
+        role === "admin" ? "/admin/problems" : "/dashboard";
+    } catch (e) {
+      console.error("Error decoding token:", e);
       window.location.href = "/login";
     }
   }, []);

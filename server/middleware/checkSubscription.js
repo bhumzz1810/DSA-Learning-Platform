@@ -6,8 +6,6 @@ const checkSubscription = async (req, res, next) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    console.log("Checking subscription for user:", req.user._id);
-
     const subscription = await Subscription.findOne({
       userId: req.user._id,
       status: { $in: ["active", "trialing"] },
@@ -17,23 +15,38 @@ const checkSubscription = async (req, res, next) => {
       return res.status(403).json({ error: "Subscription required" });
     }
 
-    const now = new Date();
-    let endDate = subscription.currentPeriodEnd;
+    // Prefer stored currentPeriodEnd when valid; otherwise compute
+    let endDate = subscription.currentPeriodEnd
+      ? new Date(subscription.currentPeriodEnd)
+      : null;
 
-    // If currentPeriodEnd is missing or invalid, calculate manually
-    if (!endDate || isNaN(new Date(endDate).getTime())) {
+    if (!endDate || Number.isNaN(endDate.getTime())) {
       const startDate = new Date(subscription.currentPeriodStart);
+      if (Number.isNaN(startDate.getTime())) {
+        return res.status(403).json({ error: "Subscription expired" });
+      }
+
       if (subscription.planName === "monthly") {
         startDate.setMonth(startDate.getMonth() + 1);
-      } else if (subscription.planName === "yearly") {
+      } else if (
+        subscription.planName === "yearly" ||
+        subscription.planName === "annual"
+      ) {
         startDate.setFullYear(startDate.getFullYear() + 1);
       }
       endDate = startDate;
     }
 
-    if (new Date(endDate) <= now) {
+    if (endDate <= new Date()) {
       return res.status(403).json({ error: "Subscription expired" });
     }
+
+    // Optional: expose for downstream handlers
+    req.subscription = {
+      planName: subscription.planName,
+      currentPeriodEnd: endDate,
+      status: subscription.status,
+    };
 
     next();
   } catch (err) {

@@ -24,6 +24,8 @@ const cron = require("node-cron");
 const rotateDailyChallenge = require("./utils/dailyRotation");
 const stripeRoutes = require("./routes/stripe.js");
 const quizRoutes = require("./routes/quizRoutes");
+const userRoutes = require("./routes/userRoutes");
+
 // const webhookRoute = require("./routes/webhook");
 // ✅ Correct route registration
 app.use("/api/stripe", require("./routes/webhook"));
@@ -36,11 +38,12 @@ const session = require("express-session");
 app.use(
   cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // <-- add these
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );
+
 app.use(express.json());
 connectDB();
 rotateDailyChallenge(); // 🔁 rotate once on every restart for dev mode
@@ -84,6 +87,7 @@ app.use("/api", dailyChallengeRoute);
 app.use("/api/stripe", stripeRoutes);
 app.use("/api/auth", require("./routes/authStatus"));
 app.use("/api/quiz", quizRoutes);
+app.use("/api/user", userRoutes);
 // Socket.IO Setup
 setupSocketServer(server);
 
