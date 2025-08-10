@@ -72,7 +72,7 @@ const LoginForm = () => {
     const apiUrl =
       import.meta.env.VITE_API_URL || "http://localhost:5000/api/auth";
     try {
-      const endpoint = showLogin ? "login" : "register";
+      const endpoint = showLogin ? "auth/login" : "auth/register";
       const payload = showLogin
         ? { email, password }
         : { email, username: email.split("@")[0], password };

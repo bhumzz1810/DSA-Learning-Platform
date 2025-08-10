@@ -4,11 +4,9 @@ const jwt = require("jsonwebtoken");
 
 // Helper to generate JWT token
 function generateToken(user) {
-  return jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "7d" }
-  );
+  return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
+    expiresIn: "7d",
+  });
 }
 
 function buildRedirectUrl(user, token) {
@@ -22,7 +20,7 @@ function buildRedirectUrl(user, token) {
     })
   );
   // Consider moving client URL to env var for flexibility
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5174";
   return `${clientUrl}/social-login?token=${token}&user=${userData}`;
 }
 
