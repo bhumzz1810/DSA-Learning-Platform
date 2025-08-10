@@ -23,9 +23,7 @@ exports.authenticate = async (req, res, next) => {
     }
 
     // ensure role is loaded
-    const user = await User.findById(decoded.id).select(
-      "+role -passwordHash -__v"
-    );
+    const user = await User.findById(decoded.id).select("-passwordHash -__v");
     if (!user) return res.status(401).json({ error: "User not found" });
 
     req.user = user;

@@ -5,7 +5,9 @@ const rooms = new Map();
 const cleanupRoom = (roomId, io) => {
   if (rooms.has(roomId)) {
     const room = rooms.get(roomId);
-    const activeUsers = Array.from(room.users.values()).filter((u) => u.isActive);
+    const activeUsers = Array.from(room.users.values()).filter(
+      (u) => u.isActive
+    );
 
     if (activeUsers.length === 0) {
       rooms.delete(roomId);
@@ -21,7 +23,7 @@ const cleanupRoom = (roomId, io) => {
 function setupSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "http://localhost:5174",
       methods: ["GET", "POST"],
       credentials: true,
       transports: ["websocket", "polling"],
@@ -62,7 +64,10 @@ function setupSocketServer(server) {
     });
 
     io.to(roomId).emit("users-updated", Array.from(room.users.values()));
-    socket.emit("files-updated", room.files.filter(f => f.path && f.name));
+    socket.emit(
+      "files-updated",
+      room.files.filter((f) => f.path && f.name)
+    );
 
     // Messages
     socket.on("send-message", (data) => {
@@ -76,7 +81,10 @@ function setupSocketServer(server) {
       if (!rooms.has(roomId)) return;
       const room = rooms.get(roomId);
       const validFiles = files.filter(
-        f => f.path && f.name && !room.files.some(existing => existing.path === f.path)
+        (f) =>
+          f.path &&
+          f.name &&
+          !room.files.some((existing) => existing.path === f.path)
       );
       if (validFiles.length === 0) {
         console.log(`No valid files to add in room ${roomId}`, files);
@@ -84,7 +92,10 @@ function setupSocketServer(server) {
       }
       room.files.push(...validFiles);
       io.to(roomId).emit("files-updated", room.files);
-      console.log(`Files added to room ${roomId}:`, validFiles.map(f => f.name));
+      console.log(
+        `Files added to room ${roomId}:`,
+        validFiles.map((f) => f.name)
+      );
     });
 
     // File content request
@@ -127,83 +138,133 @@ function setupSocketServer(server) {
     });
 
     // File delete request
-    socket.on("file-delete-request", ({ roomId: rid, filePath, fileName, requester, deleteRequestId }) => {
-      if (rid !== roomId || !filePath || !fileName || !deleteRequestId) return;
-      const room = rooms.get(roomId);
-      if (!room) {
-        console.error(`Room ${roomId} not found`);
-        return;
-      }
-      room.deleteRequests[deleteRequestId] = {
-        filePath,
-        fileName,
-        requester,
-        responses: [],
-        timeout: null,
-      };
-      const otherUsers = Array.from(room.users.values()).filter(u => u.alias !== requester && u.isActive);
-      if (otherUsers.length === 0) {
-        room.files = room.files.filter(f => f.path !== filePath);
-        delete room.code[filePath];
-        io.to(roomId).emit("file-deleted", { filePath, deleteRequestId });
-        io.to(roomId).emit("files-updated", room.files);
-        console.log(`File ${filePath} deleted immediately (no other users, id: ${deleteRequestId}) in room ${roomId}`);
-        delete room.deleteRequests[deleteRequestId];
-      } else {
-        socket.to(roomId).emit("file-delete-request", { filePath, fileName, requester, deleteRequestId });
-        console.log(`Deletion request ${deleteRequestId} for ${filePath} by ${requester} in room ${roomId}`);
-        room.deleteRequests[deleteRequestId].timeout = setTimeout(() => {
-          room.files = room.files.filter(f => f.path !== filePath);
+    socket.on(
+      "file-delete-request",
+      ({ roomId: rid, filePath, fileName, requester, deleteRequestId }) => {
+        if (rid !== roomId || !filePath || !fileName || !deleteRequestId)
+          return;
+        const room = rooms.get(roomId);
+        if (!room) {
+          console.error(`Room ${roomId} not found`);
+          return;
+        }
+        room.deleteRequests[deleteRequestId] = {
+          filePath,
+          fileName,
+          requester,
+          responses: [],
+          timeout: null,
+        };
+        const otherUsers = Array.from(room.users.values()).filter(
+          (u) => u.alias !== requester && u.isActive
+        );
+        if (otherUsers.length === 0) {
+          room.files = room.files.filter((f) => f.path !== filePath);
           delete room.code[filePath];
           io.to(roomId).emit("file-deleted", { filePath, deleteRequestId });
           io.to(roomId).emit("files-updated", room.files);
-          console.log(`File ${filePath} auto-deleted (id: ${deleteRequestId}) in room ${roomId}`);
+          console.log(
+            `File ${filePath} deleted immediately (no other users, id: ${deleteRequestId}) in room ${roomId}`
+          );
           delete room.deleteRequests[deleteRequestId];
-        }, 5000);
+        } else {
+          socket
+            .to(roomId)
+            .emit("file-delete-request", {
+              filePath,
+              fileName,
+              requester,
+              deleteRequestId,
+            });
+          console.log(
+            `Deletion request ${deleteRequestId} for ${filePath} by ${requester} in room ${roomId}`
+          );
+          room.deleteRequests[deleteRequestId].timeout = setTimeout(() => {
+            room.files = room.files.filter((f) => f.path !== filePath);
+            delete room.code[filePath];
+            io.to(roomId).emit("file-deleted", { filePath, deleteRequestId });
+            io.to(roomId).emit("files-updated", room.files);
+            console.log(
+              `File ${filePath} auto-deleted (id: ${deleteRequestId}) in room ${roomId}`
+            );
+            delete room.deleteRequests[deleteRequestId];
+          }, 5000);
+        }
       }
-    });
+    );
 
     // File delete response
-    socket.on("file-delete-response", ({ roomId: rid, filePath, approve, responder, deleteRequestId }) => {
-      if (rid !== roomId || !filePath || !deleteRequestId) return;
-      const room = rooms.get(roomId);
-      if (!room || !room.deleteRequests[deleteRequestId]) {
-        console.error(`Delete request ${deleteRequestId} not found in room ${roomId}`);
-        return;
-      }
-      room.deleteRequests[deleteRequestId].responses.push({ approve, responder });
-      console.log(`Response ${approve ? 'Yes' : 'No'} from ${responder} for ${filePath} (id: ${deleteRequestId})`);
-
-      const otherUsers = Array.from(room.users.values()).filter(u => u.alias !== room.deleteRequests[deleteRequestId].requester && u.isActive);
-      if (room.deleteRequests[deleteRequestId].responses.length === otherUsers.length) {
-        clearTimeout(room.deleteRequests[deleteRequestId].timeout);
-        if (room.deleteRequests[deleteRequestId].responses.every(r => r.approve)) {
-          room.files = room.files.filter(f => f.path !== filePath);
-          delete room.code[filePath];
-          io.to(roomId).emit("file-deleted", { filePath, deleteRequestId });
-          io.to(roomId).emit("files-updated", room.files);
-          console.log(`File ${filePath} deleted (id: ${deleteRequestId}) in room ${roomId}`);
-        } else {
-          io.to(roomId).emit("files-updated", room.files);
-          console.log(`Deletion of ${filePath} rejected (id: ${deleteRequestId}) in room ${roomId}`);
+    socket.on(
+      "file-delete-response",
+      ({ roomId: rid, filePath, approve, responder, deleteRequestId }) => {
+        if (rid !== roomId || !filePath || !deleteRequestId) return;
+        const room = rooms.get(roomId);
+        if (!room || !room.deleteRequests[deleteRequestId]) {
+          console.error(
+            `Delete request ${deleteRequestId} not found in room ${roomId}`
+          );
+          return;
         }
-        delete room.deleteRequests[deleteRequestId];
+        room.deleteRequests[deleteRequestId].responses.push({
+          approve,
+          responder,
+        });
+        console.log(
+          `Response ${
+            approve ? "Yes" : "No"
+          } from ${responder} for ${filePath} (id: ${deleteRequestId})`
+        );
+
+        const otherUsers = Array.from(room.users.values()).filter(
+          (u) =>
+            u.alias !== room.deleteRequests[deleteRequestId].requester &&
+            u.isActive
+        );
+        if (
+          room.deleteRequests[deleteRequestId].responses.length ===
+          otherUsers.length
+        ) {
+          clearTimeout(room.deleteRequests[deleteRequestId].timeout);
+          if (
+            room.deleteRequests[deleteRequestId].responses.every(
+              (r) => r.approve
+            )
+          ) {
+            room.files = room.files.filter((f) => f.path !== filePath);
+            delete room.code[filePath];
+            io.to(roomId).emit("file-deleted", { filePath, deleteRequestId });
+            io.to(roomId).emit("files-updated", room.files);
+            console.log(
+              `File ${filePath} deleted (id: ${deleteRequestId}) in room ${roomId}`
+            );
+          } else {
+            io.to(roomId).emit("files-updated", room.files);
+            console.log(
+              `Deletion of ${filePath} rejected (id: ${deleteRequestId}) in room ${roomId}`
+            );
+          }
+          delete room.deleteRequests[deleteRequestId];
+        }
       }
-    });
+    );
 
     // File renamed
     socket.on("file-renamed", ({ roomId: rid, oldPath, newPath, newName }) => {
       if (rid !== roomId || !oldPath || !newPath || !newName) return;
       const room = rooms.get(roomId);
       if (room) {
-        room.files = room.files.map(f => f.path === oldPath ? { ...f, path: newPath, name: newName } : f);
+        room.files = room.files.map((f) =>
+          f.path === oldPath ? { ...f, path: newPath, name: newName } : f
+        );
         if (room.code[oldPath]) {
           room.code[newPath] = room.code[oldPath];
           delete room.code[oldPath];
         }
         io.to(roomId).emit("file-renamed", { oldPath, newPath, newName });
         io.to(roomId).emit("files-updated", room.files);
-        console.log(`File renamed from ${oldPath} to ${newName} in room ${roomId}`);
+        console.log(
+          `File renamed from ${oldPath} to ${newName} in room ${roomId}`
+        );
       }
     });
 
