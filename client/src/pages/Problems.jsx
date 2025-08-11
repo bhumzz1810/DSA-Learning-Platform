@@ -97,7 +97,7 @@ export default function Problems() {
         if (token) {
           setIsLoggedIn(true);
           axios
-            .get(`${import.meta.env.VITE_API_URL}/auth/status`, {
+            .get(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
               headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => setIsSubscribed(res.data.subscriptionActive))
@@ -106,7 +106,7 @@ export default function Problems() {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/problems`,
+          }/api/problems`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -128,7 +128,7 @@ export default function Problems() {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/bookmarks`,
+          }/api/bookmarks`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -178,7 +178,7 @@ export default function Problems() {
         await axios.delete(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/bookmarks/${problemId}`,
+          }/api/bookmarks/${problemId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setBookmarkedIds(bookmarkedIds.filter((id) => id !== problemId));
@@ -186,7 +186,7 @@ export default function Problems() {
         await axios.post(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/bookmarks/${problemId}`,
+          }/api/bookmarks/${problemId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -216,15 +216,15 @@ export default function Problems() {
                   </p>
                 </div>
                 <button
-                     onClick={() => {
-                  navigate("/");
-                  setTimeout(() => {
-                    const pricingSection = document.getElementById("Pricing");
-                    if (pricingSection) {
-                      pricingSection.scrollIntoView({ behavior: "smooth" });
-                    }
-                  }, 100);
-                }}
+                  onClick={() => {
+                    navigate("/");
+                    setTimeout(() => {
+                      const pricingSection = document.getElementById("Pricing");
+                      if (pricingSection) {
+                        pricingSection.scrollIntoView({ behavior: "smooth" });
+                      }
+                    }, 100);
+                  }}
                   className="px-5 py-2 mt-2 md:mt-0 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition"
                 >
                   View Subscription Plans

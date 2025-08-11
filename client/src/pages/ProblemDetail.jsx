@@ -66,7 +66,7 @@ export default function ProblemDetail() {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/problems/${id}`,
+          }/api/problems/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function ProblemDetail() {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/submissions/latest/${id}`,
+          }/api/submissions/latest/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function ProblemDetail() {
       const res = await axios.get(
         `${
           import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/bookmarks`,
+        }/api/bookmarks`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const ids = res.data.bookmarks.map((p) => p._id);
@@ -120,7 +120,7 @@ export default function ProblemDetail() {
       const res = await axios.get(
         `${
           import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/notes/${id}`,
+        }/api/notes/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.note) setNote(res.data.note.content);
@@ -159,7 +159,7 @@ export default function ProblemDetail() {
 
       const response = await axios.post(
         `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000"
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
         }/api/judge/execute`,
         {
           language_id: languageId,
@@ -236,7 +236,7 @@ export default function ProblemDetail() {
       const response = await axios.post(
         `${
           import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/submissions`,
+        }/api/submissions`,
         {
           problemId: id,
           code,
@@ -301,7 +301,7 @@ export default function ProblemDetail() {
 
         try {
           const res = await axios.post(
-            "http://localhost:5000/api/suggest",
+            "http://localhost:5000//api/suggest",
             {
               prompt: textUntilPosition,
             },
@@ -346,7 +346,7 @@ export default function ProblemDetail() {
         await axios.delete(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/bookmarks/${id}`,
+          }/api/bookmarks/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setBookmarked(false);
@@ -354,7 +354,7 @@ export default function ProblemDetail() {
         await axios.post(
           `${
             import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/bookmarks/${id}`,
+          }/api/bookmarks/${id}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -372,7 +372,7 @@ export default function ProblemDetail() {
       await axios.post(
         `${
           import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/notes/${id}`,
+        }/api/notes/${id}`,
         { content: note },
         { headers: { Authorization: `Bearer ${token}` } }
       );

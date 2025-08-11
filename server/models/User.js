@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    sparse: true,
     unique: true,
     lowercase: true,
     trim: true,
@@ -24,8 +25,8 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordHash: { type: String, required: false },
-  googleId: String,
-  githubId: String,
+  googleId: { type: String, unique: true, sparse: true },
+  githubId: { type: String, unique: true, sparse: true },
   role: {
     type: String,
     enum: ["user", "admin"],
@@ -59,7 +60,14 @@ const userSchema = new mongoose.Schema({
       date: { type: Date, default: Date.now },
       category: {
         type: String,
-        enum: ["JavaScript", "React", "Node.js", "MongoDB", "Frontend", "Backend"],
+        enum: [
+          "JavaScript",
+          "React",
+          "Node.js",
+          "MongoDB",
+          "Frontend",
+          "Backend",
+        ],
       },
     },
   ],
@@ -78,8 +86,15 @@ userSchema.methods.validatePassword = async function (password) {
   return bcrypt.compare(password, this.passwordHash);
 };
 
-userSchema.methods.awardXpForProblem = function (problemId, xpPerProblem = 100) {
-  if (!this.solvedProblems.some((p) => p.problemId.toString() === problemId.toString())) {
+userSchema.methods.awardXpForProblem = function (
+  problemId,
+  xpPerProblem = 100
+) {
+  if (
+    !this.solvedProblems.some(
+      (p) => p.problemId.toString() === problemId.toString()
+    )
+  ) {
     this.solvedProblems.push(problemId);
     this.xp += xpPerProblem;
     this.level = Math.floor(this.xp / 500) + 1;

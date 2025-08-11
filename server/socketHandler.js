@@ -23,7 +23,7 @@ const cleanupRoom = (roomId, io) => {
 function setupSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5174",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST"],
       credentials: true,
       transports: ["websocket", "polling"],
@@ -168,14 +168,12 @@ function setupSocketServer(server) {
           );
           delete room.deleteRequests[deleteRequestId];
         } else {
-          socket
-            .to(roomId)
-            .emit("file-delete-request", {
-              filePath,
-              fileName,
-              requester,
-              deleteRequestId,
-            });
+          socket.to(roomId).emit("file-delete-request", {
+            filePath,
+            fileName,
+            requester,
+            deleteRequestId,
+          });
           console.log(
             `Deletion request ${deleteRequestId} for ${filePath} by ${requester} in room ${roomId}`
           );

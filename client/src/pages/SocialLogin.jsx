@@ -7,7 +7,7 @@ const SocialLogin = () => {
     const token = params.get("token");
     const userParam = params.get("user");
 
-    if (!token) return (window.location.href = "/login");
+    if (!token) return (window.location.href = "/#/login");
 
     localStorage.setItem("token", token);
 
@@ -20,11 +20,13 @@ const SocialLogin = () => {
     try {
       const payload = JSON.parse(atob(token.split(".")[1])); // ok for most JWTs
       const role = payload.role;
+      console.log("User role from token:", role);
+
       window.location.href =
-        role === "admin" ? "/admin/problems" : "/dashboard";
+        role === "admin" ? "/#/admin/problems" : "/#/dashboard";
     } catch (e) {
       console.error("Error decoding token:", e);
-      window.location.href = "/login";
+      window.location.href = "/#/login";
     }
   }, []);
 

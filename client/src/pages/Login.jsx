@@ -18,7 +18,7 @@ const LoginForm = () => {
   const containerRef = useRef(null);
   const audioRef = useRef(null);
   const navigate = useNavigate();
-
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
   useEffect(() => {
     audioRef.current = new Audio(alertSound);
     audioRef.current.volume = 0.3;
@@ -69,10 +69,9 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl =
-      import.meta.env.VITE_API_URL || "http://localhost:5000/api/auth";
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
     try {
-      const endpoint = showLogin ? "auth/login" : "auth/register";
+      const endpoint = showLogin ? "api/auth/login" : "api/auth/register";
       const payload = showLogin
         ? { email, password }
         : { email, username: email.split("@")[0], password };
@@ -275,7 +274,7 @@ const LoginForm = () => {
 
               <div className="flex flex-col w-full gap-3 max-w-xs">
                 <a
-                  href="http://localhost:5000/auth/google"
+                  href={`${API}auth/google`}
                   className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition duration-200"
                 >
                   <img
@@ -287,7 +286,7 @@ const LoginForm = () => {
                 </a>
 
                 <a
-                  href="http://localhost:5000/auth/github"
+                  href={`${API}auth/github`}
                   className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-900 transition duration-200"
                 >
                   <img

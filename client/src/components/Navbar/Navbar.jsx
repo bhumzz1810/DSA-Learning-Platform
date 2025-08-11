@@ -23,7 +23,7 @@ const Navbar = () => {
       button: "bg-blue-600 hover:bg-blue-700",
       dropdown: "bg-white border-gray-200",
       icon: "text-gray-800",
-      hover: "hover:text-blue-700"
+      hover: "hover:text-blue-700",
     },
     dark: {
       bg: "bg-gray-800",
@@ -32,7 +32,7 @@ const Navbar = () => {
       button: "bg-blue-500 hover:bg-blue-600",
       dropdown: "bg-gray-800 border-gray-700",
       icon: "text-white",
-      hover: "hover:text-blue-400"
+      hover: "hover:text-blue-400",
     },
     ocean: {
       bg: "bg-blue-900",
@@ -41,7 +41,7 @@ const Navbar = () => {
       button: "bg-cyan-600 hover:bg-cyan-700",
       dropdown: "bg-blue-900 border-blue-800",
       icon: "text-white",
-      hover: "hover:text-cyan-300"
+      hover: "hover:text-cyan-300",
     },
     forest: {
       bg: "bg-green-800",
@@ -50,8 +50,8 @@ const Navbar = () => {
       button: "bg-emerald-600 hover:bg-emerald-700",
       dropdown: "bg-green-800 border-green-700",
       icon: "text-white",
-      hover: "hover:text-emerald-300"
-    }
+      hover: "hover:text-emerald-300",
+    },
   };
 
   const currentTheme = themeStyles[theme] || themeStyles.light;
@@ -59,9 +59,9 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
-    
+
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}/auth/status`, {
+      fetch(`${import.meta.env.VITE_API_URL}api/auth/status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -76,7 +76,7 @@ const Navbar = () => {
         setShowDropdown(false);
       }
     };
-    
+
     document.addEventListener("click", handleClickOutside);
     return () => document.removeEventListener("click", handleClickOutside);
   }, [location]);
@@ -89,36 +89,37 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`w-full py-4 px-8 flex items-center justify-between sticky top-0 z-50 shadow-sm ${currentTheme.bg} ${currentTheme.text} border-b ${currentTheme.border} font-['Poppins'] box-border`}>
+    <nav
+      className={`w-full py-4 px-8 flex items-center justify-between sticky top-0 z-50 shadow-sm ${currentTheme.bg} ${currentTheme.text} border-b ${currentTheme.border} font-['Poppins'] box-border`}
+    >
       <div className="flex items-center gap-2">
         <div className="bg-white p-2 rounded-lg">
-
-        <img 
-          src={logoIcon} 
-          alt="DSArena logo" 
-          className="w-32 h-auto object-contain cursor-pointer" 
-          onClick={() => navigate("/")}
+          <img
+            src={logoIcon}
+            alt="DSArena logo"
+            className="w-32 h-auto object-contain cursor-pointer"
+            onClick={() => navigate("/")}
           />
-          </div>
+        </div>
       </div>
 
       <div className="flex items-center gap-5">
         <ul className="flex gap-6 list-none m-0 p-0 text-sm font-medium">
-          <li 
+          <li
             className={`cursor-pointer transition-colors duration-200 ${currentTheme.hover}`}
             onClick={() => navigate("/")}
           >
             Home
           </li>
           {isLoggedIn && (
-            <li 
+            <li
               className={`cursor-pointer transition-colors duration-200 ${currentTheme.hover}`}
               onClick={() => navigate("/dashboard")}
             >
               Dashboard
             </li>
           )}
-          <li 
+          <li
             className={`cursor-pointer transition-colors duration-200 ${currentTheme.hover}`}
             onClick={() => navigate("/problems")}
           >
@@ -148,7 +149,7 @@ const Navbar = () => {
         {isLoggedIn && (
           <FiBell className={`text-lg cursor-pointer ${currentTheme.icon}`} />
         )}
-        
+
         {/* <button 
           onClick={toggleTheme}
           className={`p-2 rounded-full ${theme === 'light' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}
@@ -166,7 +167,9 @@ const Navbar = () => {
             />
 
             {showDropdown && (
-              <div className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg border z-50 ${currentTheme.dropdown}`}>
+              <div
+                className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg border z-50 ${currentTheme.dropdown}`}
+              >
                 <button
                   className={`block w-full text-left px-4 py-2 text-sm hover:bg-opacity-20 hover:bg-gray-500 ${currentTheme.text}`}
                   onClick={() => navigate("/profile")}

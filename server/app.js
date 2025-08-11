@@ -37,7 +37,7 @@ const session = require("express-session");
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"], // <-- add these
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,

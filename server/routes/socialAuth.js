@@ -1,8 +1,10 @@
+// server/routes/socialAuth.js
 const router = require("express").Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
-// Helper to generate JWT token
+const CLIENT = process.env.CLIENT_URL || "http://localhost:5173";
+
 function generateToken(user) {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {
     expiresIn: "7d",
@@ -10,8 +12,7 @@ function generateToken(user) {
 }
 
 function buildRedirectUrl(user, token) {
-  // Use encodeURIComponent safely for user data
-  const userData = encodeURIComponent(
+  const userParam = encodeURIComponent(
     JSON.stringify({
       id: user._id,
       email: user.email,
@@ -19,12 +20,11 @@ function buildRedirectUrl(user, token) {
       role: user.role,
     })
   );
-  // Consider moving client URL to env var for flexibility
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5174";
-  return `${clientUrl}/social-login?token=${token}&user=${userData}`;
+  // query BEFORE hash; route AFTER hash (HashRouter)
+  return `${CLIENT}/?token=${token}&user=${userParam}#/social-login`;
 }
 
-// GOOGLE LOGIN
+// GOOGLE
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
@@ -32,20 +32,22 @@ router.get(
 
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", {
+    failureRedirect: `${CLIENT}/#/login?error=google`,
+    session: true,
+  }),
   (req, res) => {
     try {
       const token = generateToken(req.user);
-      const redirectUrl = buildRedirectUrl(req.user, token);
-      res.redirect(redirectUrl);
-    } catch (err) {
-      console.error("Google callback error:", err);
-      res.redirect("/?error=authentication_failed");
+      return res.redirect(buildRedirectUrl(req.user, token));
+    } catch (e) {
+      console.error("Google redirect error:", e);
+      return res.redirect(`${CLIENT}/#/login?error=server`);
     }
   }
 );
 
-// GITHUB LOGIN
+// GITHUB
 router.get(
   "/github",
   passport.authenticate("github", { scope: ["user:email"] })
@@ -53,15 +55,17 @@ router.get(
 
 router.get(
   "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/" }),
+  passport.authenticate("github", {
+    failureRedirect: `${CLIENT}/#/login?error=github`,
+    session: true,
+  }),
   (req, res) => {
     try {
       const token = generateToken(req.user);
-      const redirectUrl = buildRedirectUrl(req.user, token);
-      res.redirect(redirectUrl);
-    } catch (err) {
-      console.error("GitHub callback error:", err);
-      res.redirect("/?error=authentication_failed");
+      return res.redirect(buildRedirectUrl(req.user, token));
+    } catch (e) {
+      console.error("GitHub redirect error:", e);
+      return res.redirect(`${CLIENT}/#/login?error=server`);
     }
   }
 );

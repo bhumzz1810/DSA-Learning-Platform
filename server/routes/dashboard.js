@@ -8,7 +8,10 @@ const QuizAttempt = require("../models/QuizAttempt");
 const mongoose = require("mongoose");
 
 function validateObjectId(req, res, next) {
-  if (req.params.problemId && !mongoose.Types.ObjectId.isValid(req.params.problemId)) {
+  if (
+    req.params.problemId &&
+    !mongoose.Types.ObjectId.isValid(req.params.problemId)
+  ) {
     return res.status(400).json({ error: "Invalid problemId parameter" });
   }
   next();
@@ -32,7 +35,7 @@ router.get("/dashboard", authenticate, async (req, res) => {
       .limit(5)
       .lean();
 
-    const quizData = quizAttempts.map(qa => ({
+    const quizData = quizAttempts.map((qa) => ({
       quizTitle: qa.quizTitle || "Untitled Quiz",
       questionsAttempted: qa.questionsAttempted,
       correctAnswers: qa.correctAnswers,
@@ -45,7 +48,7 @@ router.get("/dashboard", authenticate, async (req, res) => {
     const recentSolved = solved
       .sort((a, b) => new Date(b.solvedAt) - new Date(a.solvedAt))
       .slice(0, 3)
-      .map(s => ({
+      .map((s) => ({
         title: s.problemId?.title || "Untitled",
         category: s.problemId?.category || "-",
         difficulty: s.problemId?.difficulty || "-",
@@ -90,7 +93,7 @@ router.get("/dashboard", authenticate, async (req, res) => {
       .limit(10)
       .lean();
 
-    const leaderboard = topUsers.map(u => ({
+    const leaderboard = topUsers.map((u) => ({
       username: u.username,
       xp: u.xp,
       level: u.level,
@@ -104,7 +107,6 @@ router.get("/dashboard", authenticate, async (req, res) => {
     // Use stored quizStats from user
     const totalCorrect = user.quizStats?.correct || 0;
     const totalIncorrect = user.quizStats?.incorrect || 0;
-
 
     const response = {
       user: {
@@ -137,6 +139,65 @@ router.get("/dashboard", authenticate, async (req, res) => {
   } catch (err) {
     console.error("Dashboard error:", err);
     res.status(500).json({ error: "Failed to load dashboard" });
+  }
+});
+
+// GET /api/dashboard/solved-problems
+router.get("/solved-problems", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).lean();
+    const solved = user.solvedProblems || [];
+    const submissionIds = solved.map((s) => s.submissionId);
+
+    // Fetch submission details and populate problem info
+    const submissions = await Submission.find({ _id: { $in: submissionIds } })
+      .populate("problemId", "title category difficulty")
+      .sort({ submittedAt: -1 })
+      .lean();
+
+    const results = submissions.map((sub) => ({
+      title: sub.problemId?.title || "Unknown",
+      category: sub.problemId?.category || "-",
+      difficulty: sub.problemId?.difficulty || "-",
+      code: sub.code,
+      language: sub.language,
+      status: sub.status,
+      runtime: sub.runtime,
+      memory: sub.memory,
+      submittedAt: sub.submittedAt,
+    }));
+
+    res.json({ total: results.length, problems: results });
+  } catch (err) {
+    console.error("Solved problems error:", err);
+    res.status(500).json({ error: "Failed to load solved problems" });
+  }
+});
+
+// GET /api/dashboard/submissions/latest/:problemId
+router.get("/submissions/latest/:problemId", authenticate, async (req, res) => {
+  try {
+    const { problemId } = req.params;
+
+    const latestSubmission = await Submission.findOne({
+      userId: req.user._id,
+      problemId,
+    })
+      .sort({ submittedAt: -1 })
+      .lean();
+
+    if (!latestSubmission) {
+      return res.json({ code: "", language: "javascript" });
+    }
+
+    res.json({
+      code: latestSubmission.code,
+      language: latestSubmission.language,
+      status: latestSubmission.status,
+    });
+  } catch (err) {
+    console.error("Latest submission error:", err);
+    res.status(500).json({ error: "Failed to fetch latest submission" });
   }
 });
 

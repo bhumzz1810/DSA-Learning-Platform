@@ -1,20 +1,48 @@
+// server/config/passport.js
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
 const User = require("../models/User");
 
-// Helper to create or find user safely
-async function findOrCreateUser(query, userData, done) {
-  try {
-    let user = await User.findOne(query);
-    if (!user) {
-      user = await User.create(userData);
-    }
-    return done(null, user);
-  } catch (error) {
-    console.error("Error in findOrCreateUser:", error);
-    return done(error, null);
-  }
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser((id, done) =>
+  User.findById(id)
+    .lean()
+    .then((user) => done(null, user))
+    .catch((err) => done(err))
+);
+
+async function upsertFromProfile(provider, profile) {
+  // Normalize
+  const email =
+    profile.emails?.[0]?.value ||
+    profile._json?.email || // GitHub sometimes
+    null;
+
+  const username =
+    profile.displayName ||
+    profile.username ||
+    [profile.name?.givenName, profile.name?.familyName]
+      .filter(Boolean)
+      .join(" ") ||
+    (email ? email.split("@")[0] : `${provider}-${profile.id}`);
+
+  const filter = email
+    ? { $or: [{ [`${provider}Id`]: profile.id }, { email }] }
+    : { [`${provider}Id`]: profile.id };
+
+  const update = {
+    $setOnInsert: { role: "user", createdAt: new Date() },
+    $set: {
+      username,
+      email, // may be null; schema should allow sparse unique
+      [`${provider}Id`]: profile.id,
+      updatedAt: new Date(),
+    },
+  };
+
+  const options = { upsert: true, new: true };
+  return User.findOneAndUpdate(filter, update, options);
 }
 
 passport.use(
@@ -24,14 +52,13 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/callback",
     },
-    (accessToken, refreshToken, profile, done) => {
-      const query = { googleId: profile.id };
-      const userData = {
-        googleId: profile.id,
-        username: profile.displayName || `GoogleUser-${profile.id}`,
-        email: profile.emails?.[0]?.value || `google-${profile.id}@dsa.com`,
-      };
-      findOrCreateUser(query, userData, done);
+    async (_a, _r, profile, done) => {
+      try {
+        const user = await upsertFromProfile("google", profile);
+        done(null, user);
+      } catch (e) {
+        done(e);
+      }
     }
   )
 );
@@ -42,22 +69,17 @@ passport.use(
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
       callbackURL: "/auth/github/callback",
+      scope: ["user:email"],
     },
-    (accessToken, refreshToken, profile, done) => {
-      const query = { githubId: profile.id };
-      const userData = {
-        githubId: profile.id,
-        username: profile.username || `GitHubUser-${profile.id}`,
-        email: profile.emails?.[0]?.value || `github-${profile.id}@dsa.com`,
-      };
-      findOrCreateUser(query, userData, done);
+    async (_a, _r, profile, done) => {
+      try {
+        const user = await upsertFromProfile("github", profile);
+        done(null, user);
+      } catch (e) {
+        done(e);
+      }
     }
   )
 );
 
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) =>
-  User.findById(id)
-    .then((user) => done(null, user))
-    .catch((err) => done(err, null))
-);
+module.exports = passport;
