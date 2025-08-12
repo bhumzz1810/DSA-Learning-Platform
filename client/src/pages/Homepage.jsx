@@ -31,13 +31,24 @@ const Homepage = () => {
         </div>
       </div>
       <About />
-      <Features />
+      <section id="features">
+        <Features />
+      </section>
       <section id="pricing">
         <Pricing isYearly={isYearly} setIsYearly={setIsYearly} />
       </section>{" "}
-      <Testimonials />
-      <Newsletter />
-      <Contact />
+
+      <section id="testimonials">
+        <Testimonials />
+      </section>
+
+      <section id="newsletter">
+        <Newsletter />
+      </section>
+
+      <section id="contact">
+        <Contact />
+      </section>
       <Footer />
     </div>
   );

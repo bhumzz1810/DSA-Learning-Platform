@@ -497,9 +497,10 @@ const GlobalSpotlight = ({
     return null;
 };
 
-const BentoCardGrid = ({ children, gridRef }) => (
+const BentoCardGrid = ({ children, gridRef, id }) => (
     <div
-        className="bento-section bg-black grid gap-2 p-3 max-w-full select-none relative"
+        id={id}
+        className="bento-section bg-black grid gap-2 p-3 max-w-full select-none relative scroll-mt-24"
         style={{ fontSize: "clamp(2rem, 0.9rem + 0.5vw, 1.5rem)" }}
         ref={gridRef}
     >
@@ -681,7 +682,7 @@ const Features = ({
                 />
             )}
 
-            <BentoCardGrid gridRef={gridRef}>
+            <BentoCardGrid gridRef={gridRef} id="features">
                 <h3 className="text-white font-semibold text-center">Features</h3>
                 <p className="text-gray-300 text-sm text-center mb-6">
                     Explore our platform's unique features designed to enhance your coding journey.</p>
