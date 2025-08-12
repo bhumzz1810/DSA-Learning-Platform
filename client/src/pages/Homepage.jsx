@@ -9,6 +9,7 @@ import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import Newsletter from "../components/Newsletter";
 import About from "../components/About";
+import BackToTop from "../components/BackToTop";
 import { useLocation } from "react-router-dom";
 
 const Homepage = () => {
@@ -50,6 +51,7 @@ const Homepage = () => {
         <Contact />
       </section>
       <Footer />
+      <BackToTop />
     </div>
   );
 };
