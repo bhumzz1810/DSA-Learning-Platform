@@ -58,21 +58,20 @@ export default function ProblemDetail() {
   const [savingNote, setSavingNote] = useState(false);
   const navigate = useNavigate(); // inside your component
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
+  const API = `${API_ROOT}/api`;
 
   useEffect(() => {
     const fetchProblem = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/api/problems/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${API}/problems/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setProblem(res.data);
         setInput(res.data.testCases?.[0]?.input || "");
         setCode("// Write your solution here");
@@ -86,16 +85,11 @@ export default function ProblemDetail() {
     const fetchLastSubmission = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/api/submissions/latest/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${API}/submissions/latest/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (res.data.code) {
           setCode(res.data.code); // 👈 Set editor with last submitted code
         }
@@ -106,23 +100,17 @@ export default function ProblemDetail() {
 
     const checkBookmark = async () => {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/api/bookmarks`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.get(`${API}/bookmarks`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const ids = res.data.bookmarks.map((p) => p._id);
       setBookmarked(ids.includes(id));
     };
     const fetchNote = async () => {
       const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/api/notes/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.get(`${API}/notes/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (res.data.note) setNote(res.data.note.content);
     };
     fetchNote();
@@ -158,9 +146,7 @@ export default function ProblemDetail() {
       const wrappedCode = wrapUserCode(code);
 
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/api/judge/execute`,
+        `${API}/judge/execute`,
         {
           language_id: languageId,
           source_code: wrappedCode,
@@ -234,9 +220,7 @@ export default function ProblemDetail() {
       console.log("Using token:", token ? "exists" : "missing");
 
       const response = await axios.post(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/api/submissions`,
+        `${API}/submissions`,
         {
           problemId: id,
           code,
@@ -301,7 +285,7 @@ export default function ProblemDetail() {
 
         try {
           const res = await axios.post(
-            "http://localhost:5000//api/suggest",
+            `${API}/suggest`,
             {
               prompt: textUntilPosition,
             },
@@ -343,18 +327,13 @@ export default function ProblemDetail() {
     const token = localStorage.getItem("token");
     try {
       if (bookmarked) {
-        await axios.delete(
-          `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/api/bookmarks/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.delete(`${API}/bookmarks/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBookmarked(false);
       } else {
         await axios.post(
-          `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-          }/api/bookmarks/${id}`,
+          `${API}/bookmarks/${id}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -370,9 +349,7 @@ export default function ProblemDetail() {
     const token = localStorage.getItem("token");
     try {
       await axios.post(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:5000/api"
-        }/api/notes/${id}`,
+        `${API}/notes/${id}`,
         { content: note },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -383,6 +360,34 @@ export default function ProblemDetail() {
       setSavingNote(false);
     }
   };
+  const toEmbedUrl = (url = "") => {
+    if (!url) return "";
+    try {
+      const u = new URL(url);
+      // youtu.be/<id> -> youtube.com/embed/<id>
+      if (u.hostname.includes("youtu.be")) {
+        const id = u.pathname.slice(1);
+        return `https://www.youtube.com/embed/${id}`;
+      }
+      // youtube.com/watch?v=<id> -> youtube.com/embed/<id>
+      if (u.hostname.includes("youtube.com") && u.pathname === "/watch") {
+        const id = u.searchParams.get("v");
+        if (id) return `https://www.youtube.com/embed/${id}`;
+      }
+      // already /embed/
+      if (
+        u.hostname.includes("youtube.com") &&
+        u.pathname.startsWith("/embed/")
+      ) {
+        return url;
+      }
+      return url;
+    } catch {
+      return url;
+    }
+  };
+
+  const isImageUrl = (url = "") => /\.(gif|png|jpe?g|svg)$/i.test(url);
 
   if (loading)
     return <div className="p-10 text-center text-lg">Loading...</div>;
@@ -524,14 +529,31 @@ export default function ProblemDetail() {
                   )}
 
                   {activeTab === "video" && (
-                    <div className="h-80 w-full">
-                      <iframe
-                        src={problem.visualAid}
-                        title="Solution Video"
-                        frameBorder="0"
-                        allowFullScreen
-                        className="w-full h-full rounded"
-                      />
+                    <div className="w-full">
+                      {isImageUrl(problem.visualAid) ? (
+                        <img
+                          src={problem.visualAid}
+                          alt="Visual aid"
+                          className="w-full h-auto rounded shadow"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div
+                          className="relative w-full"
+                          style={{ paddingTop: "56.25%" }}
+                        >
+                          <iframe
+                            src={toEmbedUrl(problem.visualAid)}
+                            title="Solution Video"
+                            className="absolute left-0 top-0 h-full w-full rounded"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
+                            loading="lazy"
+                            referrerPolicy="strict-origin-when-cross-origin"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

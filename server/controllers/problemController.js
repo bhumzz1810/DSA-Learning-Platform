@@ -2,10 +2,18 @@ const Problem = require("../models/Problem");
 
 // Validation helper (basic example)
 const validateProblemData = (data) => {
-  if (!data.title || typeof data.title !== "string" || data.title.trim() === "") {
+  if (
+    !data.title ||
+    typeof data.title !== "string" ||
+    data.title.trim() === ""
+  ) {
     return "Title is required and must be a non-empty string.";
   }
-  if (!data.description || typeof data.description !== "string" || data.description.trim() === "") {
+  if (
+    !data.description ||
+    typeof data.description !== "string" ||
+    data.description.trim() === ""
+  ) {
     return "Description is required and must be a non-empty string.";
   }
   if (!["Easy", "Medium", "Hard"].includes(data.difficulty)) {
@@ -18,8 +26,10 @@ const validateProblemData = (data) => {
 exports.createProblem = async (req, res) => {
   try {
     const validationError = validateProblemData(req.body);
-    if (validationError) return res.status(400).json({ error: validationError });
-
+    if (validationError)
+      return res.status(400).json({ error: validationError });
+    // ensure authorId is present
+    if (!req.body.authorId) req.body.authorId = req.user?.id;
     const problem = new Problem(req.body);
     await problem.save();
     res.status(201).json(problem);
@@ -72,7 +82,8 @@ exports.updateProblem = async (req, res) => {
     }
 
     const validationError = validateProblemData(req.body);
-    if (validationError) return res.status(400).json({ error: validationError });
+    if (validationError)
+      return res.status(400).json({ error: validationError });
 
     const updated = await Problem.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -96,11 +107,12 @@ exports.deleteProblem = async (req, res) => {
       return res.status(400).json({ error: "Invalid problem ID format" });
     }
 
-    const problem = await Problem.findById(id);
-    if (!problem) return res.status(404).json({ error: "Problem not found" });
-
-    problem.isArchived = true;
-    await problem.save();
+    const updated = await Problem.findByIdAndUpdate(
+      id,
+      { $set: { isArchived: true } },
+      { new: true, runValidators: false } // ← skip validators for archive
+    );
+    if (!updated) return res.status(404).json({ error: "Problem not found" });
 
     res.status(200).json({ message: "Problem archived" });
   } catch (err) {
@@ -117,11 +129,12 @@ exports.restoreProblem = async (req, res) => {
       return res.status(400).json({ error: "Invalid problem ID format" });
     }
 
-    const problem = await Problem.findById(id);
-    if (!problem) return res.status(404).json({ error: "Problem not found" });
-
-    problem.isArchived = false;
-    await problem.save();
+    const updated = await Problem.findByIdAndUpdate(
+      id,
+      { $set: { isArchived: false } },
+      { new: true, runValidators: false }
+    );
+    if (!updated) return res.status(404).json({ error: "Problem not found" });
 
     res.status(200).json({ message: "Problem restored" });
   } catch (err) {

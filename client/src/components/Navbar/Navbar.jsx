@@ -61,7 +61,7 @@ const Navbar = () => {
     setIsLoggedIn(!!token);
 
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}api/auth/status`, {
+      fetch(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())

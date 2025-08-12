@@ -50,6 +50,9 @@ const userSchema = new mongoose.Schema({
   subscribed: { type: Boolean, default: false },
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now },
+  resetPasswordToken: { type: String },
+  resetPasswordExpires: { type: Date },
+  passwordChangedAt: { type: Date }, // optional but nice to have
 
   attemptedQuestionsCount: { type: Number, default: 0 },
   attemptedQuestionIds: { type: [String], default: [] },
@@ -138,5 +141,11 @@ userSchema.methods.updateBadges = async function () {
   this.badges = Array.from(badges);
   await this.save();
 };
+
+// near schema bottom, before module.exports
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true, sparse: true });
+userSchema.index({ role: 1, subscribed: 1 });
+userSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("User", userSchema);

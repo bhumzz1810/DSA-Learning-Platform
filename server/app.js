@@ -71,6 +71,9 @@ cron.schedule("0 0 * * *", () => {
 app.get("/", (req, res) => {
   res.send("DSA Platform API is running");
 });
+if (process.env.NODE_ENV !== "production") {
+  app.use("/api/dev", require("./routes/devMail"));
+}
 
 // Routes
 app.use("/api/auth", authRoutes);

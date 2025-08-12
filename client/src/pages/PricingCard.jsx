@@ -45,16 +45,18 @@ const Pricing = ({ isYearly, setIsYearly }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   const handleSubscribeClick = (plan) => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user) {
       toast.info("Please login to subscribe to premium features");
-      navigate("/login", { 
-        state: { 
+      navigate("/login", {
+        state: {
           from: "/pricing",
-          message: "You need to login to subscribe to our premium plans" 
-        } 
+          message: "You need to login to subscribe to our premium plans",
+        },
       });
       return;
     }
@@ -67,11 +69,11 @@ const Pricing = ({ isYearly, setIsYearly }) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     try {
-      const res = await fetch("/api/stripe/create-checkout-session", {
+      const res = await fetch(`${API_ROOT}/stripe/create-checkout-session`, {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           userId: user.id,
@@ -103,7 +105,10 @@ const Pricing = ({ isYearly, setIsYearly }) => {
   };
 
   return (
-    <section id="Pricing" className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg">
+    <section
+      id="Pricing"
+      className="bg-black py-20 px-6 text-white text-center backdrop-blur-lg"
+    >
       <h2 className="text-3xl text-white font-bold mb-2">Pricing</h2>
 
       <p className="mb-8 text-sm text-gray-400">

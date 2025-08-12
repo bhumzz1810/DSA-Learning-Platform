@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
 import alertSound from "../../public/music/warning.mp3";
 import { toast } from "react-toastify";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
 const LoginForm = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -19,6 +20,8 @@ const LoginForm = () => {
   const audioRef = useRef(null);
   const navigate = useNavigate();
   const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const REST = API.replace(/\/+$/, ""); // normalize
+  const [showForgot, setShowForgot] = useState(false);
   useEffect(() => {
     audioRef.current = new Audio(alertSound);
     audioRef.current.volume = 0.3;
@@ -69,9 +72,9 @@ const LoginForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const apiUrl = `${REST}/api/auth`;
     try {
-      const endpoint = showLogin ? "api/auth/login" : "api/auth/register";
+      const endpoint = showLogin ? "login" : "register";
       const payload = showLogin
         ? { email, password }
         : { email, username: email.split("@")[0], password };
@@ -242,11 +245,16 @@ const LoginForm = () => {
                   </button>
                 </div>
               )}
+
               {showLogin && (
                 <div className="forgot-pass">
-                  <a href="#" tabIndex="0">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgot(true)}
+                    className="text-blue-600 hover:underline"
+                  >
                     Forgot your password?
-                  </a>
+                  </button>
                 </div>
               )}
               <button type="submit" className="btn">
@@ -267,6 +275,12 @@ const LoginForm = () => {
                 </a>
               </div>
             </form>
+
+            <ForgotPasswordModal
+              open={showForgot}
+              onClose={() => setShowForgot(false)}
+              apiBase={REST}
+            />
             <hr className="my-6 border-t border-gray-300 w-full" />
 
             <div className="mt-6 w-full flex flex-col items-center">
@@ -274,7 +288,7 @@ const LoginForm = () => {
 
               <div className="flex flex-col w-full gap-3 max-w-xs">
                 <a
-                  href={`${API}auth/google`}
+                  href={`${REST}/auth/google`}
                   className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition duration-200"
                 >
                   <img
@@ -286,7 +300,7 @@ const LoginForm = () => {
                 </a>
 
                 <a
-                  href={`${API}auth/github`}
+                  href={`${REST}/auth/github`}
                   className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-800 text-white text-sm font-medium rounded-md hover:bg-gray-900 transition duration-200"
                 >
                   <img

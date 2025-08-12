@@ -15,33 +15,32 @@ const checkSubscription = async (req, res, next) => {
       return res.status(403).json({ error: "Subscription required" });
     }
 
-    // Prefer stored currentPeriodEnd when valid; otherwise compute
-    let endDate = subscription.currentPeriodEnd
-      ? new Date(subscription.currentPeriodEnd)
-      : null;
-
-    if (!endDate || Number.isNaN(endDate.getTime())) {
-      const startDate = new Date(subscription.currentPeriodStart);
-      if (Number.isNaN(startDate.getTime())) {
-        return res.status(403).json({ error: "Subscription expired" });
-      }
-
-      if (subscription.planName === "monthly") {
-        startDate.setMonth(startDate.getMonth() + 1);
-      } else if (
-        subscription.planName === "yearly" ||
-        subscription.planName === "annual"
-      ) {
-        startDate.setFullYear(startDate.getFullYear() + 1);
-      }
-      endDate = startDate;
+    // Always base endDate on currentPeriodStart
+    const startDate = new Date(subscription.currentPeriodStart);
+    if (Number.isNaN(startDate.getTime())) {
+      return res.status(403).json({ error: "Subscription expired" });
     }
 
+    let endDate;
+    if (subscription.planName === "monthly") {
+      endDate = new Date(startDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+    } else if (
+      subscription.planName === "yearly" ||
+      subscription.planName === "annual"
+    ) {
+      endDate = new Date(startDate);
+      endDate.setFullYear(endDate.getFullYear() + 1);
+    } else {
+      // fallback if unknown plan
+      endDate = new Date(startDate);
+    }
+
+    // Expiry check
     if (endDate <= new Date()) {
       return res.status(403).json({ error: "Subscription expired" });
     }
 
-    // Optional: expose for downstream handlers
     req.subscription = {
       planName: subscription.planName,
       currentPeriodEnd: endDate,

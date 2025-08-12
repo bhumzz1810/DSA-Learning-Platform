@@ -50,7 +50,8 @@ const problemSchema = new mongoose.Schema({
   hints: {
     type: [String],
     validate: {
-      validator: (arr) => arr.every((h) => typeof h === "string" && h.trim() !== ""),
+      validator: (arr) =>
+        arr.every((h) => typeof h === "string" && h.trim() !== ""),
       message: "Hints must be non-empty strings",
     },
     default: [],
@@ -64,10 +65,14 @@ const problemSchema = new mongoose.Schema({
     trim: true,
     validate: {
       validator: function (v) {
-        // Optional URL validation regex
-        return !v || /^https?:\/\/.+\.(gif|png|jpg|jpeg|svg)$/i.test(v);
+        if (!v) return true; // allow empty
+        const imageRegex = /^https?:\/\/.+\.(gif|png|jpg|jpeg|svg)$/i;
+        const youtubeRegex =
+          /^https?:\/\/(www\.)?(youtube\.com|youtu\.be)\/.+$/i;
+        return imageRegex.test(v) || youtubeRegex.test(v);
       },
-      message: (props) => `${props.value} is not a valid URL to an image/gif`,
+      message: (props) =>
+        `${props.value} must be a valid image (.gif/.png/.jpg/.jpeg/.svg) or YouTube URL`,
     },
   },
   authorId: {
@@ -95,5 +100,7 @@ const problemSchema = new mongoose.Schema({
 problemSchema.index({ category: 1 });
 problemSchema.index({ difficulty: 1 });
 problemSchema.index({ isDaily: 1, isArchived: 1 });
+problemSchema.index({ title: "text", category: "text" }); // speeds up q= search
+problemSchema.index({ difficulty: 1, isArchived: 1 });
 
 module.exports = mongoose.model("Problem", problemSchema);

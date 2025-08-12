@@ -25,6 +25,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
 import UserAuthRoute from "./components/UserAuthRoute";
+import ResetPassword from "./pages/ResetPassword";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -51,6 +52,7 @@ function App() {
         <LayoutWrapper>
           <Routes>
             {/* PUBLIC ROUTES */}
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route
               path="/"
               element={
@@ -75,7 +77,6 @@ function App() {
                 </UserAuthRoute>
               }
             />
-
             {/* PRIVATE ROUTES */}
             <Route
               path="/problems"
@@ -181,7 +182,6 @@ function App() {
                 </UserAuthRoute>
               }
             />
-
             {/* ADMIN ROUTES */}
             <Route
               path="/admin/add-problem"

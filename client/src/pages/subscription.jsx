@@ -6,11 +6,13 @@ const user = JSON.parse(localStorage.getItem("user"));
 const SubscriptionPage = () => {
   const location = useLocation();
   const billing = location.state?.billing || "monthly"; // fallback to monthly
-
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   const handleSubscribe = async () => {
     console.log("User for subscription:", user, "Billing:", billing);
 
-    const res = await fetch("/api/stripe/create-checkout-session", {
+    const res = await fetch(`${API_ROOT}/stripe/create-checkout-session`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -42,6 +44,6 @@ const SubscriptionPage = () => {
       </button>
     </div>
   );
-}
+};
 
 export default SubscriptionPage;
