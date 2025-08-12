@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo/dsalogoicon.svg";
-import warning from "@/assets/music/warning.mp3";
+import alertSound from "@/assets/music/warning.mp3";
 import { toast } from "react-toastify";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
 
