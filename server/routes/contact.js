@@ -13,18 +13,28 @@ router.post("/", async (req, res) => {
       website = "",
     } = req.body || {};
 
-    // Honeypot: if a bot fills this hidden field, drop silently
-    if (website) return res.json({ ok: true });
+    if (website) return res.json({ ok: true }); // honeypot
 
-    if (name.trim().length < 2) throw new Error("Name is too short");
-    if (!isEmail(email)) throw new Error("Invalid email");
-    if (message.trim().length < 10) throw new Error("Message is too short");
+    if (name.trim().length < 2)
+      return res.status(400).json({ ok: false, message: "Name too short" });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return res.status(400).json({ ok: false, message: "Invalid email" });
+    if (message.trim().length < 10)
+      return res.status(400).json({ ok: false, message: "Message too short" });
 
-    // Notify you
+    // DEBUG: log that we reached send
+    console.log("Contact payload OK:", {
+      name,
+      email,
+      messageLen: message.length,
+    });
+
+    // Send to you
     const toAdmin =
       process.env.SUPPORT_EMAIL ||
       process.env.FROM_EMAIL ||
       "onboarding@resend.dev";
+
     await sendMail({
       to: toAdmin,
       subject: `New contact: ${name}`,
@@ -36,7 +46,7 @@ router.post("/", async (req, res) => {
       )}</p>`,
     });
 
-    // Optional: auto-ack to the user
+    // Ack to user
     await sendMail({
       to: email,
       subject: "Thanks — we got your message",
@@ -44,10 +54,14 @@ router.post("/", async (req, res) => {
       html: `<p>Hi ${name},</p><p>Thanks for contacting us! We'll get back to you soon.</p><p>— Team</p>`,
     });
 
-    res.json({ ok: true, message: "Thanks! We’ll get back to you shortly." });
+    return res.json({
+      ok: true,
+      message: "Thanks! We’ll get back to you shortly.",
+    });
   } catch (e) {
-    console.error("contact error:", e.message);
-    res.status(400).json({ ok: false, message: "Invalid input" });
+    console.error("Contact send failed:", e?.message || e);
+    // Return distinct message so we know it's the send step
+    return res.status(500).json({ ok: false, message: "Email send failed" });
   }
 });
 
