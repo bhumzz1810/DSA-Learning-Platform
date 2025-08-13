@@ -18,7 +18,7 @@ export default function BillingSuccess() {
     const verifySession = async () => {
       try {
         await fetch(
-          `${API}/stripe/session?id=${encodeURIComponent(sessionId)}`,
+          `${API}/api/stripe/session?id=${encodeURIComponent(sessionId)}`,
           {
             headers: { Authorization: token ? `Bearer ${token}` : "" },
           }
@@ -34,7 +34,7 @@ export default function BillingSuccess() {
       const deadline = Date.now() + 30_000; // 30s max
       while (Date.now() < deadline) {
         try {
-          const res = await fetch(`${API}/auth/status`, {
+          const res = await fetch(`${API}/api/auth/status`, {
             headers: { Authorization: token ? `Bearer ${token}` : "" },
           });
           const data = await res.json();
