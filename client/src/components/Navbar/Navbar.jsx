@@ -18,7 +18,7 @@ const Navbar = () => {
     ocean: logoHome,
     forest: logoHome,
   };
-  const logoSrc = isHome ? logoHome : (logoByTheme[theme] || logoIcon);
+  const logoSrc = isHome ? logoHome : logoByTheme[theme] || logoIcon;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -68,12 +68,9 @@ const Navbar = () => {
     },
   };
 
-<<<<<<< HEAD
-  const currentTheme = themeStyles[theme] || themeStyles.light;
   const API_ROOT = (
     import.meta.env.VITE_API_URL || "http://localhost:5000"
   ).replace(/\/+$/, "");
-=======
   // Plain Home
   const homeStyles = {
     bg: "bg-transparent",
@@ -86,9 +83,8 @@ const Navbar = () => {
     shell: "absolute top-0 left-0 right-0",
   };
 
-  const current = isHome ? homeStyles : (themeStyles[theme] || themeStyles.light);
+  const current = isHome ? homeStyles : themeStyles[theme] || themeStyles.light;
   const ctaTextColor = isHome ? "text-black" : "text-white";
->>>>>>> 9707b0856aefa555f20240b560a9fbd363035824
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -137,15 +133,24 @@ const Navbar = () => {
 
         <div className="flex items-center gap-5">
           <ul className="flex gap-6 list-none m-0 p-0 text-sm font-medium">
-            <li className={`${current.hover} cursor-pointer`} onClick={() => navigate("/")}>
+            <li
+              className={`${current.hover} cursor-pointer`}
+              onClick={() => navigate("/")}
+            >
               Home
             </li>
             {isLoggedIn && (
-              <li className={`${current.hover} cursor-pointer`} onClick={() => navigate("/dashboard")}>
+              <li
+                className={`${current.hover} cursor-pointer`}
+                onClick={() => navigate("/dashboard")}
+              >
                 Dashboard
               </li>
             )}
-            <li className={`${current.hover} cursor-pointer`} onClick={() => navigate("/problems")}>
+            <li
+              className={`${current.hover} cursor-pointer`}
+              onClick={() => navigate("/problems")}
+            >
               Problems
             </li>
             {isLoggedIn && (
@@ -155,8 +160,9 @@ const Navbar = () => {
                     ? navigate("/join-room")
                     : navigate("/", { state: { scrollToPricing: true } })
                 }
-                className={`cursor-pointer ${isSubscribed ? current.hover : "text-gray-400"
-                  }`}
+                className={`cursor-pointer ${
+                  isSubscribed ? current.hover : "text-gray-400"
+                }`}
                 title={
                   isSubscribed
                     ? "Access collaborative editor"
@@ -168,7 +174,9 @@ const Navbar = () => {
             )}
           </ul>
 
-          {isLoggedIn && <FiBell className={`text-lg cursor-pointer ${current.icon}`} />}
+          {isLoggedIn && (
+            <FiBell className={`text-lg cursor-pointer ${current.icon}`} />
+          )}
 
           {isLoggedIn ? (
             <div className="relative dropdown-container">
@@ -179,14 +187,25 @@ const Navbar = () => {
                 onClick={() => setShowDropdown((s) => !s)}
               />
               {showDropdown && (
-                <div className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg border z-50 ${current.dropdown}`}>
-                  <button className="block w-full text-left px-4 py-2 text-sm hover:bg-white/10" onClick={() => navigate("/profile")}>
+                <div
+                  className={`absolute right-0 mt-2 w-44 rounded-md shadow-lg border z-50 ${current.dropdown}`}
+                >
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-white/10"
+                    onClick={() => navigate("/profile")}
+                  >
                     Profile
                   </button>
-                  <button className="block w-full text-left px-4 py-2 text-sm hover:bg-white/10" onClick={() => navigate("/settings")}>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-white/10"
+                    onClick={() => navigate("/settings")}
+                  >
                     Settings
                   </button>
-                  <button className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/10" onClick={handleLogout}>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/10"
+                    onClick={handleLogout}
+                  >
                     Logout
                   </button>
                 </div>
