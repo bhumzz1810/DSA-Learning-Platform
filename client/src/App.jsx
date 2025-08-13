@@ -27,6 +27,8 @@ import "./index.css";
 import UserAuthRoute from "./components/UserAuthRoute";
 import ResetPassword from "./pages/ResetPassword";
 import BillingSuccess from "./pages/BillingSuccess";
+import NewsletterUnsubscribed from "./pages/NewsletterUnsubscribed";
+import NewsletterConfirmed from "./pages/NewsletterConfirmed";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -57,11 +59,11 @@ function App() {
             // Add somewhere in your router:
             <Route
               path="/newsletter/confirmed"
-              element={<div className="p-8">🎉 You’re subscribed!</div>}
+              element={<NewsletterConfirmed />}
             />
             <Route
               path="/newsletter/unsubscribed"
-              element={<div className="p-8">You’ve been unsubscribed.</div>}
+              element={<NewsletterUnsubscribed />}
             />
             <Route
               path="/"
