@@ -10,7 +10,8 @@ const Leaderboard = () => {
   const [error, setError] = useState(null);
   const { theme, toggleTheme } = useTheme();
   const API_ROOT = (
-    import.meta.env.VITE_API_URL || "http://localhost:5000"
+    import.meta.env.VITE_API_URL ||
+    "https://dsa-learning-platform-five.vercel.app"
   ).replace(/\/+$/, "");
   const themeConfig = {
     light: {

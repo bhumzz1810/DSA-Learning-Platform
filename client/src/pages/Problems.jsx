@@ -105,7 +105,8 @@ export default function Problems() {
         }
         const res = await axios.get(
           `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+            import.meta.env.VITE_API_URL ||
+            "https://dsa-learning-platform-five.vercel.app/api"
           }/api/problems`,
           {
             headers: {
@@ -127,7 +128,8 @@ export default function Problems() {
       try {
         const res = await axios.get(
           `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+            import.meta.env.VITE_API_URL ||
+            "https://dsa-learning-platform-five.vercel.app/api"
           }/api/bookmarks`,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -177,7 +179,8 @@ export default function Problems() {
       if (bookmarkedIds.includes(problemId)) {
         await axios.delete(
           `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+            import.meta.env.VITE_API_URL ||
+            "https://dsa-learning-platform-five.vercel.app/api"
           }/api/bookmarks/${problemId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -185,7 +188,8 @@ export default function Problems() {
       } else {
         await axios.post(
           `${
-            import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+            import.meta.env.VITE_API_URL ||
+            "https://dsa-learning-platform-five.vercel.app/api"
           }/api/bookmarks/${problemId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }

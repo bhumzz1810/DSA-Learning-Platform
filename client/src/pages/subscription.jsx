@@ -7,7 +7,8 @@ const SubscriptionPage = () => {
   const location = useLocation();
   const billing = location.state?.billing || "monthly"; // fallback to monthly
   const API_ROOT = (
-    import.meta.env.VITE_API_URL || "http://localhost:5000"
+    import.meta.env.VITE_API_URL ||
+    "https://dsa-learning-platform-five.vercel.app"
   ).replace(/\/+$/, "");
   const handleSubscribe = async () => {
     console.log("User for subscription:", user, "Billing:", billing);

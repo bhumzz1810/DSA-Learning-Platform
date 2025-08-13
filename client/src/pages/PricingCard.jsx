@@ -46,7 +46,8 @@ const Pricing = ({ isYearly, setIsYearly }) => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const API_ROOT = (
-    import.meta.env.VITE_API_URL || "http://localhost:5000"
+    import.meta.env.VITE_API_URL ||
+    "https://dsa-learning-platform-five.vercel.app"
   ).replace(/\/+$/, "");
   const handleSubscribeClick = (plan) => {
     const user = JSON.parse(localStorage.getItem("user"));

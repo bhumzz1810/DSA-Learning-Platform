@@ -8,7 +8,9 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API =
+    import.meta.env.VITE_API_URL ||
+    "https://dsa-learning-platform-five.vercel.app";
   const REST = API.replace(/\/+$/, "");
 
   // Robust token parsing for HashRouter
