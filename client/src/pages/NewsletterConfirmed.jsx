@@ -1,11 +1,22 @@
-// src/pages/NewsletterConfirmed.jsx
-export default function NewsletterConfirmed() {
-  return (
-    <div className="min-h-[40vh] flex items-center justify-center p-8 text-center text-white bg-black">
-      <div>
-        <h1 className="text-2xl font-semibold mb-2">🎉 You’re subscribed!</h1>
-        <p className="text-gray-300">Thanks for confirming your email.</p>
-      </div>
-    </div>
-  );
+// src/pages/NewsletterConfirm.jsx
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+
+const RAW = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(
+  /\/+$/,
+  ""
+);
+const API = RAW.endsWith("/api") ? RAW : `${RAW}/api`;
+
+export default function NewsletterConfirm() {
+  const { search } = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = new URLSearchParams(search).get("token");
+    if (!token) return;
+    fetch(`${API}/newsletter/confirm?token=${encodeURIComponent(token)}`)
+      .then(() => navigate("/newsletter/confirmed", { replace: true }))
+      .catch(() => navigate("/newsletter/unsubscribed", { replace: true }));
+  }, [search, navigate]);
+  return <div className="p-8 text-white">Confirming your subscription…</div>;
 }
