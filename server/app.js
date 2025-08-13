@@ -38,7 +38,7 @@ app.use("/api/stripe", require("./routes/webhook")); // router should use expres
 
 // --- CORS ---
 const allowedOrigins = [
-  process.env.CLIENT_URL || "https://dsa-learning-platform-five.vercel.app/", // Vercel in prod; Vite in dev
+  process.env.CLIENT_URL || "http://localhost:5173", // Vercel in prod; Vite in dev
 ];
 app.use(
   cors({
@@ -119,6 +119,7 @@ app.use("/api", require("./routes/dailyChallenge"));
 app.use("/api/stripe", require("./routes/stripe.js"));
 app.use("/api/quiz", require("./routes/quizRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/contact", require("./routes/contact"));
 
 // --- Socket.IO (make sure socketHandler CORS matches CLIENT_URL) ---
 setupSocketServer(server);

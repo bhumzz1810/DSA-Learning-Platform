@@ -31,7 +31,9 @@ const Homepage = () => {
         </div>
       </div>
       <About />
-      <Features />
+      <section id="features">
+        <Features />
+      </section>
       <section id="pricing">
         <Pricing isYearly={isYearly} setIsYearly={setIsYearly} />
       </section>{" "}

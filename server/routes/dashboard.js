@@ -86,10 +86,10 @@ router.get("/dashboard", authenticate, async (req, res) => {
       };
     }
 
-    // Leaderboard users - top 10 by XP
+    // Top 10 with tie-breaker
     const topUsers = await User.find({})
-      .select("username xp level solvedProblems")
-      .sort({ xp: -1 })
+      .select("username xp level solvedProblems _id")
+      .sort({ xp: -1, _id: 1 })
       .limit(10)
       .lean();
 
@@ -101,7 +101,13 @@ router.get("/dashboard", authenticate, async (req, res) => {
     }));
 
     // Get current user's rank (1-based)
-    const yourRank = (await User.countDocuments({ xp: { $gt: user.xp } })) + 1;
+    const yourRank =
+      (await User.countDocuments({
+        $or: [
+          { xp: { $gt: user.xp } },
+          { xp: user.xp, _id: { $lt: user._id } },
+        ],
+      })) + 1;
 
     // Calculate total quiz stats from quizAttempts
     // Use stored quizStats from user

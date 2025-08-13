@@ -13,10 +13,12 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: "https://dsa-learning-platform-316y.onrender.com",
+        // target: "http://localhost:5000",
         changeOrigin: true,
       },
       "/socket.io": {
         target: "https://dsa-learning-platform-316y.onrender.com",
+        // target: "http://localhost:5000",
         ws: true,
         changeOrigin: true,
       },
