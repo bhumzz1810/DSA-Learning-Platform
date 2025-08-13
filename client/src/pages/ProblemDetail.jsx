@@ -4,6 +4,7 @@ import Editor from "@monaco-editor/react";
 import axios from "axios";
 import { FiMaximize, FiMinimize } from "react-icons/fi";
 import { toast } from "react-toastify";
+import ProblemDetailSkeleton from "../components/skeletons/ProblemDetailSkeleton";
 
 const wrapUserCode = (userCode) => {
   return `
@@ -64,64 +65,68 @@ export default function ProblemDetail() {
   const API = `${API_ROOT}/api`;
 
   useEffect(() => {
+    let cancelled = false;
+    setLoading(true); // page-level loading
     const token = localStorage.getItem("token");
     const isAuthed = !!token;
 
-    const fetchProblem = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API}/problems/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    const pProblem = axios
+      .get(`${API}/problems/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+      .then((res) => {
+        if (cancelled) return;
         setProblem(res.data);
         setInput(res.data.testCases?.[0]?.input || "");
         setCode("// Write your solution here");
-      } catch (err) {
+      })
+      .catch(() => {
+        if (cancelled) return;
         setError("Problem not found");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchLastSubmission = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API}/submissions/latest/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (res.data.code) {
-          setCode(res.data.code); // 👈 Set editor with last submitted code
-        }
-      } catch (err) {
-        console.error("Failed to load last submission:", err);
-      }
-    };
-
-    const checkBookmark = async () => {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${API}/bookmarks`, {
-        headers: { Authorization: `Bearer ${token}` },
       });
-      const ids = res.data.bookmarks.map((p) => p._id);
-      setBookmarked(ids.includes(id));
+
+    // 2) Private calls (only if authed). Each is self-contained and non-fatal.
+    const pPrivate = isAuthed
+      ? Promise.allSettled([
+          axios
+            .get(`${API}/submissions/latest/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+              if (!cancelled && res.data?.code) setCode(res.data.code);
+            })
+            .catch(() => {}),
+
+          axios
+            .get(`${API}/bookmarks`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+              if (cancelled) return;
+              const ids = (res.data?.bookmarks || []).map((p) => p._id);
+              setBookmarked(ids.includes(id));
+            })
+            .catch(() => {}),
+
+          axios
+            .get(`${API}/notes/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((res) => {
+              if (!cancelled && res.data?.note) setNote(res.data.note.content);
+            })
+            .catch(() => {}),
+        ])
+      : Promise.resolve();
+
+    // 3) Only hide skeleton when everything (that matters) has settled
+    Promise.allSettled([pProblem, pPrivate]).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
     };
-    const fetchNote = async () => {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(`${API}/notes/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.data.note) setNote(res.data.note.content);
-    };
-    -fetchProblem();
-    if (isAuthed) {
-      fetchNote();
-      checkBookmark();
-      fetchLastSubmission();
-    }
   }, [id]);
 
   useEffect(() => {
@@ -403,8 +408,7 @@ export default function ProblemDetail() {
 
   const isImageUrl = (url = "") => /\.(gif|png|jpe?g|svg)$/i.test(url);
 
-  if (loading)
-    return <div className="p-10 text-center text-lg">Loading...</div>;
+  if (loading) return <ProblemDetailSkeleton />;
 
   if (error || !problem) {
     return (

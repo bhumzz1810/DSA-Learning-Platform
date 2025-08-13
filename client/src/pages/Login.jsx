@@ -111,7 +111,7 @@ const LoginForm = () => {
         if (role === "admin") {
           navigate("/admin/problems");
         } else {
-          navigate("/dashboard");
+          navigate("/");
         }
       }, 1500); // enough time to show the popup
     } catch (err) {

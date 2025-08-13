@@ -24,6 +24,91 @@ import {
   Brain,
 } from "lucide-react";
 
+function ProfileSkeleton({ themeClass = "dark" }) {
+  const palette = {
+    light: { bg: "bg-gray-50", tile: "bg-gray-200", border: "border-gray-200" },
+    dark: { bg: "bg-gray-900", tile: "bg-white/10", border: "border-white/10" },
+    ocean: {
+      bg: "bg-blue-900",
+      tile: "bg-white/10",
+      border: "border-white/10",
+    },
+    forest: {
+      bg: "bg-green-900",
+      tile: "bg-white/10",
+      border: "border-white/10",
+    },
+  }[themeClass] || {
+    bg: "bg-gray-900",
+    tile: "bg-white/10",
+    border: "border-white/10",
+  };
+
+  return (
+    <div
+      className={`min-h-screen ${palette.bg} px-6 md:px-16 py-10 animate-pulse`}
+    >
+      {/* Header */}
+      <div className="flex justify-between items-center mb-10">
+        <div className={`h-8 w-48 ${palette.tile} rounded`} />
+        <div className={`h-9 w-40 ${palette.tile} rounded-full`} />
+      </div>
+
+      {/* Profile card */}
+      <div
+        className={`rounded-2xl border ${palette.border} ${palette.tile} bg-opacity-20 p-6 mb-10`}
+      >
+        <div className="flex items-center gap-6">
+          <div className={`w-20 h-20 rounded-full ${palette.tile}`} />
+          <div className="flex-1">
+            <div className={`h-6 w-48 ${palette.tile} rounded mb-3`} />
+            <div className="flex gap-4">
+              <div className={`h-5 w-20 ${palette.tile} rounded`} />
+              <div className={`h-5 w-24 ${palette.tile} rounded`} />
+              <div className={`h-5 w-28 ${palette.tile} rounded`} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Two-column grid */}
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Left column */}
+        <div className="space-y-6">
+          <div
+            className={`rounded-2xl border ${palette.border} ${palette.tile} bg-opacity-20 p-6`}
+          >
+            <div className={`h-6 w-40 ${palette.tile} rounded mb-4`} />
+            <div className={`h-3 w-full ${palette.tile} rounded mb-2`} />
+            <div className={`h-3 w-4/5 ${palette.tile} rounded mb-2`} />
+            <div className={`h-3 w-3/5 ${palette.tile} rounded mb-4`} />
+            <div className={`h-10 w-40 ${palette.tile} rounded`} />
+          </div>
+
+          <div
+            className={`rounded-2xl border ${palette.border} ${palette.tile} bg-opacity-20 p-6`}
+          >
+            <div className={`h-6 w-48 ${palette.tile} rounded mb-4`} />
+            <div className={`h-48 w-full ${palette.tile} rounded`} />
+          </div>
+        </div>
+
+        {/* Right column */}
+        <div
+          className={`rounded-2xl border ${palette.border} ${palette.tile} bg-opacity-20 p-6`}
+        >
+          <div className={`h-6 w-40 ${palette.tile} rounded mb-6`} />
+          <div className="grid grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className={`h-24 rounded-xl ${palette.tile}`} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const Profilepage = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,6 +129,10 @@ const Profilepage = () => {
   const currentTheme = themeConfig[theme] || themeConfig.dark;
 
   useEffect(() => {
+    let cancelled = false;
+    const started = Date.now();
+    const MIN_MS = 300;
+
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -60,20 +149,26 @@ const Profilepage = () => {
           localStorage.removeItem("token");
           return navigate("/login");
         }
-
         if (!res.ok) throw new Error("Failed to fetch dashboard");
 
         const data = await res.json();
-        setDashboardData(data);
+        if (!cancelled) setDashboardData(data);
       } catch (err) {
-        setError(err.message);
+        if (!cancelled) setError(err.message);
       } finally {
-        setLoading(false);
+        const elapsed = Date.now() - started;
+        const wait = Math.max(0, MIN_MS - elapsed);
+        setTimeout(() => {
+          if (!cancelled) setLoading(false);
+        }, wait);
       }
     };
 
     fetchDashboardData();
-  }, [navigate]);
+    return () => {
+      cancelled = true;
+    };
+  }, [navigate, API_ROOT]);
 
   const badgeIcons = [
     <Trophy className="w-8 h-8 text-yellow-400" />,
@@ -91,12 +186,8 @@ const Profilepage = () => {
 
   const handleContinueLearning = () => navigate("/problems");
 
-  if (loading)
-    return (
-      <div className={`min-h-screen ${currentTheme.bg} text-white p-10`}>
-        Loading...
-      </div>
-    );
+  if (loading) return <ProfileSkeleton themeClass={theme} />;
+
   if (error)
     return (
       <div className={`min-h-screen ${currentTheme.bg} text-red-400 p-10`}>

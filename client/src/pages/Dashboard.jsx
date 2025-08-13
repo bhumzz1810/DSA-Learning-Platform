@@ -16,6 +16,7 @@ import {
   ThumbsUp,
   Brain,
 } from "lucide-react";
+import DashboardSkeleton from "../components/skeletons/DashboardSkeleton";
 
 // Animation variants
 const cardVariants = {
@@ -79,7 +80,7 @@ const problemVariants = {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({ user: null });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [flipped, setFlipped] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -189,6 +190,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
+    setLoadingDaily(true);
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -264,18 +267,8 @@ const Dashboard = () => {
     fetchDailyChallenge();
   }, []);
 
-  if (loading) {
-    return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}
-      >
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
-          className="w-14 h-14 border-4 border-t-transparent border-indigo-400 rounded-full shadow-lg"
-        />
-      </div>
-    );
+  if (loading || loadingDaily) {
+    return <DashboardSkeleton />;
   }
 
   if (error) {
