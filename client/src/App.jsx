@@ -97,7 +97,7 @@ function App() {
             />
 
             <Route path="/billing/success" element={<BillingSuccess />} />
-            <Route path="/billing/cancel" element={<BillingCancel />} />
+            {/* <Route path="/billing/cancel" element={<BillingCancel />} /> */}
             <Route
               path="/dashboard"
               element={
