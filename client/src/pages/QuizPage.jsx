@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import api from "@/lib/api";
+import { API_ROOT } from "@/lib/api";
 const FREE_LIMIT = 20; // central limit
 
 const QuizPage = () => {
@@ -61,12 +62,9 @@ const QuizPage = () => {
     else setIsFetchingNext(true);
 
     try {
-      const res = await axios.get(
-        `/api/quiz/question/random?cb=${Date.now()}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await api.get(`/quiz/question/random`, {
+        params: { cb: Date.now() },
+      });
 
       if (res.data.limitReached) {
         setShowModal(true);
@@ -156,11 +154,10 @@ const QuizPage = () => {
     const answerToSend = autoSubmit ? "__NO_ANSWER__" : selected;
 
     try {
-      const res = await axios.post(
-        "/api/quiz/submit",
-        { questionId: question._id, selectedOption: answerToSend },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post("/quiz/submit", {
+        questionId: question._id,
+        selectedOption: answerToSend,
+      });
 
       const isCorrect = !autoSubmit && res.data.correct;
       setFeedback(
