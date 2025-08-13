@@ -86,7 +86,7 @@ node seedProblems.js<br>
 | Role                   | Name                    |
 |------------------------|-------------------------|
 | Full Stack Developer   | Bhumil Parate           |
-| Frontend Developer     | Vasim Ahmed Choudhary   |
+| Full Stack Developer   | Vasim Ahmed Choudhary   |
 | UI/UX Designer         | Alshifan                |
 
 
