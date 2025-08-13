@@ -81,7 +81,7 @@ function App() {
             <Route
               path="/problems"
               element={
-                <UserAuthRoute type="private">
+                <UserAuthRoute type="public">
                   <Problems />
                 </UserAuthRoute>
               }
@@ -89,7 +89,7 @@ function App() {
             <Route
               path="/problems/:id"
               element={
-                <UserAuthRoute type="private">
+                <UserAuthRoute type="public">
                   <ProblemDetail />
                 </UserAuthRoute>
               }

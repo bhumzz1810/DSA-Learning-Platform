@@ -70,13 +70,8 @@ router.get("/admin", authenticate, requireAdmin, async (req, res, next) => {
 });
 
 // ✅ Anyone logged in can fetch problems
-router.get("/", authenticate, problemController.getAllProblems);
-router.get(
-  "/:id",
-  authenticate,
-  validateObjectId,
-  problemController.getProblemById
-);
+router.get("/", problemController.getAllProblems);
+router.get("/:id", validateObjectId, problemController.getProblemById);
 
 // ✅ Admin-only routes
 router.post("/", authenticate, requireAdmin, problemController.createProblem);

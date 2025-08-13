@@ -325,6 +325,10 @@ export default function ProblemDetail() {
 
   const toggleBookmark = async () => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     try {
       if (bookmarked) {
         await axios.delete(`${API}/bookmarks/${id}`, {
@@ -345,8 +349,13 @@ export default function ProblemDetail() {
   };
 
   const saveNote = async () => {
-    setSavingNote(true);
     const token = localStorage.getItem("token");
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    setSavingNote(true);
     try {
       await axios.post(
         `${API}/notes/${id}`,
