@@ -22,7 +22,6 @@ const plans = [
     features: [
       { text: "Daily Challenges", icon: <FaRocket /> },
       { text: "Basic Problems", icon: <FaCode /> },
-      { text: "Pair Coding", icon: <FaUserFriends /> },
       { text: "Limited Progress Tracking", icon: <FaChartLine /> },
     ],
   },
@@ -31,10 +30,9 @@ const plans = [
     price: 12,
     features: [
       { text: "All Free Features", icon: <FaCheckCircle /> },
-      { text: "Mock Interviews", icon: <FaBrain /> },
       { text: "Advanced Problems", icon: <FaTrophy /> },
       { text: "AI Suggestions", icon: <FaRobot /> },
-      { text: "Visual Algorithm Flow", icon: <FaEye /> },
+      { text: "Pair Coding", icon: <FaUserFriends /> },
       { text: "Gamified Progress", icon: <FaChartLine /> },
     ],
   },

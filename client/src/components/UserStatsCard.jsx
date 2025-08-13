@@ -1,3 +1,4 @@
+import DefaultAvatar from "@/components/DefaultAvatar";
 const UserStatsCard = ({ user, leaderboard, theme }) => {
   const themeConfig = {
     light: {
