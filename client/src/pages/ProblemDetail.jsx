@@ -64,6 +64,9 @@ export default function ProblemDetail() {
   const API = `${API_ROOT}/api`;
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const isAuthed = !!token;
+
     const fetchProblem = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -113,10 +116,12 @@ export default function ProblemDetail() {
       });
       if (res.data.note) setNote(res.data.note.content);
     };
-    fetchNote();
-    checkBookmark();
-    fetchProblem();
-    fetchLastSubmission();
+    -fetchProblem();
+    if (isAuthed) {
+      fetchNote();
+      checkBookmark();
+      fetchLastSubmission();
+    }
   }, [id]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
-import { Navigate } from "react-router-dom";
+// src/components/UserAuthRoute.jsx
+import { Navigate, useLocation } from "react-router-dom";
 
 export default function UserAuthRoute({ children, type }) {
   const token = localStorage.getItem("token");
@@ -9,19 +10,21 @@ export default function UserAuthRoute({ children, type }) {
       return null;
     }
   })();
-  const path = window.location.pathname;
+  const { pathname } = useLocation(); // <-- works with HashRouter
 
   if (type === "private") {
     if (!token) return <Navigate to="/login" replace />;
-
     // Admin-only guard
-    if (path.startsWith("/admin") && (!user || user.role !== "admin")) {
+    if (pathname.startsWith("/admin") && (!user || user.role !== "admin")) {
       return <Navigate to="/unauthorized" replace />;
     }
   }
 
   if (type === "public") {
-    if (token && path !== "/") return <Navigate to="/dashboard" replace />;
+    // if logged-in users should NOT visit login/sign-up pages
+    if (token && (pathname === "/login" || pathname === "/social-login")) {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return children;

@@ -391,7 +391,7 @@ const Dashboard = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
+          <div className="absolute inset-0 opacity-5"></div>
           <div
             className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor(
               "from"
