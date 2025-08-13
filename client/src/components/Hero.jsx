@@ -6,7 +6,7 @@ const Hero = () => {
   const navigate = useNavigate();
   return (
     <section className="text-center py-10 px-4">
-      <h1 className="text-4xl md:text-5xl font-semibold mb-2">
+      <h1 className="text-4xl md:text-5xl font-semibold mb-2 mt-12">
         Master Data Structures <br /> & Algorithms Efficiently
       </h1>
       <p className="text-lg mb-10 text-gray-300 max-w-xl mx-auto">
