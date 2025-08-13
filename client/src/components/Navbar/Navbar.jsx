@@ -174,9 +174,9 @@ const Navbar = () => {
             )}
           </ul>
 
-          {isLoggedIn && (
+          {/* {isLoggedIn && (
             <FiBell className={`text-lg cursor-pointer ${current.icon}`} />
-          )}
+          )} */}
 
           {isLoggedIn ? (
             <div className="relative dropdown-container">
@@ -196,12 +196,12 @@ const Navbar = () => {
                   >
                     Profile
                   </button>
-                  <button
+                  {/* <button
                     className="block w-full text-left px-4 py-2 text-sm hover:bg-white/10"
                     onClick={() => navigate("/settings")}
                   >
                     Settings
-                  </button>
+                  </button> */}
                   <button
                     className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/10"
                     onClick={handleLogout}
