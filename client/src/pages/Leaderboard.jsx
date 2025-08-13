@@ -9,27 +9,29 @@ const Leaderboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { theme, toggleTheme } = useTheme();
-
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   const themeConfig = {
     light: {
-      bg: 'bg-gradient-to-br from-gray-50 to-gray-200',
-      text: 'text-gray-900',
-      card: 'bg-white border-gray-200',
+      bg: "bg-gradient-to-br from-gray-50 to-gray-200",
+      text: "text-gray-900",
+      card: "bg-white border-gray-200",
     },
     dark: {
-      bg: 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950',
-      text: 'text-gray-100',
-      card: 'bg-gray-800 border-gray-700',
+      bg: "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-950",
+      text: "text-gray-100",
+      card: "bg-gray-800 border-gray-700",
     },
     ocean: {
-      bg: 'bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950',
-      text: 'text-blue-50',
-      card: 'bg-blue-800 border-blue-700',
+      bg: "bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950",
+      text: "text-blue-50",
+      card: "bg-blue-800 border-blue-700",
     },
     forest: {
-      bg: 'bg-gradient-to-br from-green-900 via-green-800 to-green-950',
-      text: 'text-green-50',
-      card: 'bg-green-800 border-green-700',
+      bg: "bg-gradient-to-br from-green-900 via-green-800 to-green-950",
+      text: "text-green-50",
+      card: "bg-green-800 border-green-700",
     },
   };
 
@@ -39,7 +41,7 @@ const Leaderboard = () => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/dashboard", {
+        const response = await fetch(`${API_ROOT}/api/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -64,7 +66,9 @@ const Leaderboard = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentTheme.bg}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${currentTheme.bg}`}
+      >
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
       </div>
     );
@@ -72,7 +76,9 @@ const Leaderboard = () => {
 
   if (error) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentTheme.bg} ${currentTheme.text}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${currentTheme.bg} ${currentTheme.text}`}
+      >
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">Error Loading Leaderboard</h2>
           <p className="mb-4 text-red-400">{error}</p>
@@ -88,7 +94,9 @@ const Leaderboard = () => {
   }
 
   return (
-    <div className={`min-h-screen px-8 py-10 ${currentTheme.bg} ${currentTheme.text}`}>
+    <div
+      className={`min-h-screen px-8 py-10 ${currentTheme.bg} ${currentTheme.text}`}
+    >
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">LeaderBoard</h1>
 

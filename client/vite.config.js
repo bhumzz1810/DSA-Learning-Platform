@@ -12,11 +12,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:5000",
+        target: "https://dsa-learning-platform-316y.onrender.com",
         changeOrigin: true,
       },
       "/socket.io": {
-        target: "http://localhost:5000",
+        target: "https://dsa-learning-platform-316y.onrender.com",
         ws: true,
         changeOrigin: true,
       },

@@ -3,7 +3,8 @@ const router = require("express").Router();
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
-const CLIENT = process.env.CLIENT_URL || "http://localhost:5173";
+const CLIENT =
+  process.env.CLIENT_URL || "https://dsa-learning-platform-five.vercel.app";
 
 function generateToken(user) {
   return jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, {

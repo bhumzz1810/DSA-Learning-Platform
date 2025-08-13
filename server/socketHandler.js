@@ -23,7 +23,7 @@ const cleanupRoom = (roomId, io) => {
 function setupSocketServer(server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://dsa-learning-platform-five.vercel.app",
       methods: ["GET", "POST"],
       credentials: true,
       transports: ["websocket", "polling"],

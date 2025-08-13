@@ -23,12 +23,15 @@ const QuizPage = () => {
   const hasSubmittedRef = useRef(false);
 
   const token = localStorage.getItem("token");
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
 
   // Fetch dashboard
   useEffect(() => {
     async function fetchDashboard() {
       try {
-        const res = await axios.get("http://localhost:5000/api/dashboard", {
+        const res = await axios.get(`${API_ROOT}/api/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -94,9 +97,12 @@ const QuizPage = () => {
     hasSubmittedRef.current = false; // reset double-submit blocker
 
     try {
-      const res = await axios.get(`/api/quiz/question/random?cb=${Date.now()}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        `/api/quiz/question/random?cb=${Date.now()}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       const { limitReached } = res.data;
       if (limitReached) {

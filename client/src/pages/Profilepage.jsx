@@ -21,7 +21,7 @@ import {
   Gem,
   ShieldCheck,
   ThumbsUp,
-  Brain
+  Brain,
 } from "lucide-react";
 
 const Profilepage = () => {
@@ -29,7 +29,10 @@ const Profilepage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { theme ,toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   // Theme configuration
 
   const themeConfig = {
@@ -46,7 +49,7 @@ const Profilepage = () => {
         const token = localStorage.getItem("token");
         if (!token) return navigate("/login");
 
-        const res = await fetch("http://localhost:5000/api/dashboard", {
+        const res = await fetch(`${API_ROOT}/api/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -72,7 +75,7 @@ const Profilepage = () => {
     fetchDashboardData();
   }, [navigate]);
 
- const badgeIcons = [
+  const badgeIcons = [
     <Trophy className="w-8 h-8 text-yellow-400" />,
     <Award className="w-8 h-8 text-blue-400" />,
     <Medal className="w-8 h-8 text-purple-400" />,
@@ -88,19 +91,36 @@ const Profilepage = () => {
 
   const handleContinueLearning = () => navigate("/problems");
 
-  if (loading) return <div className={`min-h-screen ${currentTheme.bg} text-white p-10`}>Loading...</div>;
-  if (error) return <div className={`min-h-screen ${currentTheme.bg} text-red-400 p-10`}>Error: {error}</div>;
-  if (!dashboardData) return <div className={`min-h-screen ${currentTheme.bg} p-10`}>No data</div>;
+  if (loading)
+    return (
+      <div className={`min-h-screen ${currentTheme.bg} text-white p-10`}>
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className={`min-h-screen ${currentTheme.bg} text-red-400 p-10`}>
+        Error: {error}
+      </div>
+    );
+  if (!dashboardData)
+    return (
+      <div className={`min-h-screen ${currentTheme.bg} p-10`}>No data</div>
+    );
 
   const user = {
     ...dashboardData.user,
-    username: dashboardData.user.username.charAt(0).toUpperCase() + dashboardData.user.username.slice(1),
+    username:
+      dashboardData.user.username.charAt(0).toUpperCase() +
+      dashboardData.user.username.slice(1),
     rank: dashboardData.leaderboard.yourRank,
   };
 
   return (
-    <div className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} px-6 md:px-16 py-10 space-y-12`}>
-   <div className="flex justify-between items-center mb-4">
+    <div
+      className={`min-h-screen ${currentTheme.bg} ${currentTheme.text} px-6 md:px-16 py-10 space-y-12`}
+    >
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Your Profile</h1>
 
         <div className="flex items-center gap-2">
@@ -129,15 +149,27 @@ const Profilepage = () => {
         </div>
       </div>
 
-      <ProfileCard user={user} leaderboard={dashboardData.leaderboard} theme={theme} />
+      <ProfileCard
+        user={user}
+        leaderboard={dashboardData.leaderboard}
+        theme={theme}
+      />
 
       <div className="grid md:grid-cols-2 gap-8">
         <div className="flex flex-col space-y-6">
-          <LearningProgress user={user} theme={theme} onContinueLearning={handleContinueLearning} />
+          <LearningProgress
+            user={user}
+            theme={theme}
+            onContinueLearning={handleContinueLearning}
+          />
           <XPProgressChart user={user} theme={theme} />
         </div>
 
-        <EarnedBadges badges={user.badges} theme={theme} badgeIcons={badgeIcons} />
+        <EarnedBadges
+          badges={user.badges}
+          theme={theme}
+          badgeIcons={badgeIcons}
+        />
       </div>
     </div>
   );

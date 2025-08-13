@@ -4,8 +4,17 @@ import { Helmet } from "react-helmet";
 import { useTheme } from "../components/RT_Pairing/ThemeContext";
 import { useNavigate, Link } from "react-router-dom";
 import {
-  Trophy, Award, Medal, Crown, Star,
-  Rocket, Flame, Gem, ShieldCheck, ThumbsUp, Brain
+  Trophy,
+  Award,
+  Medal,
+  Crown,
+  Star,
+  Rocket,
+  Flame,
+  Gem,
+  ShieldCheck,
+  ThumbsUp,
+  Brain,
 } from "lucide-react";
 
 // Animation variants
@@ -76,7 +85,9 @@ const Dashboard = () => {
   const { theme, toggleTheme } = useTheme();
   const [dailyChallenge, setDailyChallenge] = useState(null);
   const [loadingDaily, setLoadingDaily] = useState(true);
-
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   // Theme configuration with fallbacks
   const themeConfig = {
     light: {
@@ -85,7 +96,8 @@ const Dashboard = () => {
       text: "text-gray-800",
       title: "text-indigo-700",
       accent: "text-indigo-600",
-      button: "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white",
+      button:
+        "bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white",
       rank: "text-indigo-600",
       premium: "text-yellow-600",
       badge: "bg-indigo-100 text-indigo-800",
@@ -96,10 +108,11 @@ const Dashboard = () => {
       text: "text-white",
       title: "text-indigo-300",
       accent: "text-indigo-200",
-      button: "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-500 hover:to-purple-600 text-white",
+      button:
+        "bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-500 hover:to-purple-600 text-white",
       rank: "text-indigo-300",
       premium: "text-yellow-400",
-      badge: "bg-cyan-900/50 text-cyan-100"
+      badge: "bg-cyan-900/50 text-cyan-100",
     },
     ocean: {
       bg: "bg-blue-800",
@@ -107,7 +120,8 @@ const Dashboard = () => {
       text: "text-white",
       title: "text-cyan-300",
       accent: "text-cyan-200",
-      button: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white",
+      button:
+        "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white",
       rank: "text-cyan-300",
       premium: "text-yellow-300",
     },
@@ -117,10 +131,11 @@ const Dashboard = () => {
       text: "text-white",
       title: "text-emerald-300",
       accent: "text-emerald-200",
-      button: "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white",
+      button:
+        "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white",
       rank: "text-emerald-300",
       premium: "text-yellow-300",
-    }
+    },
   };
 
   const currentTheme = themeConfig[theme] || themeConfig.light;
@@ -141,9 +156,13 @@ const Dashboard = () => {
   ];
 
   // Generate meta description based on user data
-  const metaDescription = userData?.user 
-    ? `${userData.user.username}'s coding dashboard - Level ${userData.user.level || 0}, ${userData.user.totalSolved || 0} problems solved, ${userData.user.streak || 0}-day streak`
-    : 'Personal coding dashboard to track your programming progress, achievements, and stats';
+  const metaDescription = userData?.user
+    ? `${userData.user.username}'s coding dashboard - Level ${
+        userData.user.level || 0
+      }, ${userData.user.totalSolved || 0} problems solved, ${
+        userData.user.streak || 0
+      }-day streak`
+    : "Personal coding dashboard to track your programming progress, achievements, and stats";
 
   // Safe theme color extraction
   const getThemeColor = (type) => {
@@ -164,7 +183,8 @@ const Dashboard = () => {
   const calculateXpProgress = () => {
     if (!userData?.user?.level || userData.user.level <= 0) return 0;
     const xpForNextLevel = 1000;
-    const currentXp = (userData.user.xp || 0) - (userData.user.level - 1) * 1000;
+    const currentXp =
+      (userData.user.xp || 0) - (userData.user.level - 1) * 1000;
     return (currentXp / xpForNextLevel) * 100;
   };
 
@@ -172,7 +192,7 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:5000/api/dashboard", {
+        const response = await fetch(`${API_ROOT}/api/dashboard`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -186,7 +206,8 @@ const Dashboard = () => {
         const data = await response.json();
         console.log("API Response:", data);
 
-        const rank = data.rank ||
+        const rank =
+          data.rank ||
           data.user?.rank ||
           data.leaderboard?.yourRank ||
           data.leaderboard?.rank ||
@@ -197,11 +218,16 @@ const Dashboard = () => {
             ...data.user,
             streak: data.user.streak || 0,
             totalSolved: data.user.totalSolved || 0,
-            userRank: typeof rank === 'number' ? rank : (rank === "--" ? rank : parseInt(rank) || "--"),
+            userRank:
+              typeof rank === "number"
+                ? rank
+                : rank === "--"
+                ? rank
+                : parseInt(rank) || "--",
             quizAttempts: data.user.quizAttempts || 0,
           },
           quizStats: data.quizStats,
-          leaderboard: data.leaderboard
+          leaderboard: data.leaderboard,
         });
       } catch (err) {
         setError(err.message);
@@ -212,19 +238,19 @@ const Dashboard = () => {
 
     const fetchDailyChallenge = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/problems', {
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_ROOT}/api/problems`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch problems');
+          throw new Error("Failed to fetch problems");
         }
 
         const data = await response.json();
-        const dailyProblem = data.find(problem => problem.isDaily);
+        const dailyProblem = data.find((problem) => problem.isDaily);
         setDailyChallenge(dailyProblem || null);
       } catch (err) {
         console.error("Error fetching daily challenge:", err);
@@ -240,7 +266,9 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${currentTheme.loading}`}
+      >
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
@@ -252,7 +280,9 @@ const Dashboard = () => {
 
   if (error) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}
+      >
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">Error Loading Dashboard</h2>
           <p className="mb-4 text-red-400">{error}</p>
@@ -269,7 +299,9 @@ const Dashboard = () => {
 
   if (!userData?.user) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${currentTheme.loading} ${currentTheme.text}`}
+      >
         <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm">
           <h2 className="text-2xl font-bold mb-4">No User Data Found</h2>
           <p>Please check your connection and try again</p>
@@ -279,21 +311,47 @@ const Dashboard = () => {
   }
 
   return (
-    <div className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}>
+    <div
+      className={`min-h-screen px-4 py-12 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${currentTheme.bg} ${currentTheme.text}`}
+    >
       {/* SEO Meta Tags */}
       <Helmet>
-        <title>{userData?.user ? `${userData.user.username}'s Dashboard` : 'My Coding Dashboard'}</title>
+        <title>
+          {userData?.user
+            ? `${userData.user.username}'s Dashboard`
+            : "My Coding Dashboard"}
+        </title>
         <meta name="description" content={metaDescription} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
-        <meta property="og:title" content={userData?.user ? `${userData.user.username}'s Coding Progress` : 'Coding Dashboard'} />
+        <meta
+          property="og:title"
+          content={
+            userData?.user
+              ? `${userData.user.username}'s Coding Progress`
+              : "Coding Dashboard"
+          }
+        />
         <meta property="og:description" content={metaDescription} />
-        <meta property="og:image" content="https://yourdomain.com/images/dashboard-preview.png" />
+        <meta
+          property="og:image"
+          content="https://yourdomain.com/images/dashboard-preview.png"
+        />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:url" content={window.location.href} />
-        <meta property="twitter:title" content={userData?.user ? `${userData.user.username}'s Coding Progress` : 'Coding Dashboard'} />
+        <meta
+          property="twitter:title"
+          content={
+            userData?.user
+              ? `${userData.user.username}'s Coding Progress`
+              : "Coding Dashboard"
+          }
+        />
         <meta property="twitter:description" content={metaDescription} />
-        <meta property="twitter:image" content="https://yourdomain.com/images/dashboard-preview.png" />
+        <meta
+          property="twitter:image"
+          content="https://yourdomain.com/images/dashboard-preview.png"
+        />
         <link rel="canonical" href={window.location.href} />
       </Helmet>
 
@@ -312,7 +370,9 @@ const Dashboard = () => {
               repeat: Infinity,
               ease: "linear",
             }}
-            className={`absolute rounded-full bg-${getThemeColor("from")} blur-sm`}
+            className={`absolute rounded-full bg-${getThemeColor(
+              "from"
+            )} blur-sm`}
             style={{
               width: `${Math.random() * 10 + 5}px`,
               height: `${Math.random() * 10 + 5}px`,
@@ -332,7 +392,11 @@ const Dashboard = () => {
           transition={{ duration: 0.8 }}
         >
           <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5"></div>
-          <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor("from")} blur-3xl opacity-20`}></div>
+          <div
+            className={`absolute -top-32 -right-32 w-64 h-64 rounded-full bg-${getThemeColor(
+              "from"
+            )} blur-3xl opacity-20`}
+          ></div>
           <div className="rounded-3xl flex justify-between items-center relative z-10">
             <div>
               <h1 className="text-3xl sm:text-4xl font-bold">
@@ -361,10 +425,10 @@ const Dashboard = () => {
               {theme === "light"
                 ? "🌙"
                 : theme === "dark"
-                  ? "🌞"
-                  : theme === "ocean"
-                    ? "🌲"
-                    : "🌊"}
+                ? "🌞"
+                : theme === "ocean"
+                ? "🌲"
+                : "🌊"}
             </motion.button>
           </div>
         </motion.header>
@@ -403,7 +467,7 @@ const Dashboard = () => {
                   "flex items-center justify-center text-white text-xl"
                 )}`}
               >
-                {typeof userData.user.userRank === 'number'
+                {typeof userData.user.userRank === "number"
                   ? userData.user.userRank <= 3
                     ? ["🥇", "🥈", "🥉"][userData.user.userRank - 1]
                     : "🏅"
@@ -412,7 +476,7 @@ const Dashboard = () => {
               <div className="ml-4">
                 <p className="text-sm opacity-80">Your rank</p>
                 <p className="text-xl font-bold">
-                  {typeof userData.user.userRank === 'number'
+                  {typeof userData.user.userRank === "number"
                     ? `#${userData.user.userRank}`
                     : userData.user.userRank}
                 </p>
@@ -436,7 +500,9 @@ const Dashboard = () => {
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${calculateXpProgress()}%` }}
-                  className={`h-full rounded-full relative ${applyGradient("")}`}
+                  className={`h-full rounded-full relative ${applyGradient(
+                    ""
+                  )}`}
                 >
                   <div className="absolute inset-0 bg-white/20 animate-pulse"></div>
                 </motion.div>
@@ -464,7 +530,9 @@ const Dashboard = () => {
             </h3>
             <div className="flex items-center justify-center">
               <div
-                className={`text-5xl font-bold ${applyGradient("bg-clip-text")}`}
+                className={`text-5xl font-bold ${applyGradient(
+                  "bg-clip-text"
+                )}`}
               >
                 {userData.user.streak !== undefined ? userData.user.streak : 0}
               </div>
@@ -487,9 +555,12 @@ const Dashboard = () => {
           transition={{ delay: 0.6 }}
           className={`rounded-3xl w-full p-6 sm:p-8 shadow-xl ${currentTheme.card} border border-opacity-20 relative overflow-hidden group`}
         >
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             style={{
-              background: `linear-gradient(to bottom right, ${getThemeColor("from")}1A, ${getThemeColor("to")}1A)`,
+              background: `linear-gradient(to bottom right, ${getThemeColor(
+                "from"
+              )}1A, ${getThemeColor("to")}1A)`,
             }}
           ></div>
           <div
@@ -507,13 +578,17 @@ const Dashboard = () => {
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  className={`p-4 rounded-2xl flex items-center justify-center ${applyGradient("text-white shadow-lg")}`}
+                  className={`p-4 rounded-2xl flex items-center justify-center ${applyGradient(
+                    "text-white shadow-lg"
+                  )}`}
                 >
                   <span className="text-3xl">🧠</span>
                 </motion.div>
 
                 <div>
-                  <h2 className={`text-2xl sm:text-3xl font-bold ${currentTheme.title}`}>
+                  <h2
+                    className={`text-2xl sm:text-3xl font-bold ${currentTheme.title}`}
+                  >
                     Quiz Progress
                   </h2>
                   <p className={`text-sm ${currentTheme.subtitle} opacity-80`}>
@@ -536,7 +611,10 @@ const Dashboard = () => {
             {userData.user.quizAttempts > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <motion.div
-                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  }}
                   className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
                 >
                   <div className="text-4xl font-bold mb-2 flex items-center">
@@ -553,7 +631,10 @@ const Dashboard = () => {
                 </motion.div>
 
                 <motion.div
-                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  }}
                   className={`p-5 rounded-xl bg-green-100/30 dark:bg-green-900/30 text-green-800 dark:text-green-100 flex flex-col items-center`}
                 >
                   <div className="text-4xl font-bold mb-2 flex items-center">
@@ -570,7 +651,10 @@ const Dashboard = () => {
                 </motion.div>
 
                 <motion.div
-                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  }}
                   className={`p-5 rounded-xl bg-red-100/30 dark:bg-red-900/30 text-red-800 dark:text-red-100 flex flex-col items-center`}
                 >
                   <div className="text-4xl font-bold mb-2 flex items-center">
@@ -587,16 +671,20 @@ const Dashboard = () => {
                 </motion.div>
 
                 <motion.div
-                  whileHover={{ y: -5, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+                  }}
                   className={`p-5 rounded-xl ${currentTheme.badge} flex flex-col items-center`}
                 >
                   <div className="text-4xl font-bold mb-2 flex items-center">
                     {userData.quizStats
                       ? `${Math.round(
-                        (userData.quizStats.totalCorrect /
-                          (userData.quizStats.totalCorrect + userData.quizStats.totalIncorrect)) *
-                        100
-                      )}%`
+                          (userData.quizStats.totalCorrect /
+                            (userData.quizStats.totalCorrect +
+                              userData.quizStats.totalIncorrect)) *
+                            100
+                        )}%`
                       : "0%"}
                     <motion.span
                       animate={{ y: [0, -3, 0] }}
@@ -623,19 +711,39 @@ const Dashboard = () => {
                   }}
                   className="w-40 h-40 flex items-center justify-center"
                 >
-                  <div className={`relative w-full h-full ${applyGradient("rounded-full opacity-20")}`}></div>
-                  <div className={`absolute text-6xl ${applyGradient("bg-clip-text text-transparent")}`}>?</div>
+                  <div
+                    className={`relative w-full h-full ${applyGradient(
+                      "rounded-full opacity-20"
+                    )}`}
+                  ></div>
+                  <div
+                    className={`absolute text-6xl ${applyGradient(
+                      "bg-clip-text text-transparent"
+                    )}`}
+                  >
+                    ?
+                  </div>
                 </motion.div>
 
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className={`text-2xl font-bold ${currentTheme.title} mb-3`}>Ready for Your First Quiz Challenge?</h3>
-                  <p className={`text-lg mb-6 ${currentTheme.subtitle} opacity-90 max-w-lg mx-auto md:mx-0`}>
-                    Test your knowledge with our interactive coding quizzes. Track your progress, earn achievements, and climb the leaderboard!
+                  <h3
+                    className={`text-2xl font-bold ${currentTheme.title} mb-3`}
+                  >
+                    Ready for Your First Quiz Challenge?
+                  </h3>
+                  <p
+                    className={`text-lg mb-6 ${currentTheme.subtitle} opacity-90 max-w-lg mx-auto md:mx-0`}
+                  >
+                    Test your knowledge with our interactive coding quizzes.
+                    Track your progress, earn achievements, and climb the
+                    leaderboard!
                   </p>
                   <motion.button
                     whileHover={{
                       scale: 1.05,
-                      boxShadow: `0 5px 15px rgba(${getThemeColor("from")}, 0.3)`,
+                      boxShadow: `0 5px 15px rgba(${getThemeColor(
+                        "from"
+                      )}, 0.3)`,
                     }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => navigate("/quiz")}
@@ -651,8 +759,12 @@ const Dashboard = () => {
             {userData.user.quizAttempts > 0 && (
               <div className="mt-8">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Quiz Mastery Progress</span>
-                  <span className="text-sm font-medium">Level {Math.floor(userData.user.quizAttempts / 5) + 1}</span>
+                  <span className="text-sm font-medium">
+                    Quiz Mastery Progress
+                  </span>
+                  <span className="text-sm font-medium">
+                    Level {Math.floor(userData.user.quizAttempts / 5) + 1}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                   <motion.div
@@ -669,7 +781,9 @@ const Dashboard = () => {
                 </div>
                 <div className="flex justify-between text-xs mt-2 opacity-70">
                   <span>{userData.user.quizAttempts} quizzes taken</span>
-                  <span>{5 - (userData.user.quizAttempts % 5)} to next level</span>
+                  <span>
+                    {5 - (userData.user.quizAttempts % 5)} to next level
+                  </span>
                 </div>
               </div>
             )}
@@ -688,7 +802,7 @@ const Dashboard = () => {
               🔥 Daily Challenge
             </h2>
             <span className="text-sm px-3 py-1 rounded-full bg-yellow-100 text-yellow-800">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              {new Date().toLocaleDateString("en-US", { weekday: "long" })}
             </span>
           </div>
 
@@ -707,10 +821,15 @@ const Dashboard = () => {
                     {dailyChallenge.description}
                   </p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${dailyChallenge.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100' :
-                  dailyChallenge.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100' :
-                    'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100'
-                  }`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    dailyChallenge.difficulty === "Easy"
+                      ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-100"
+                      : dailyChallenge.difficulty === "Medium"
+                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-100"
+                      : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-100"
+                  }`}
+                >
                   {dailyChallenge.difficulty}
                 </span>
               </div>
@@ -721,7 +840,8 @@ const Dashboard = () => {
                 </span>
                 {dailyChallenge.hints?.length > 0 && (
                   <span className="px-3 py-1 bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-100 rounded-full text-sm">
-                    {dailyChallenge.hints.length} Hint{dailyChallenge.hints.length !== 1 ? 's' : ''}
+                    {dailyChallenge.hints.length} Hint
+                    {dailyChallenge.hints.length !== 1 ? "s" : ""}
                   </span>
                 )}
               </div>
@@ -782,7 +902,9 @@ const Dashboard = () => {
           transition={{ delay: 0.4 }}
           className={`mb-8 w-full p-6 border border-opacity-20 rounded-xl ${currentTheme.card}`}
         >
-          <h2 className={`text-2xl font-bold mb-4 ${currentTheme.title}`}>🏅 Earned Badges</h2>
+          <h2 className={`text-2xl font-bold mb-4 ${currentTheme.title}`}>
+            🏅 Earned Badges
+          </h2>
           {userData.user.badges?.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               <AnimatePresence>
@@ -803,7 +925,9 @@ const Dashboard = () => {
               </AnimatePresence>
             </div>
           ) : (
-            <p className={`${currentTheme.text} opacity-80`}>No badges earned yet. Solve problems to earn badges!</p>
+            <p className={`${currentTheme.text} opacity-80`}>
+              No badges earned yet. Solve problems to earn badges!
+            </p>
           )}
         </motion.section>
 
@@ -815,7 +939,9 @@ const Dashboard = () => {
           transition={{ delay: 0.3 }}
           className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
         >
-          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>
+          <h2
+            className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}
+          >
             💎 Subscription
           </h2>
           {userData.user.subscription ? (
@@ -870,7 +996,9 @@ const Dashboard = () => {
               >
                 💎
               </div>
-              <h3 className={`text-lg font-semibold mb-2 ${currentTheme.title}`}>
+              <h3
+                className={`text-lg font-semibold mb-2 ${currentTheme.title}`}
+              >
                 No Active Subscription
               </h3>
               <p className={`text-sm mb-4 ${currentTheme.subtitle} opacity-80`}>
@@ -904,7 +1032,9 @@ const Dashboard = () => {
           transition={{ delay: 0.5 }}
           className={`rounded-3xl p-6 sm:p-8 shadow-lg ${currentTheme.card} border border-opacity-20`}
         >
-          <h2 className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}>
+          <h2
+            className={`text-xl sm:text-2xl font-bold mb-5 ${currentTheme.title}`}
+          >
             📘 Recently Solved
           </h2>
           <div className="space-y-4">
@@ -921,20 +1051,25 @@ const Dashboard = () => {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <h3 className={`text-base sm:text-lg font-semibold ${currentTheme.title}`}>
+                      <h3
+                        className={`text-base sm:text-lg font-semibold ${currentTheme.title}`}
+                      >
                         {problem.title}
                       </h3>
                       <div className="flex gap-2 mt-2 flex-wrap text-xs">
-                        <span className={`px-2.5 py-1 rounded-full ${currentTheme.badge}`}>
+                        <span
+                          className={`px-2.5 py-1 rounded-full ${currentTheme.badge}`}
+                        >
                           {problem.category}
                         </span>
                         <span
-                          className={`px-2.5 py-1 rounded-full font-medium ${problem.difficulty === "Easy"
-                            ? "bg-green-100/70 text-green-800"
-                            : problem.difficulty === "Medium"
+                          className={`px-2.5 py-1 rounded-full font-medium ${
+                            problem.difficulty === "Easy"
+                              ? "bg-green-100/70 text-green-800"
+                              : problem.difficulty === "Medium"
                               ? "bg-yellow-100/70 text-yellow-800"
                               : "bg-red-100/70 text-red-800"
-                            }`}
+                          }`}
                         >
                           {problem.difficulty}
                         </span>
