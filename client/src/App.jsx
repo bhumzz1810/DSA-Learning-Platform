@@ -54,6 +54,15 @@ function App() {
           <Routes>
             {/* PUBLIC ROUTES */}
             <Route path="/reset-password" element={<ResetPassword />} />
+            // Add somewhere in your router:
+            <Route
+              path="/newsletter/confirmed"
+              element={<div className="p-8">🎉 You’re subscribed!</div>}
+            />
+            <Route
+              path="/newsletter/unsubscribed"
+              element={<div className="p-8">You’ve been unsubscribed.</div>}
+            />
             <Route
               path="/"
               element={
@@ -95,7 +104,6 @@ function App() {
                 </UserAuthRoute>
               }
             />
-
             <Route path="/billing/success" element={<BillingSuccess />} />
             {/* <Route path="/billing/cancel" element={<BillingCancel />} /> */}
             <Route

@@ -120,6 +120,7 @@ app.use("/api/stripe", require("./routes/stripe.js"));
 app.use("/api/quiz", require("./routes/quizRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/contact", require("./routes/contact"));
+app.use("/api/newsletter", require("./routes/newsletter"));
 
 // --- Socket.IO (make sure socketHandler CORS matches CLIENT_URL) ---
 setupSocketServer(server);
