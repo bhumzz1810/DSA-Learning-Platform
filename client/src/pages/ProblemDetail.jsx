@@ -59,8 +59,7 @@ export default function ProblemDetail() {
   const navigate = useNavigate(); // inside your component
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const API_ROOT = (
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-five.vercel.app"
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
   ).replace(/\/+$/, "");
   const API = `${API_ROOT}/api`;
 

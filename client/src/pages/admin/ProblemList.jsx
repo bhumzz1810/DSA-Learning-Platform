@@ -44,10 +44,10 @@ const SkeletonRow = () => (
 );
 
 const ProblemList = () => {
-  const API = (
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-five.vercel.app"
-  ).replace(/\/+$/, "");
+  const API = (import.meta.env.VITE_API_URL || "http://localhost:5000").replace(
+    /\/+$/,
+    ""
+  );
   const [problems, setProblems] = useState([]);
   const [showArchived, setShowArchived] = useState(false);
 

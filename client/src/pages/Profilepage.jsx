@@ -31,8 +31,7 @@ const Profilepage = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const API_ROOT = (
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-five.vercel.app"
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
   ).replace(/\/+$/, "");
   // Theme configuration
 

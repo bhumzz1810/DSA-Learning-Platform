@@ -86,8 +86,7 @@ const Dashboard = () => {
   const [dailyChallenge, setDailyChallenge] = useState(null);
   const [loadingDaily, setLoadingDaily] = useState(true);
   const API_ROOT = (
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-five.vercel.app"
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
   ).replace(/\/+$/, "");
   // Theme configuration with fallbacks
   const themeConfig = {

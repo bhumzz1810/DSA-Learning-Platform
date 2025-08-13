@@ -55,13 +55,16 @@ const Navbar = () => {
   };
 
   const currentTheme = themeStyles[theme] || themeStyles.light;
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
 
     if (token) {
-      fetch(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
+      fetch(`${API_ROOT}/api/auth/status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())

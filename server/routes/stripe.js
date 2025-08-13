@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+const stripe = new Stripe(process.env.VITE_STRIPE_PUBLISHABLE_KEY, {
   apiVersion: "2022-11-15", // specify Stripe API version explicitly
 });
 

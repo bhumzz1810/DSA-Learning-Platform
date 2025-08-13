@@ -51,8 +51,7 @@ const SkeletonRow = () => (
 
 export default function UserList() {
   const API_ROOT = (
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-five.vercel.app"
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
   ).replace(/\/+$/, "");
   const API = `${API_ROOT}/api`;
 

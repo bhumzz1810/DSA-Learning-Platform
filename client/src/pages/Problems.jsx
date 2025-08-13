@@ -90,6 +90,9 @@ export default function Problems() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const API_ROOT = (
+    import.meta.env.VITE_API_URL || "http://localhost:5000"
+  ).replace(/\/+$/, "");
   useEffect(() => {
     const fetchProblems = async () => {
       try {
@@ -97,23 +100,17 @@ export default function Problems() {
         if (token) {
           setIsLoggedIn(true);
           axios
-            .get(`${import.meta.env.VITE_API_URL}/api/auth/status`, {
+            .get(`${API_ROOT}/api/auth/status`, {
               headers: { Authorization: `Bearer ${token}` },
             })
             .then((res) => setIsSubscribed(res.data.subscriptionActive))
             .catch(() => setIsSubscribed(false));
         }
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_URL ||
-            "https://dsa-learning-platform-five.vercel.app/api"
-          }/api/problems`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await axios.get(`${API_ROOT}/api/problems`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setProblems(res.data);
       } catch (err) {
         console.error("Error fetching problems:", err);
@@ -126,15 +123,9 @@ export default function Problems() {
       if (!token) return; // ✅ Don't fetch if not logged in
 
       try {
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_URL ||
-            "https://dsa-learning-platform-five.vercel.app/api"
-          }/api/bookmarks`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(`${API_ROOT}/api/bookmarks`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const ids = res.data.bookmarks.map((p) => p._id);
         setBookmarkedIds(ids);
       } catch (err) {
@@ -177,20 +168,13 @@ export default function Problems() {
     }
     try {
       if (bookmarkedIds.includes(problemId)) {
-        await axios.delete(
-          `${
-            import.meta.env.VITE_API_URL ||
-            "https://dsa-learning-platform-five.vercel.app/api"
-          }/api/bookmarks/${problemId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.delete(`${API_ROOT}/api/bookmarks/${problemId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setBookmarkedIds(bookmarkedIds.filter((id) => id !== problemId));
       } else {
         await axios.post(
-          `${
-            import.meta.env.VITE_API_URL ||
-            "https://dsa-learning-platform-five.vercel.app/api"
-          }/api/bookmarks/${problemId}`,
+          `${API_ROOT}/api/bookmarks/${problemId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );

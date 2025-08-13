@@ -19,9 +19,7 @@ const LoginForm = () => {
   const containerRef = useRef(null);
   const audioRef = useRef(null);
   const navigate = useNavigate();
-  const API =
-    import.meta.env.VITE_API_URL ||
-    "https://dsa-learning-platform-316y.onrender.com";
+  const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
   const REST = API.replace(/\/+$/, ""); // normalize
   const [showForgot, setShowForgot] = useState(false);
   useEffect(() => {

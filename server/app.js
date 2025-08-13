@@ -51,7 +51,17 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Stripe-Signature"],
   })
 );
-app.options("*", cors());
+// make sure OPTIONS requests succeed quickly
+app.options(
+  "*",
+  cors({
+    origin: (origin, cb) => {
+      if (!origin || allowed.includes(origin)) return cb(null, true);
+      return cb(new Error("CORS blocked"), false);
+    },
+    credentials: true,
+  })
+);
 
 // --- Parsers & DB ---
 app.use(express.json({ limit: "1mb" }));
