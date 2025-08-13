@@ -1,26 +1,27 @@
 import React from "react";
 import { motion } from "framer-motion";
+import avatar from "../assets/avatar.jpg";
 
 const testimonials = [
   {
     name: "Divyanshu",
     role: "Software Engineer",
     rating: 4,
-    avatar: "../assets/avatar.jpg",
+    avatar,
     text: "DSArena helped me ace my technical interviews. The interactive challenges are the closest thing to real coding tests.",
   },
   {
     name: "Nanji 160",
     role: "CS Student",
     rating: 5,
-    avatar: "../assets/avatar.jpg",
+    avatar,
     text: "The visual explanations of algorithms made complex concepts click for me. Worth every penny of the Pro plan!",
   },
   {
     name: "Emily Rodriguez",
     role: "Bootcamp Grad",
     rating: 5,
-    avatar: "../assets/avatar.jpg",
+    avatar,
     text: "Went from zero to confident in data structures within 3 months. The community support is incredible.",
   },
 ];
