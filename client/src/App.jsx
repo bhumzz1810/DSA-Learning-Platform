@@ -26,6 +26,7 @@ import "./index.css";
 
 import UserAuthRoute from "./components/UserAuthRoute";
 import ResetPassword from "./pages/ResetPassword";
+import BillingSuccess from "./pages/BillingSuccess";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -94,6 +95,9 @@ function App() {
                 </UserAuthRoute>
               }
             />
+
+            <Route path="/billing/success" element={<BillingSuccess />} />
+            <Route path="/billing/cancel" element={<BillingCancel />} />
             <Route
               path="/dashboard"
               element={
