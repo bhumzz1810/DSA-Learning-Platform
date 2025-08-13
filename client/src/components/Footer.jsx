@@ -1,6 +1,12 @@
 import React from "react";
 import { FaFacebookF, FaTwitter, FaGithub, FaLinkedinIn } from "react-icons/fa";
 
+
+const scrollTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
 const Footer = () => {
     return (
         <footer className="bg-black text-gray-400 py-12 px-6">
@@ -15,10 +21,10 @@ const Footer = () => {
                 <div>
                     <h4 className="text-white font-semibold mb-3">Quick Links</h4>
                     <ul className="space-y-2">
-                        <li><a href="#features" className="hover:text-cyan-400 transition">Features</a></li>
-                        <li><a href="#pricing" className="hover:text-cyan-400 transition">Pricing</a></li>
-                        <li><a href="#testimonials" className="hover:text-cyan-400 transition">Testimonials</a></li>
-                        <li><a href="#contact" className="hover:text-cyan-400 transition">Contact</a></li>
+                        <li><button onClick={() => scrollTo("features")} className="hover:text-cyan-400 transition">Features</button></li>
+                        <li><button onClick={() => scrollTo("pricing")} className="hover:text-cyan-400 transition">Pricing</button></li>
+                        <li><button onClick={() => scrollTo("testimonials")} className="hover:text-cyan-400 transition">Testimonials</button></li>
+                        <li><button onClick={() => scrollTo("contact")} className="hover:text-cyan-400 transition">Contact</button></li>
                     </ul>
                 </div>
 
