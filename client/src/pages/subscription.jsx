@@ -12,7 +12,7 @@ const SubscriptionPage = () => {
   const handleSubscribe = async () => {
     console.log("User for subscription:", user, "Billing:", billing);
 
-    const res = await fetch(`${API_ROOT}/stripe/create-checkout-session`, {
+    const res = await fetch(`${API_ROOT}/api/stripe/create-checkout-session`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

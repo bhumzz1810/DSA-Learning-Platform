@@ -69,19 +69,22 @@ const Pricing = ({ isYearly, setIsYearly }) => {
     const user = JSON.parse(localStorage.getItem("user"));
 
     try {
-      const res = await fetch(`${API_ROOT}/stripe/create-checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          email: user.email,
-          billing: isYearly ? "yearly" : "monthly",
-          plan: selectedPlan,
-        }),
-      });
+      const res = await fetch(
+        `${API_ROOT}/api/stripe/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            email: user.email,
+            billing: isYearly ? "yearly" : "monthly",
+            plan: selectedPlan,
+          }),
+        }
+      );
 
       if (!res.ok) {
         throw new Error(await res.text());
