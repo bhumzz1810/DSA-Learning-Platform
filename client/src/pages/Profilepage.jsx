@@ -184,6 +184,20 @@ const Profilepage = () => {
     <Brain className="w-8 h-8 text-rose-400" />,
   ];
 
+  const handleUsernameUpdate = (newUsername) => {
+    setDashboardData((prev) => ({
+      ...prev,
+      user: { ...prev.user, username: newUsername },
+    }));
+  };
+
+  const handlePhotoUpdate = (newPhotoUrl) => {
+    setDashboardData((prev) => ({
+      ...prev,
+      user: { ...prev.user, profileImage: newPhotoUrl },
+    }));
+  };
+
   const handleContinueLearning = () => navigate("/problems");
 
   if (loading) return <ProfileSkeleton themeClass={theme} />;
@@ -244,6 +258,8 @@ const Profilepage = () => {
         user={user}
         leaderboard={dashboardData.leaderboard}
         theme={theme}
+        onUsernameUpdate={handleUsernameUpdate}
+        onPhotoUpdate={handlePhotoUpdate} // ✅ Pass callback here
       />
 
       <div className="grid md:grid-cols-2 gap-8">

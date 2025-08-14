@@ -56,6 +56,8 @@ const userSchema = new mongoose.Schema({
 
   attemptedQuestionsCount: { type: Number, default: 0 },
   attemptedQuestionIds: { type: [String], default: [] },
+  profileImage: { type: String }, // Cloudinary secure_url
+  profileImagePublicId: { type: String }, // Cloudinary public_id
 
   quizScores: [
     {

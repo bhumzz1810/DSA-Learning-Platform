@@ -102,7 +102,7 @@ cron.schedule(
   { timezone: "America/Toronto" }
 );
 rotateDailyChallenge(); // once on boot
-
+app.use("/uploads", express.static("uploads"));
 // --- Routers ---
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/auth", require("./routes/authStatus"));
@@ -121,7 +121,7 @@ app.use("/api/quiz", require("./routes/quizRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/contact", require("./routes/contact"));
 app.use("/api/newsletter", require("./routes/newsletter"));
-
+app.use("/api/cloudinary", require("./routes/cloudinary"));
 // --- Socket.IO (make sure socketHandler CORS matches CLIENT_URL) ---
 setupSocketServer(server);
 

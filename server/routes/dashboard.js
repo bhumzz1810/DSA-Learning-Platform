@@ -126,6 +126,9 @@ router.get("/dashboard", authenticate, async (req, res) => {
         totalSolved: solved.length,
         recentSolved,
         quizAttempts: user.attemptedQuestionsCount || 0,
+        profileImage: user.profileImage || null, // ✅ add this
+        profileImagePublicId: user.profileImagePublicId || null, // optional
+        personalizedCategories: user.personalizedCategories || [],
       },
       leaderboard: {
         topUsers: leaderboard,
